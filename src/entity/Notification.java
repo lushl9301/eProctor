@@ -1,4 +1,4 @@
-public class Notification extends Conversation {
+public class Notification {
 
   private Time sendTime;
   private String messageId;
