@@ -1,48 +1,24 @@
 package entity;
 
-import java.awt.EventQueue;
-
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.JPasswordField;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.UIManager;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class LoginUI {
 
-	private JFrame frame;
+	JFrame frame;
 	private JTextField textFieldUsername;
 	private JPasswordField passwordField;
-
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-					LoginUI window = new LoginUI();
-					window.frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
-
-	/**
-	 * Create the application.
-	 */
+	
 	public LoginUI() {
 		initialize();
 	}
 
-	/**
-	 * Initialize the contents of the frame.
-	 */
 	private void initialize() {
 		frame = new JFrame();
 		frame.setResizable(false);
@@ -72,7 +48,14 @@ public class LoginUI {
 		passwordField.setBounds(100, 120, 150, 20);
 		frame.getContentPane().add(passwordField);
 		
-		JButton btnLogin = new JButton("Login");
+		final JButton btnLogin = new JButton("Login");
+		btnLogin.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				String str = new String();
+				str = "" + LoginControl.verifyUser();
+				btnLogin.setText(str);
+			}
+		});
 		btnLogin.setBounds(140, 192, 70, 23);
 		frame.getContentPane().add(btnLogin);
 		
