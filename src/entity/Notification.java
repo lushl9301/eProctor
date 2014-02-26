@@ -23,11 +23,11 @@ public class Notification extends Conversation {
     }
 
     public String getCourseCode() {
-        return this.courseId;
+        return this.courseCode;
     }
 
-    public void setCourseCode(String courseId) {
-        this.courseId = courseId;
+    public void setCourseCode(String courseCode) {
+        this.courseCode = courseCode;
     }
 
     public String getExamId() {

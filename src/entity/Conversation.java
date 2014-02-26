@@ -5,7 +5,7 @@ public class Conversation {
     private String receiverId;
     private ArrayList<String> messageIdList;
     private ArrayList<String> messageList;
-    private String courseId;
+    private String courseCode;
     private String conversationId;
     private String examId;
 
@@ -49,12 +49,12 @@ public class Conversation {
         this.messageList = messageList;
     }
 
-    public String getCourseId() {
-        return this.courseId;
+    public String getCourseCode() {
+        return this.courseCode;
     }
 
-    public void setCourseId(String courseId) {
-        this.courseId = courseId;
+    public void setCourseCode(String courseCode) {
+        this.courseCode = courseCode;
     }
 
     public String getConversationId() {
