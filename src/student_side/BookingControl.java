@@ -1,5 +1,6 @@
 class BookingSys {
 
+    private ArrayList<Course> registeredCourse;
     private ArrayList<Exam> comingExam;
     private Student currentStudent;
 
@@ -11,8 +12,10 @@ class BookingSys {
                 this.comingExam.add(e);
             }
         }
+        this.fetchRegisteredCourse();
     }
-
+//==========check coming exam======================
+//=================================================
     public void updateComingExam() {
         for (Exam e : this.comingExam) {
             if (e.timePassed()) {
@@ -26,7 +29,28 @@ class BookingSys {
         return this.comingExam;
     }
 
+//==========booking exam===========================
+//=================================================
 
-//    public ArrayList<Course> 
+    public void fetchRegisteredCourse(Student currentStudent) {
+        /*
+        fetch register course from server
+         */
+        this.registeredCourse = server.getRegisterdCourse(currentStudent);
+    }
+
+    public ArrayList<Exam> getCourseExam(Course selectedCourse) {
+        /*
+        get exam session from certain course
+         */
+        return selectedCourse.getExamList();
+    }
+
+    public boolean bookExam(Exam selectedExam) {
+        /*
+        register/book exam. update info to server
+         */
+        //return 
+    }
 
 }
