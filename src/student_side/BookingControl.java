@@ -4,7 +4,7 @@ class BookingSys {
     private Student currentStudent;
 
     public BookingSys() {
-        ArryaList<Exam> allExams = server.getBookedExams(currentStudent);
+        ArrayList<Exam> allExams = server.getBookedExams(currentStudent);
         this.comingExam = new ArrayList<Exam>();
         for (Exam e : allExams) {
             if (e.timePassed()) {
@@ -26,5 +26,7 @@ class BookingSys {
         return this.comingExam;
     }
 
+
+//    public ArrayList<Course> 
 
 }
