@@ -6,8 +6,14 @@ import javax.swing.JTextField;
 import javax.swing.JPasswordField;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.Color;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 public class LoginUI {
 
@@ -51,9 +57,16 @@ public class LoginUI {
 		final JButton btnLogin = new JButton("Login");
 		btnLogin.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				String str = new String();
-				str = "" + LoginControl.verifyUser();
-				btnLogin.setText(str);
+				try {
+					textFieldUsername.setText(LoginControl.getMD5(passwordField.getPassword()));
+				} catch (NoSuchAlgorithmException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}				
+				LoginControl.verifyUser();
+				//String str = new String();
+				//str = "" + LoginControl.verifyUser();
+				//btnLogin.setText(str);
 			}
 		});
 		btnLogin.setBounds(140, 192, 70, 23);
@@ -63,5 +76,10 @@ public class LoginUI {
 		JComboBox cbxDomain = new JComboBox(domainStrings);
 		cbxDomain.setBounds(100, 170, 150, 20);
 		frame.getContentPane().add(cbxDomain);
+		
+		JLabel lblErrormessage = new JLabel("");
+		lblErrormessage.setForeground(Color.RED);
+		lblErrormessage.setBounds(100, 230, 150, 14);
+		frame.getContentPane().add(lblErrormessage);
 	}
 }

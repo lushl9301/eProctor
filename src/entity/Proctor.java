@@ -1,13 +1,13 @@
 public class Proctor {
 
-  private String userName;
-  private String userPassword;
-  private ArrayList<String> courseId;
-  private ArrayList<String> examId;
-  private ArrayList<String> conversationId;
-  private String userId;
-  private ArrayList<String> cameraRecordingId;
-  private ArrayList<String> screenRecordingId;
+  private String userName = null;
+  private String userPassword = null;
+  private ArrayList<String> courseId = new ArrayList<String>();
+  private ArrayList<String> examId = new ArrayList<String>();
+  private ArrayList<String> conversationId = new ArrayList<String>();
+  private String userId = null;
+  private ArrayList<String> cameraRecordingId = new ArrayList<String>();
+  private ArrayList<String> screenRecordingId = new ArrayList<String>();
 
   public String getUserName() {
     return this.userName;
