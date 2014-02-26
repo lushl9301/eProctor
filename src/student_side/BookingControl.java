@@ -1,4 +1,4 @@
-class BookingSys {
+class BookingControl {
 
     private ArrayList<Course> registeredCourse;
     private ArrayList<Exam> comingExam;
@@ -14,6 +14,14 @@ class BookingSys {
         }
         this.fetchRegisteredCourse();
     }
+
+    public void fetchRegisteredCourse(Student currentStudent) {
+        /*
+        fetch registered course from server
+         */
+        this.registeredCourse = server.getRegisterdCourse(currentStudent);
+    }
+
 //==========check coming exam======================
 //=================================================
     public void updateComingExam() {
@@ -23,21 +31,15 @@ class BookingSys {
             }
         }
     }
-    
+
+    //same as current booking in UI windows
     public ArrayList<Exam> checkComingExam(Student currentStudent) {
         this.updateComingExam();
         return this.comingExam;
     }
 
-//==========booking exam===========================
+//==========book exam==============================
 //=================================================
-
-    public void fetchRegisteredCourse(Student currentStudent) {
-        /*
-        fetch register course from server
-         */
-        this.registeredCourse = server.getRegisterdCourse(currentStudent);
-    }
 
     public ArrayList<Exam> getCourseExam(Course selectedCourse) {
         /*
@@ -50,7 +52,7 @@ class BookingSys {
         /*
         register/book exam. update info to server
          */
-        //return 
+        return server.bookExam(currentStudent, selectedExam);
     }
 
 }
