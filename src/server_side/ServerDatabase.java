@@ -11,7 +11,13 @@ public class ServerDatabase {
     }
 
     public static boolean verifyUser(String userID, String md5, String domain) {
-        mongoClient = new MongoClient("localhost",27017);
+        try {
+            mongoClient = new MongoClient("localhost",27017);
+        } catch (UnknownHostException e) {
+            System.out.println("fail to connect to database");
+            return false;
+        }
+
         db = mongoClient.getDB("testJavaMongo");
         coll = db.getCollection("hhh");
 
