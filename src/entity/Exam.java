@@ -1,88 +1,92 @@
 public class Exam {
 
-  private Time startTime;
-  private Time endTime;
-  private ArrayList<String> proctorId;
-  private ArrayList<String> studentId;
-  private ArrayList<Integer> result;
-  private String courseCode;
-  private String examId;
-  private ArrayList<String> cameraRecordingId;
-  private ArrayList<String> screenRecordingId;
-  private String examAddress;
-  private ArrayList<String> conversationId;
-  private ArrayList<String> notificationId;
+  private Time startTime = null;
+  private Time endTime = null;
+  private ArrayList<String> proctorId = new ArrayList<String>();
+  private ArrayList<String> studentId = new ArrayList<String>();
+  private ArrayList<Integer> result = new ArrayList<Integer>();
+  private String courseCode = null;
+  private String examId = null;
+  private ArrayList<String> cameraRecordingId = new ArrayList<String>();
+  private ArrayList<String> screenRecordingId = new ArrayList<String>();
+  private String examAddress = null;
+  private ArrayList<String> conversationId = new ArrayList<String>();
+  private ArrayList<String> notificationId = new ArrayList<String>();
+
+  public Exam() {
+
+  }
 
   public ArrayList<String> getProctorId() {
-    return this.proctorId;
+      return this.proctorId;
   }
 
   public void setProctorId(ArrayList<String> proctorId) {
-    this.proctorId = proctorId;
+      this.proctorId = proctorId;
   }
 
   public ArrayList<String> getStudentId() {
-    return this.studentId;
+      return this.studentId;
   }
 
   public void setStudentId(ArrayList<String> studentId) {
-    this.studentId = studentId;
+      this.studentId = studentId;
   }
 
   public String getCourseCode() {
-    return this.courseCode;
+      return this.courseCode;
   }
 
   public void setCourseCode(String courseCode) {
-    this.courseCode = courseCode;
+      this.courseCode = courseCode;
   }
 
   public String getExamId() {
-    return this.examId;
+      return this.examId;
   }
 
   public void setExamId(String examId) {
-    this.examId = examId;
+      this.examId = examId;
   }
 
   public ArrayList<String> getCameraRecordingId() {
-    return this.cameraRecordingId;
+      return this.cameraRecordingId;
   }
 
   public void setCameraRecordingId(ArrayList<String> cameraRecordingId) {
-    this.cameraRecordingId = cameraRecordingId;
+      this.cameraRecordingId = cameraRecordingId;
   }
 
   public ArrayList<String> getScreenRecordingId() {
-    return this.screenRecordingId;
+      return this.screenRecordingId;
   }
 
   public void setScreenRecordingId(ArrayList<String> screenRecordingId) {
-    this.screenRecordingId = screenRecordingId;
+      this.screenRecordingId = screenRecordingId;
   }
 
   public String getExamAddress() {
-    return this.examAddress;
+      return this.examAddress;
   }
 
   public void setExamAddress(String examAddress) {
-    this.examAddress = examAddress;
+      this.examAddress = examAddress;
   }
 
   public ArrayList<String> getConversationId() {
-    return this.conversationId;
+      return this.conversationId;
   }
 
   public void setConversationId(ArrayList<String> conversationId) {
-    this.conversationId = conversationId;
+      this.conversationId = conversationId;
   }
 
   public ArrayList<String> getNotificationId() {
-    return this.notificationId;
+      return this.notificationId;
   }
 
   public void setNotificationId(ArrayList<String> notificationId) {
-    this.notificationId = notificationId;
+      this.notificationId = notificationId;
   }
 
 }
