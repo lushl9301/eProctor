@@ -4,6 +4,7 @@ public class Notification extends Conversation {
     private String notificationId;
     private String courseCode;
     private String examId;
+    private String message;
 
     public Time getSendTime() {
         return this.sendTime;
@@ -37,4 +38,11 @@ public class Notification extends Conversation {
         this.examId = examId;
     }
 
+    public String getMessage() {
+        return this. message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
 }
