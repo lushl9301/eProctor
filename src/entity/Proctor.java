@@ -1,76 +1,76 @@
 public class Proctor {
 
-  private String userName = null;
-  private String userPassword = null;
-  private ArrayList<String> courseId = new ArrayList<String>();
-  private ArrayList<String> examId = new ArrayList<String>();
-  private ArrayList<String> conversationId = new ArrayList<String>();
-  private String userId = null;
-  private ArrayList<String> cameraRecordingId = new ArrayList<String>();
-  private ArrayList<String> screenRecordingId = new ArrayList<String>();
+    private String userName;
+    private String userPassword;
+    private ArrayList<String> courseIdList;
+    private ArrayList<String> examIdList;
+    private ArrayList<String> conversationIdList;
+    private String userId;
+    private ArrayList<String> cameraRecordingIdList;
+    private ArrayList<String> screenRecordingIdList;
 
-  public String getUserName() {
-    return this.userName;
-  }
+    public String getUserName() {
+        return this.userName;
+    }
 
-  public void setUserName(String userName) {
-    this.userName = userName;
-  }
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
 
-  public String getUserPassword() {
-    return this.userPassword;
-  }
+    public String getUserPassword() {
+        return this.userPassword;
+    }
 
-  public void setUserPassword(String userPassword) {
-    this.userPassword = userPassword;
-  }
+    public void setUserPassword(String userPassword) {
+        this.userPassword = userPassword;
+    }
 
-  public ArrayList<String> getCourseId() {
-    return this.courseId;
-  }
+    public ArrayList<String> getCourseIdList() {
+        return this.courseIdList;
+    }
 
-  public void setCourseId(ArrayList<String> courseId) {
-    this.courseId = courseId;
-  }
+    public void setCourseIdList(ArrayList<String> courseIdList) {
+        this.courseIdList = courseIdList;
+    }
 
-  public ArrayList<String> getExamId() {
-    return this.examId;
-  }
+    public ArrayList<String> getExamIdList() {
+        return this.examIdList;
+    }
 
-  public void setExamId(ArrayList<String> examId) {
-    this.examId = examId;
-  }
+    public void setExamIdList(ArrayList<String> examIdList) {
+        this.examIdList = examIdList;
+    }
 
-  public ArrayList<String> getConversationId() {
-    return this.conversationId;
-  }
+    public ArrayList<String> getConversationIdList() {
+        return this.conversationIdList;
+    }
 
-  public void setConversationId(ArrayList<String> conversationId) {
-    this.conversationId = conversationId;
-  }
+    public void setConversationIdList(ArrayList<String> conversationIdList) {
+        this.conversationIdList = conversationIdList;
+    }
 
-  public String getUserId() {
-    return this.userId;
-  }
+    public String getUserId() {
+        return this.userId;
+    }
 
-  public void setUserId(String userId) {
-    this.userId = userId;
-  }
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
 
-  public ArrayList<String> getCameraRecordingId() {
-    return this.cameraRecordingId;
-  }
+    public ArrayList<String> getCameraRecordingIdList() {
+        return this.cameraRecordingIdList;
+    }
 
-  public void setCameraRecordingId(ArrayList<String> cameraRecordingId) {
-    this.cameraRecordingId = cameraRecordingId;
-  }
+    public void setCameraRecordingIdList(ArrayList<String> cameraRecordingIdList) {
+        this.cameraRecordingIdList = cameraRecordingIdList;
+    }
 
-  public ArrayList<String> getScreenRecordingId() {
-    return this.screenRecordingId;
-  }
+    public ArrayList<String> getScreenRecordingIdList() {
+        return this.screenRecordingIdList;
+    }
 
-  public void setScreenRecordingId(ArrayList<String> screenRecordingId) {
-    this.screenRecordingId = screenRecordingId;
-  }
+    public void setScreenRecordingIdList(ArrayList<String> screenRecordingIdList) {
+        this.screenRecordingIdList = screenRecordingIdList;
+    }
 
 }

@@ -1,49 +1,49 @@
 public class Course {
 
-  private String courseCode;
-  private String courseTitle;
-  private ArrayList<String> examId;
-  private ArrayList<String> studentId;
-  private ArrayList<Integer> result;
+    private String courseCode;
+    private String courseTitle;
+    private ArrayList<String> examIdList;
+    private ArrayList<String> studentIdList;
+    private ArrayList<Integer> resultList;
 
-  public String getCourseCode() {
-    return this.courseCode;
-  }
+    public String getCourseCode() {
+        return this.courseCode;
+    }
 
-  public void setCourseCode(String courseCode) {
-    this.courseCode = courseCode;
-  }
+    public void setCourseCode(String courseCode) {
+        this.courseCode = courseCode;
+    }
 
-  public String getCourseTitle() {
-    return this.courseTitle;
-  }
+    public String getCourseTitle() {
+        return this.courseTitle;
+    }
 
-  public void setCourseTitle(String courseTitle) {
-    this.courseTitle = courseTitle;
-  }
+    public void setCourseTitle(String courseTitle) {
+        this.courseTitle = courseTitle;
+    }
 
-  public ArrayList<String> getExamId() {
-    return this.examId;
-  }
+    public ArrayList<String> getExamIdList() {
+        return this.examIdList;
+    }
 
-  public void setExamId(ArrayList<String> examId) {
-    this.examId = examId;
-  }
+    public void setExamIdList(ArrayList<String> examIdList) {
+        this.examIdList = examIdList;
+    }
 
-  public ArrayList<String> getStudentId() {
-    return this.studentId;
-  }
+    public ArrayList<String> getStudentIdList() {
+        return this.studentIdList;
+    }
 
-  public void setStudentId(ArrayList<String> studentId) {
-    this.studentId = studentId;
-  }
+    public void setStudentIdList(ArrayList<String> studentIdList) {
+        this.studentIdList = studentIdList;
+    }
 
-  public ArrayList<Integer> getResult() {
-    return this.result;
-  }
+    public ArrayList<Integer> getResultList() {
+        return this.resultList;
+    }
 
-  public void setResult(ArrayList<Integer> result) {
-    this.result = result;
-  }
+    public void setResultList(ArrayList<Integer> resultList) {
+        this.resultList = resultList;
+    }
 
 }

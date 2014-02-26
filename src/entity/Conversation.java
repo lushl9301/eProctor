@@ -1,76 +1,76 @@
 public class Conversation {
 
-  private ArrayList<Time> sendTime;
-  private String senderId;
-  private String receiverId;
-  private ArrayList<String> messageId;
-  private ArrayList<String> message;
-  private String courseId;
-  private String conversationId;
-  private String examId;
+    private ArrayList<Time> sendTimeList;
+    private String senderId;
+    private String receiverId;
+    private ArrayList<String> messageIdList;
+    private ArrayList<String> messageList;
+    private String courseId;
+    private String conversationId;
+    private String examId;
 
-  public ArrayList<Time> getSendTime() {
-    return this.sendTime;
-  }
+    public ArrayList<Time> getSendTimeList() {
+        return this.sendTimeList;
+    }
 
-  public void setSendTime(ArrayList<Time> sendTime) {
-    this.sendTime = sendTime;
-  }
+    public void setSendTimeList(ArrayList<Time> sendTimeList) {
+        this.sendTimeList = sendTimeList;
+    }
 
-  public String getSenderId() {
-    return this.senderId;
-  }
+    public String getSenderId() {
+        return this.senderId;
+    }
 
-  public void setSenderId(String senderId) {
-    this.senderId = senderId;
-  }
+    public void setSenderId(String senderId) {
+        this.senderId = senderId;
+    }
 
-  public String getReceiverId() {
-    return this.receiverId;
-  }
+    public String getReceiverId() {
+        return this.receiverId;
+    }
 
-  public void setReceiverId(String receiverId) {
-    this.receiverId = receiverId;
-  }
+    public void setReceiverId(String receiverId) {
+        this.receiverId = receiverId;
+    }
 
-  public ArrayList<String> getMessageId() {
-    return this.messageId;
-  }
+    public ArrayList<String> getMessageIdList() {
+        return this.messageIdList;
+    }
 
-  public void setMessageId(ArrayList<String> messageId) {
-    this.messageId = messageId;
-  }
+    public void setMessageIdList(ArrayList<String> messageIdList) {
+        this.messageIdList = messageIdList;
+    }
 
-  public ArrayList<String> getMessage() {
-    return this.message;
-  }
+    public ArrayList<String> getMessageList() {
+        return this.messageList;
+    }
 
-  public void setMessage(ArrayList<String> message) {
-    this.message = message;
-  }
+    public void setMessageList(ArrayList<String> messageList) {
+        this.messageList = messageList;
+    }
 
-  public String getCourseId() {
-    return this.courseId;
-  }
+    public String getCourseId() {
+        return this.courseId;
+    }
 
-  public void setCourseId(String courseId) {
-    this.courseId = courseId;
-  }
+    public void setCourseId(String courseId) {
+        this.courseId = courseId;
+    }
 
-  public String getConversationId() {
-    return this.conversationId;
-  }
+    public String getConversationId() {
+        return this.conversationId;
+    }
 
-  public void setConversationId(String conversationId) {
-    this.conversationId = conversationId;
-  }
+    public void setConversationId(String conversationId) {
+        this.conversationId = conversationId;
+    }
 
-  public String getExamId() {
-    return this.examId;
-  }
+    public String getExamId() {
+        return this.examId;
+    }
 
-  public void setExamId(String examId) {
-    this.examId = examId;
-  }
+    public void setExamId(String examId) {
+        this.examId = examId;
+    }
 
 }
