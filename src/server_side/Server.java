@@ -43,7 +43,11 @@ public class Server {
 
 //==========RecordingDisplayControl================
 //=================================================
-
+    public Recording getRecording(Integer selectedRecordingID) {
+        /*
+        query here
+         */
+    }
 
 //==========MessageControl=========================
 //=================================================
