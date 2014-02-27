@@ -4,6 +4,19 @@ public class Server {
 
     }
 
+    public ArrayList<String> fetchData(String tableName, String key, ArrayList<String> query) {
+        /*
+        use socket to change this request to
+        "number of string" "table name" "key" "query1" "query2" ....
+         */
+        
+        /*
+        use socket to change this return
+        "number of returned string" "string1" "string2"...
+         */
+    }
+
+
 //==========LoginControl===========================
 //=================================================
     public boolean verifyUser(String userID, String md5, String domain) {
