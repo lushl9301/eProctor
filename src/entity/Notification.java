@@ -1,10 +1,10 @@
 public class Notification extends Conversation {
 
     private Time sendTime;
-    private String messageId;
     private String notificationId;
-    private String courseId;
+    private String courseCode;
     private String examId;
+    private String message;
 
     public Time getSendTime() {
         return this.sendTime;
@@ -12,14 +12,6 @@ public class Notification extends Conversation {
 
     public void setSendTime(Time sendTime) {
         this.sendTime = sendTime;
-    }
-
-    public String getMessageId() {
-        return this.messageId;
-    }
-
-    public void setMessageId(String messageId) {
-        this.messageId = messageId;
     }
 
     public String getNotificationId() {
@@ -30,12 +22,12 @@ public class Notification extends Conversation {
         this.notificationId = notificationId;
     }
 
-    public String getCourseId() {
-        return this.courseId;
+    public String getCourseCode() {
+        return this.courseCode;
     }
 
-    public void setCourseId(String courseId) {
-        this.courseId = courseId;
+    public void setCourseCode(String courseCode) {
+        this.courseCode = courseCode;
     }
 
     public String getExamId() {
@@ -46,4 +38,11 @@ public class Notification extends Conversation {
         this.examId = examId;
     }
 
+    public String getMessage() {
+        return this. message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
 }
