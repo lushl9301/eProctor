@@ -1,26 +1,34 @@
 class BookingControl {
 
     private ArrayList<Course> registeredCourse;
+    private ArrayList<Exam> bookedExam;
     private ArrayList<Exam> comingExam;
     private Student currentStudent;
 
     public BookingSys() {
-        ArrayList<Exam> allExams = server.getBookedExams(currentStudent);
+        this.fetchBookedExam();
+        this.fetchRegisteredCourse();
         this.comingExam = new ArrayList<Exam>();
-        for (Exam e : allExams) {
+        for (Exam e : bookedExams) {
             if (e.timePassed()) {
                 this.comingExam.add(e);
             }
         }
-        this.fetchRegisteredCourse();
     }
 
-    public void fetchRegisteredCourse(Student currentStudent) {
+    public void fetchBookedExam() {
+        /*
+        fetch booked exam from server
+         */
+        this.bookedExam = server.getBookedExam(this.currentStudent)
+    }
+    public void fetchRegisteredCourse() {
         /*
         fetch registered course from server
          */
-        this.registeredCourse = server.getRegisterdCourse(currentStudent);
+        this.registeredCourse = server.getRegisterdCourse(this.currentStudent);
     }
+
 
 //==========check coming exam======================
 //=================================================
