@@ -12,14 +12,31 @@ public class Server {
 
 //==========BookingControl=========================
 //=================================================
-
+    public ArrayList<Exam> getBookedExams(Student currentStudent) {
+        /*
+        query here
+         */
+    }
+    public ArrayList<Course> getRegisteredCourse(Student currentStudent) {
+        /*
+        query here
+         */
+    }
+    public boolean bookExam(Student currentStudent, Exam selectedExam) {
+        /*
+        query here
+         */
+    }
 
 //==========CheckExamResultControl=================
 //=================================================
+    //public ArrayList<Course> getRegisteredCourse()
 
 
 //==========ReviewControl==========================
 //=================================================
+
+
 
 //==========MessageControl=========================
 //=================================================
