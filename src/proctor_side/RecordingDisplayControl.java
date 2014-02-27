@@ -6,10 +6,16 @@ public class RecordingDisplayControl {
 
     }
 
-    public displayRecording(Integer selectedRecordingID) {
+    public void displayRecording(Integer selectedRecordingID) {
         this.fetchRecording(Integer selectedRecordingID);
         /*
         display selectedRecording to UI
+         */
+    }
+
+    public void displayRecording(Student selectedStudent) {
+        /*
+        display selected student recording during exam
          */
     }
 
@@ -19,6 +25,5 @@ public class RecordingDisplayControl {
          */
         this.selectedRecording = server.getRecording(selectedRecordingID);
     }
-
 
 }
