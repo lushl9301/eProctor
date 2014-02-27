@@ -12,7 +12,7 @@ public class Server {
 
 //==========BookingControl=========================
 //=================================================
-    public ArrayList<Exam> getBookedExams(Student currentStudent) {
+    public ArrayList<Exam> getBookedExam(Student currentStudent) {
         /*
         query here
          */
@@ -35,7 +35,14 @@ public class Server {
 
 //==========ReviewControl==========================
 //=================================================
+    public ArrayList<Exam> getInvigilatedExam(this.currentProctor) {
+        /*
+        query here
+         */
+    }
 
+//==========RecordingDisplayControl================
+//=================================================
 
 
 //==========MessageControl=========================
