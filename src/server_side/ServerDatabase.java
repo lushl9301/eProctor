@@ -43,4 +43,39 @@ public class ServerDatabase {
             return false;
         }
     }
+
+    public static boolean updateExam(Exam newExam) {
+        try {
+            mongoClient = new MongoClient("localhost",27017);
+        } catch (UnknownHostException e) {
+            System.out.println("fail to connect to database");
+            return false;
+        }
+
+        db = mongoClient.getDB("testJavaMongo");
+        coll = db.getCollection("examBasic");
+
+        try {
+            DBObject one = coll.findOne(new BasicDBObject("examId", newExam.examId));
+            mongoClient.close();
+
+            // System.out.println(one);
+            // System.out.println("passed");
+            
+            // ArrayList<String> queryResult = new ArrayList((BasicDBList) one.get("courseCode"));
+            // Iterator i = queryResult.iterator();
+            // while(i.hasNext())
+            //     System.out.println(i.next());
+
+            
+
+            if (one)
+                return false;
+            return true;
+        } catch (NullPointerException e) {
+            mongoClient.close();
+            System.out.println("denied");
+            return false;
+        }
+    }
 }
