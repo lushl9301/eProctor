@@ -4,7 +4,7 @@ public class Student {
     private String userPassword;
     private ArrayList<String> courseIdList;
     private ArrayList<String> examIdList;
-    private String userId;
+    private String realName;
     private ArrayList<String> cameraRecordingIdList;
     private ArrayList<String> screenRecordingIdList;
     private ArrayList<Integer> examResultList;
@@ -42,12 +42,12 @@ public class Student {
         this.examIdList = examIdList;
     }
 
-    public String getUserId() {
-        return this.userId;
+    public String getRealName() {
+        return this.realName;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setRealName(String userId) {
+        this.realName = realName;
     }
 
     public ArrayList<String> getCameraRecordingIdList() {

@@ -5,7 +5,7 @@ public class Proctor {
     private ArrayList<String> courseIdList;
     private ArrayList<String> examIdList;
     private ArrayList<String> conversationIdList;
-    private String userId;
+    private String realName;
     private ArrayList<String> cameraRecordingIdList;
     private ArrayList<String> screenRecordingIdList;
 
@@ -49,12 +49,12 @@ public class Proctor {
         this.conversationIdList = conversationIdList;
     }
 
-    public String getUserId() {
-        return this.userId;
+    public String getRealName() {
+        return this.realName;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setRealName(String userId) {
+        this.realName = realName;
     }
 
     public ArrayList<String> getCameraRecordingIdList() {
