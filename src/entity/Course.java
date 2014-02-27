@@ -4,7 +4,6 @@ public class Course {
     private String courseTitle;
     private ArrayList<String> examIdList;
     private ArrayList<String> studentIdList;
-    private ArrayList<Integer> resultList;
 
     public String getCourseCode() {
         return this.courseCode;

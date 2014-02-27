@@ -6,11 +6,14 @@ public class RecordingDisplayControl {
 
     }
 
-    public void displayRecording(Integer selectedRecordingID) {
-        this.fetchRecording(Integer selectedRecordingID);
+    public void displayRecordingList(Integer selectedRecordingID) {
+        ArrayList<String> query = new ArrayList<String>();
+        query.addAll(Arrays.asList(new String[] {"recordingID"}));
         /*
-        display selectedRecording to UI
+        display Recording list to UI
          */
+        //this.fetchRecording(Integer selectedRecordingID);
+        
     }
 
     public void displayRecording(Student selectedStudent) {
@@ -19,11 +22,11 @@ public class RecordingDisplayControl {
          */
     }
 
-    public void fetchRecording(Integer selectedRecordingID) {
-        /*
-        fetch selected recording from server according to it's ID
-         */
-        this.selectedRecording = server.getRecording(selectedRecordingID);
-    }
+//    public void fetchRecording(Integer selectedRecordingID) {
+//        /*
+//        fetch selected recording from server according to it's ID
+//         */
+//        this.selectedRecording = server.getRecording(selectedRecordingID);
+//    }
 
 }

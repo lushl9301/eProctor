@@ -40,5 +40,4 @@ class CheckExamResultControl {
         }
         return this.examResult;
     }
-
 }

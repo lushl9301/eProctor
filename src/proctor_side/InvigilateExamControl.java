@@ -2,9 +2,9 @@ public class InvigilateExamControl {
 
     private Time examTime;
     private Exam currentExam;
-    private ArrayList<Recording> studentRecordingList; 
+/*    private ArrayList<Recording> studentRecordingList; 
     private ArrayList<Student> invigilatedStudent;
-
+*/
     public InvigilateExamControl() {
 
     }
