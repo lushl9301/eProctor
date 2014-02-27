@@ -5,7 +5,7 @@ class BookingControl {
     private ArrayList<Exam> comingExam;
     private Student currentStudent;
 
-    public BookingSys() {
+    public BookingControl() {
         this.fetchBookedExam();
         this.fetchRegisteredCourse();
         this.comingExam = new ArrayList<Exam>();
