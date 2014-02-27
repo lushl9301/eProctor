@@ -53,29 +53,28 @@ public class ServerDatabase {
         }
 
         db = mongoClient.getDB("testJavaMongo");
-        coll = db.getCollection("examBasic");
+        coll = db.getCollection("exam");
 
         try {
-            DBObject one = coll.findOne(new BasicDBObject("examId", newExam.examId));
+            DBObject one = coll.update(new BasicDBObject("examId", newExam.examId));
             mongoClient.close();
 
-            // System.out.println(one);
-            // System.out.println("passed");
-            
-            // ArrayList<String> queryResult = new ArrayList((BasicDBList) one.get("courseCode"));
-            // Iterator i = queryResult.iterator();
-            // while(i.hasNext())
-            //     System.out.println(i.next());
+            coll.update(new BasicDBObject("examId", newExam.examId), 
+                        new BasicDBObject("$set", new BasicDBObject("courseCode", newExam.courseCode)
+                                                    .append("startTime", newExam.startTime)
+                                                    .append("endTime", newExam.endTime)
+                                                    .append("examAddress", newExam.examAddress)
+                                                    .append("proctorIdList", newExam.proctorIdList));
 
-            
-
-            if (one)
-                return false;
+            mongoClient.close();
+            System.out.println("success");
             return true;
         } catch (NullPointerException e) {
             mongoClient.close();
-            System.out.println("denied");
+            System.out.println("failed");
             return false;
         }
     }
+
+    
 }
