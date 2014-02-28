@@ -11,17 +11,17 @@ public class Client implements Runnable {
     private static PrintStream outToServer = null;
     //private static BufferedReader inFromControl = null;
     private static boolean closed = false;
-    private ArrayList<String> replyString;
+    private ArrayList<ArrayList<String>> replyString;
+    private int port = 3000;
+    private String host = "localhost";
+    private int numOfString;
 
-    public ArrayList<String> fetchData(String tableName, String key,
-                                       ArrayList<String> inFromControl) throws Exception {
-        int port = 3000;
-        String host = "localhost";
+    public ArrayList<ArrayList<String>> fetchData(String tableName, String key,
+                                                  ArrayList<String> inFromControl) throws Exception {
 
-        int numOfString = inFromControl.size();
+        numOfString = inFromControl.size();
         inFromControl.add(0, key);
         inFromControl.add(0, tableName);
-
 
         clientSocket = new Socket(host, port);
         inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
@@ -44,12 +44,17 @@ public class Client implements Runnable {
     public void run() {
         String reply;
         try {
-            int numOfReplyString = Integer.parseInt(inFromServer.readLine());
-            this.replyString = new ArrayList<String>();
-            while (numOfReplyString > 0) {
-                reply = inFromServer.readLine();
-                this.replyString.add(reply);
-                numOfReplyString--;
+            this.replyString = new ArrayList<ArrayList<String>>();
+            while (numOfString > 0) {
+                int currentLength = Integer.parseInt(inFromServer.readLine());
+                ArrayList<String> currentList = new ArrayList<String>();
+                while (currentLength > 0) {
+                    reply = inFromServer.readLine();
+                    currentList.add(reply);
+                    currentLength--;
+                }
+                replyString.add(currentList);
+                numOfString--;
             }
             closed = true;
             for (String s : replyString) {
