@@ -130,34 +130,34 @@ public class ServerDatabase {
     //     }
     // }
 
-    public static boolean verifyUser(String userID, String md5, String domain) {
-        try {
-            mongoClient = new MongoClient("localhost",27017);
-            db = mongoClient.getDB("testJavaMongo");
-            user = db.getCollection("user");
+    // public static boolean verifyUser(String userID, String md5, String domain) {
+    //     try {
+    //         mongoClient = new MongoClient("localhost",27017);
+    //         db = mongoClient.getDB("testJavaMongo");
+    //         user = db.getCollection("user");
 
-            if (!user.findOne(new BasicDBObject("userID", userID)
-                            .append("md5", md5)
-                            .append("domain", domain)))
-                return false;
-            return true;
-        } catch (Exception e) {
-            System.out.println("failed");
-            return false;
-        }
-    }
+    //         if (!user.findOne(new BasicDBObject("userID", userID)
+    //                         .append("md5", md5)
+    //                         .append("domain", domain)))
+    //             return false;
+    //         return true;
+    //     } catch (Exception e) {
+    //         System.out.println("failed");
+    //         return false;
+    //     }
+    // }
 
-    
-        try {
-            mongoClient = new MongoClient("localhost",27017);
-            db = mongoClient.getDB("testJavaMongo");
-            user = db.getCollection("user");
+
+    //     try {
+    //         mongoClient = new MongoClient("localhost",27017);
+    //         db = mongoClient.getDB("testJavaMongo");
+    //         user = db.getCollection("user");
 
             
 
-            return true;
-        } catch (Exception e) {
-            System.out.println("failed");
-            return false;
-        }
+    //         return true;
+    //     } catch (Exception e) {
+    //         System.out.println("failed");
+    //         return false;
+    //     }
 }
