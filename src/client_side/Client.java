@@ -1,5 +1,8 @@
+package client;
+
 import java.io.*;
 import java.net.*;
+import java.util.*;
 
 public class Client implements Runnable {
 
@@ -15,19 +18,23 @@ public class Client implements Runnable {
         int port = 3000;
         String host = "localhost";
 
-        int numOfString = 2 + query.size();
-        query.add(0, key);
-        query.add(0, tableName);
+        int numOfString = inFromControl.size();
+        inFromControl.add(0, key);
+        inFromControl.add(0, tableName);
 
 
         clientSocket = new Socket(host, port);
-        inFromServer = new BufferedReader(new InputStream(clientSocket.getInputStream()));
+        inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
         outToServer = new PrintStream(clientSocket.getOutputStream());
         
         if (clientSocket != null) {
             new Thread(new Client()).start();
+            outToServer.println(numOfString);
             for (String s : inFromControl) {
                 outToServer.println(s);
+            }
+            while (!closed) {
+                ;
             }
             clientSocket.close();
         }
@@ -45,21 +52,12 @@ public class Client implements Runnable {
                 numOfReplyString--;
             }
             closed = true;
+            for (String s : replyString) {
+                System.out.println(s);
+            }
         } catch (IOException e) {
             System.err.println(e);
         }
-    }
-
-
-    public ArrayList<String> fetchData(String tableName, String key, ArrayList<String> query) {
-        /*
-        use socket to change this request to
-        "number of string" "table name" "key" "query1" "query2" ....
-         */
-        /*
-        use socket to change this return
-        "number of returned string" "string1" "string2"...
-         */
     }
 
 /*
@@ -72,19 +70,10 @@ public class Client implements Runnable {
 //==========BookingControl=========================
 //=================================================
     public ArrayList<Exam> getBookedExam(Student currentStudent) {
-        /*
-        query here
-         */
     }
     public ArrayList<Course> getRegisteredCourse(Student currentStudent) {
-        /*
-        query here
-         */
     }
     public boolean bookExam(Student currentStudent, Exam selectedExam) {
-        /*
-        query here
-         */
     }
 
 //==========CheckExamResultControl=================
@@ -95,17 +84,11 @@ public class Client implements Runnable {
 //==========ReviewControl==========================
 //=================================================
     public ArrayList<Exam> getInvigilatedExam(this.currentProctor) {
-        /*
-        query here
-         */
     }
 
 //==========RecordingDisplayControl================
 //=================================================
     public Recording getRecording(Integer selectedRecordingID) {
-        /*
-        query here
-         */
     }
 
 //==========MessageControl=========================
@@ -123,6 +106,6 @@ public class Client implements Runnable {
 
 //==========TakeExamControl========================
 //=================================================
-
 */
+
 }

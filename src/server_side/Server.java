@@ -1,7 +1,10 @@
+package server;
+
 import java.io.*;
 import java.net.*;
+import java.util.*;
 
-public class MultiThreadChatServer {
+public class Server {
     private static ServerSocket welcomeSocket = null;
     private static Socket serverSocket = null;
     private static final int maxClientsCount = 10;
@@ -10,7 +13,7 @@ public class MultiThreadChatServer {
     public static void main(String[] args) throws Exception {
         int port = 3000;
         String host = "localhost";
-        
+        System.out.println("server started");        
         welcomeSocket = new ServerSocket(port);
         
         while (true) {
