@@ -25,14 +25,6 @@ public class ServerDatabase {
                                             .append("md5", "30e04e5dfa8b1f8b3d56"));
             mongoClient.close();
 
-            // System.out.println(one);
-            // System.out.println("passed");
-            
-            // ArrayList<String> queryResult = new ArrayList((BasicDBList) one.get("courseCode"));
-            // Iterator i = queryResult.iterator();
-            // while(i.hasNext())
-            //     System.out.println(i.next());
-
             if (!one)
                 return false;
             return true;
