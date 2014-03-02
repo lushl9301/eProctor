@@ -1,101 +1,95 @@
-package nnn;
-//http://www.dreamincode.net/forums/topic/259777-a-simple-chat-program-with-clientserver-gui-optional/
-import java.net.*;
 import java.io.*;
 import java.util.*;
 
-public class Client implements Runnable {
+import static com.googlecode.javacv.cpp.opencv_core.*;
 
-    private static ObjectInputStream sInput;       // to read from the socket
-    private static ObjectOutputStream sOutput;     // to write on the socket
-    private static Socket socket;
-    private static String server = "localhost";
-    private static int port = 3000;
+import java.awt.image.BufferedImage;
+import java.net.Socket;
+
+import javax.imageio.ImageIO;
+
+import com.googlecode.javacv.CanvasFrame;
+import com.googlecode.javacv.FrameGrabber;
+import com.googlecode.javacv.cpp.opencv_core.IplImage;
+
+public class Client {
+
+    private ObjectInputStream sInput;       // to read from the socket
+    private ObjectOutputStream sOutput;     // to write on the socket
+    private Socket socket;
+    private String server = "localhost";
     public static ArrayList<ArrayList<String>> receivedMsg = null;
 
-    public ArrayList<ArrayList<String>> fetchData(String tableName, String key,
-                                                  ArrayList<String> inFromControl) {
-
+    public ArrayList<ArrayList<String>> fetchData(int port, String tableName, String key, ArrayList<String> inFromControl) throws IOException {
         try {
             socket = new Socket(server, port);
-        } catch(Exception ec) {
-            display("Error connectiong to server:" + ec);
-            return null;
-        }
         
-        String info = "Connection accepted " + socket.getInetAddress() + ":" + socket.getPort();
-        display(info);
+            String info = "Connection accepted " + socket.getInetAddress() + ":" + socket.getPort();
+            System.out.println(info);
     
-        /* Creating both Data Stream */
-        try {
             sInput  = new ObjectInputStream(socket.getInputStream());
             sOutput = new ObjectOutputStream(socket.getOutputStream());
-        } catch (IOException eIO) {
-            display("Exception creating new Input/output Streams: " + eIO);
-            return null;
-        }
+            
+	        inFromControl.add(0, key);
+	        inFromControl.add(0, tableName);
+	        ArrayList<ArrayList<String>> msg = new ArrayList<ArrayList<String>>();
+	        msg.add(inFromControl);
+	        sOutput.writeObject(new ChatMessage(ChatMessage.MESSAGE, msg));
         
-
-        inFromControl.add(0, key);
-        inFromControl.add(0, tableName);
-        ArrayList<ArrayList<String>> msg = new ArrayList<ArrayList<String>>();
-        msg.add(inFromControl);
-        sendMessage(new ChatMessage(ChatMessage.MESSAGE, msg));
-        
-        new Thread(new Client()).run();
-        while (this.receivedMsg == null) {
-            ;
-        }
-        display(this.receivedMsg);
-        return this.receivedMsg;
-    }
-
-
-    private void display(String msg) {
-        System.out.println(msg);
-    }
-    private void display(ArrayList<ArrayList<String>> msg) {
-        for (ArrayList<String> s : msg) {
-            for (String a : s) {
-                System.out.println(a);
-            }
-        }
-    }
-    
-    /*
-     * To send a message to the server
-     */
-    public void sendMessage(ChatMessage msg) {
-        try {
-            sOutput.writeObject(msg);
-        } catch(IOException e) {
-            display("Exception writing to server: " + e);
-        }
-    }
-
-    public void disconnect() {
-        try { 
-            if(sInput != null) sInput.close();
-        } catch(Exception e) {} // not much else I can do
-        try {
-            if(sOutput != null) sOutput.close();
-        } catch(Exception e) {} // not much else I can do
-        try{
-            if(socket != null) socket.close();
-        } catch(Exception e) {} // not much else I can do
-    }
-    
-    public void run() {       
-        try {
-            receivedMsg = (ArrayList<ArrayList<String>>) sInput.readObject();
-            while (receivedMsg == null) {
-                ;
-            }
-        } catch(IOException e) {
-            display("Server has close the connection: " + e);
+            @SuppressWarnings("unchecked")
+            ArrayList<ArrayList<String>> readObject = (ArrayList<ArrayList<String>>) sInput.readObject();
+            receivedMsg = readObject;
         } catch (Exception e) {
-            ;
+        	e.printStackTrace();
         }
-        disconnect();
+        
+        sInput.close();
+        sOutput.close();
+        socket.close();
+        for (ArrayList<String> s : receivedMsg)
+            for (String a : s)
+                System.out.println(a);
+        return receivedMsg;
     }
+}
+
+class GrabberShow implements Runnable {
+    IplImage image;
+    CanvasFrame canvas = new CanvasFrame("Web Cam");
+    int port;
+    public GrabberShow(int port) {
+        canvas.setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE);
+        new Thread(this, "send image").start();
+        this.port = port;
+    }
+    
+    public void run() {
+    	FrameGrabber grabber = null;
+		try {
+			grabber = FrameGrabber.createDefault(0);
+		} catch (com.googlecode.javacv.FrameGrabber.Exception e1) {
+			e1.printStackTrace();
+		}
+        try {
+            grabber.start();
+            IplImage img;
+            BufferedImage buf;
+            while (true) {
+                img = grabber.grab();
+                buf = img.getBufferedImage();
+                if (img != null) {
+                    cvFlip(img, img, 1);// l-r = 90_degrees_steps_anti_clockwise
+                    canvas.showImage(img);
+                    send(buf);
+                }
+            }
+        } catch (Exception e) {
+        }
+   }
+    
+    public void send(BufferedImage buf) throws Exception {
+	    Socket socket = new Socket("localhost", port);
+	    ImageIO.write(buf, "JPG", socket.getOutputStream());
+	    socket.close();
+  }
 }
