@@ -1,95 +1,240 @@
-package server;
-
-public class Server {
-
+package nnn;
+//http://www.dreamincode.net/forums/topic/259777-a-simple-chat-program-with-clientserver-gui-optional/
 import java.io.*;
 import java.net.*;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class Server {
-    private static ServerSocket welcomeSocket = null;
-    private static Socket serverSocket = null;
-    private static final int maxClientsCount = 10;
-    private static final clientThread[] threads = new clientThread[maxClientsCount];
     
-    public static void main(String[] args) throws Exception {
-        int port = 3000;
-        String host = "localhost";
-        System.out.println("server started");        
-        welcomeSocket = new ServerSocket(port);
-        
-        while (true) {
-            serverSocket = welcomeSocket.accept();
-            int i;
-            for (i = 0; i < maxClientsCount; i++) {
-                if (threads[i] == null) {
-                    System.out.println("number " + i + " :");
-                    (threads[i] = new clientThread(serverSocket, threads)).start();
+    private static int uniqueId; // a unique ID for each connection
+    private ArrayList<ClientThread> al; // an ArrayList to keep the list of the Client
+    private SimpleDateFormat sdf; // to display time
+    private int port;
+    private boolean keepGoing;
+    
+
+    public Server(int port) {
+        this.port = port;
+        sdf = new SimpleDateFormat("HH:mm:ss");
+        al = new ArrayList<ClientThread>();
+    }
+    
+    /*
+     *  To run as a console application just open a console window and: 
+     * > java Server
+     * > java Server portNumber
+     * If the port number is not specified 3000 is used
+     */ 
+    public static void main(String[] args) {
+        int portNumber = 3000;
+        switch(args.length) {
+            case 1:
+                try {
+                    portNumber = Integer.parseInt(args[0]);
+                }
+                catch(Exception e) {
+                    System.out.println("Invalid port number.");
+                    System.out.println("Usage is: > java Server [portNumber]");
+                    return;
+                }
+            case 0:
+                break;
+            default:
+                System.out.println("Usage is: > java Server [portNumber]");
+                return;
+                
+        }
+
+        Server server = new Server(portNumber);
+        server.start();
+    }
+
+    public void start() {
+        keepGoing = true;
+
+        try {
+            ServerSocket serverSocket = new ServerSocket(port);
+
+            while(keepGoing) 
+            {
+                display("Server waiting for Clients on port " + port + ".");
+                
+                Socket socket = serverSocket.accept();
+
+                if(!keepGoing)
                     break;
+                ClientThread t = new ClientThread(socket);
+                al.add(t); //add to thread ArrayList
+                t.start();
+            }
+            //stop
+            try {
+                serverSocket.close();
+                for(int i = 0; i < al.size(); ++i) {
+                    ClientThread tc = al.get(i);
+                    try {
+                        tc.sInput.close();
+                        tc.sOutput.close();
+                        tc.socket.close();
+                    } catch(IOException ioE) {
+                        ;
+                    }
                 }
             }
-            if (i >= maxClientsCount) {
-                PrintStream outToClient = new PrintStream(serverSocket.getOutputStream());
-                outToClient.println("Server too busy. Try later.");
-                outToClient.close();
-                serverSocket.close();
+            catch(Exception e) {
+                display("Exception closing the server and clients: " + e);
+            }
+        }
+
+        catch (IOException e) {
+            String msg = sdf.format(new Date()) + " Exception on ServerSocket: " + e + "\n";
+            display(msg);
+        }
+    }       
+
+    //GUI can stop server --maybe
+    protected void stop() {
+        keepGoing = false;
+        // connect to myself as Client to exit statement 
+        // Socket socket = serverSocket.accept();
+        try {
+            new Socket("localhost", port);
+        } catch(Exception e) {
+            // nothing I can really do
+        }
+    }
+
+    private void display(String msg) {
+        String time = sdf.format(new Date()) + " " + msg;
+        System.out.println(time);
+    }
+    private void display(ArrayList<ArrayList<String>> msg) {
+        this.display("");
+        for (ArrayList<String> s : msg) {
+            for (String a : s) {
+                System.out.println(a);
             }
         }
     }
-}
 
-class clientThread extends Thread {
-    private BufferedReader inFromClient = null;
-    private PrintStream outToClient = null;
-    private Socket serverSocket = null;
-    private final clientThread[] threads;
-    private int maxClientsCount;
-    private String name;
-    
-    
-    public clientThread(Socket serverSocket, clientThread[] threads) {
-        this.serverSocket = serverSocket;
-        this.threads = threads;
-        this.maxClientsCount = threads.length;
+    /*
+     *  to broadcast a message to all Clients
+     */
+    /*private synchronized void broadcast(String message) {
+        // add HH:mm:ss and \n to the message
+        String time = sdf.format(new Date());
+        String messageLf = time + " " + message + "\n";
+        System.out.print(messageLf);
+        
+        // we loop in reverse order in case we would have to remove a Client
+        // because it has disconnected
+        for(int i = al.size(); --i >= 0;) {
+            ClientThread ct = al.get(i);
+            // try to write to the Client if it fails remove it from the list
+            if(!ct.writeMsg(messageLf)) {
+                al.remove(i);
+                display("Disconnected Client " + ct.id + " removed from list.");
+            }
+        }
+    }*/
+
+
+    //received cm and write back msg already    
+    synchronized void remove(int id) {
+        for(int i = 0; i < al.size(); ++i) {
+            ClientThread ct = al.get(i);
+            if(ct.id == id) {
+                al.remove(i);
+                return;
+            }
+        }
     }
-    
-    public void run() {
-        int maxClientsCount = this.maxClientsCount;
-        clientThread[] threads = this.threads;
-        int numOfQueryString;
 
-        try {
-            inFromClient = new BufferedReader(new InputStreamReader(serverSocket.getInputStream()));
-            outToClient = new PrintStream(serverSocket.getOutputStream());
 
-            numOfQueryString = Integer.parseInt(inFromClient.readLine());
+    /** One instance of this thread will run for each client */
+    class ClientThread extends Thread {
+        Socket socket;
+        ObjectInputStream sInput;
+        ObjectOutputStream sOutput;
 
-            System.out.println("length of query: " + numOfQueryString);
-            String tableName = inFromClient.readLine();
-            String key = inFromClient.readLine();
-            ArrayList<String> query = new ArrayList<String>();
-            while (numOfQueryString > 0) {
-                String line = inFromClient.readLine();
-                query.add(line);
-                System.out.println(line);
-                numOfQueryString--;
+        int id;
+        ChatMessage cm;
+        // the date I connect
+        String date;
+
+        ClientThread(Socket socket) {
+            id = ++uniqueId;
+            this.socket = socket;
+            System.out.println("Thread trying to create Object Input/Output Streams");
+            try {
+                sOutput = new ObjectOutputStream(socket.getOutputStream());
+                sInput  = new ObjectInputStream(socket.getInputStream());
+                display(id + " just connected.");
+            } catch (IOException e) {
+                display("Exception creating new Input/output Streams: " + e);
+                return;
             }
-            /*
-            query to data base
-            (String tableName, String key, ArrayList<String> query) 
-             */
-            ArrayList<String> replyString = new ArrayList<String>();
-            replyString.add("2");
-            replyString.add("success1");
-            replyString.add("success2");
-            synchronized(this) {
-                for (String s : replyString) {
-                outToClient.println(s);
-               }
+
+            date = new Date().toString() + "\n";
+        }
+
+        //run forever
+        public void run() {
+            try {
+                cm = (ChatMessage) sInput.readObject();
+            } catch (IOException e) {
+                display(id + " Exception reading Streams: " + e);           
+            } catch(ClassNotFoundException e2) {
             }
-            serverSocket.close();
-        } catch (IOException e) {
-            System.err.println(e);
+            // the messaage part of the ChatMessage
+            ArrayList<ArrayList<String>> message = cm.getMessage();
+            display(message);
+            
+            ArrayList<ArrayList<String>> replyMsg = new ArrayList<ArrayList<String>>();
+            ArrayList<String> s = new ArrayList<String>();
+            s.add("1"); s.add("2");
+            replyMsg.add(s);
+            ArrayList<String> b = new ArrayList<String>();
+            s.add("3"); s.add("4");
+            replyMsg.add(b);
+            writeMsg(replyMsg);
+            //broadcast(id + ": " + message);
+            
+            // remove myself from the arrayList containing the list of the
+            // connected Clients
+            remove(id);
+            close();
+        }
+        
+        private void close() {
+            try {
+                if(sOutput != null) sOutput.close();
+            }
+            catch(Exception e) {}
+            try {
+                if(sInput != null) sInput.close();
+            }
+            catch(Exception e) {};
+            try {
+                if(socket != null) socket.close();
+            }
+            catch (Exception e) {}
+        }
+
+        private boolean writeMsg(ArrayList<ArrayList<String>> msg) {
+            if(!socket.isConnected()) {
+                close();
+                return false;
+            }
+
+            try {
+                sOutput.writeObject(msg);
+            } catch(IOException e) {
+                display("Error sending message to " + id);
+                display(e.toString());
+            }
+            return true;
         }
     }
 

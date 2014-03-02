@@ -1,63 +1,101 @@
-package client;
-
-import java.io.*;
+package nnn;
+//http://www.dreamincode.net/forums/topic/259777-a-simple-chat-program-with-clientserver-gui-optional/
 import java.net.*;
+import java.io.*;
 import java.util.*;
 
 public class Client implements Runnable {
 
-    private static Socket clientSocket = null;
-    private static BufferedReader inFromServer = null;
-    private static PrintStream outToServer = null;
-    //private static BufferedReader inFromControl = null;
-    private static boolean closed = false;
-    private ArrayList<String> replyString;
+    private static ObjectInputStream sInput;       // to read from the socket
+    private static ObjectOutputStream sOutput;     // to write on the socket
+    private static Socket socket;
+    private static String server = "localhost";
+    private static int port = 3000;
+    public static ArrayList<ArrayList<String>> receivedMsg = null;
 
-    public ArrayList<String> fetchData(String tableName, String key,
-                                       ArrayList<String> inFromControl) throws Exception {
-        int port = 3000;
-        String host = "localhost";
+    public ArrayList<ArrayList<String>> fetchData(String tableName, String key,
+                                                  ArrayList<String> inFromControl) {
 
-        int numOfString = inFromControl.size();
+        try {
+            socket = new Socket(server, port);
+        } catch(Exception ec) {
+            display("Error connectiong to server:" + ec);
+            return null;
+        }
+        
+        String info = "Connection accepted " + socket.getInetAddress() + ":" + socket.getPort();
+        display(info);
+    
+        /* Creating both Data Stream */
+        try {
+            sInput  = new ObjectInputStream(socket.getInputStream());
+            sOutput = new ObjectOutputStream(socket.getOutputStream());
+        } catch (IOException eIO) {
+            display("Exception creating new Input/output Streams: " + eIO);
+            return null;
+        }
+        
+
         inFromControl.add(0, key);
         inFromControl.add(0, tableName);
-
-
-        clientSocket = new Socket(host, port);
-        inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-        outToServer = new PrintStream(clientSocket.getOutputStream());
+        ArrayList<ArrayList<String>> msg = new ArrayList<ArrayList<String>>();
+        msg.add(inFromControl);
+        sendMessage(new ChatMessage(ChatMessage.MESSAGE, msg));
         
-        if (clientSocket != null) {
-            new Thread(new Client()).start();
-            outToServer.println(numOfString);
-            for (String s : inFromControl) {
-                outToServer.println(s);
+        new Thread(new Client()).run();
+        while (this.receivedMsg == null) {
+            ;
+        }
+        display(this.receivedMsg);
+        return this.receivedMsg;
+    }
+
+
+    private void display(String msg) {
+        System.out.println(msg);
+    }
+    private void display(ArrayList<ArrayList<String>> msg) {
+        for (ArrayList<String> s : msg) {
+            for (String a : s) {
+                System.out.println(a);
             }
-            while (!closed) {
+        }
+    }
+    
+    /*
+     * To send a message to the server
+     */
+    public void sendMessage(ChatMessage msg) {
+        try {
+            sOutput.writeObject(msg);
+        } catch(IOException e) {
+            display("Exception writing to server: " + e);
+        }
+    }
+
+    public void disconnect() {
+        try { 
+            if(sInput != null) sInput.close();
+        } catch(Exception e) {} // not much else I can do
+        try {
+            if(sOutput != null) sOutput.close();
+        } catch(Exception e) {} // not much else I can do
+        try{
+            if(socket != null) socket.close();
+        } catch(Exception e) {} // not much else I can do
+    }
+    
+    public void run() {       
+        try {
+            receivedMsg = (ArrayList<ArrayList<String>>) sInput.readObject();
+            while (receivedMsg == null) {
                 ;
             }
-            clientSocket.close();
+        } catch(IOException e) {
+            display("Server has close the connection: " + e);
+        } catch (Exception e) {
+            ;
         }
-        return this.replyString;
+        disconnect();
     }
-
-    public void run() {
-        String reply;
-        try {
-            int numOfReplyString = Integer.parseInt(inFromServer.readLine());
-            this.replyString = new ArrayList<String>();
-            while (numOfReplyString > 0) {
-                reply = inFromServer.readLine();
-                this.replyString.add(reply);
-                numOfReplyString--;
-            }
-            closed = true;
-            for (String s : replyString) {
-                System.out.println(s);
-            }
-        } catch (IOException e) {
-            System.err.println(e);
-        }
-    }
-
 }
