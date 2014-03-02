@@ -10,30 +10,30 @@ public class ServerDatabase {
 
     }
 
-    public static boolean verifyUser(String userID, String md5, String domain) {
-        try {
-            mongoClient = new MongoClient("localhost",27017);
-            db = mongoClient.getDB("testJavaMongo");
-            coll = db.getCollection("hhh");
-        } catch (UnknownHostException e) {
-            System.out.println("fail to connect to database");
-            return false;
-        }
+    // public static boolean verifyUser(String userID, String md5, String domain) {
+    //     try {
+    //         mongoClient = new MongoClient("localhost",27017);
+    //         db = mongoClient.getDB("testJavaMongo");
+    //         coll = db.getCollection("hhh");
+    //     } catch (UnknownHostException e) {
+    //         System.out.println("fail to connect to database");
+    //         return false;
+    //     }
 
-        try {
-            DBObject one = coll.findOne(new BasicDBObject("username", "gongy0000")
-                                            .append("md5", "30e04e5dfa8b1f8b3d56"));
-            mongoClient.close();
+    //     try {
+    //         DBObject one = coll.findOne(new BasicDBObject("username", "gongy0000")
+    //                                         .append("md5", "30e04e5dfa8b1f8b3d56"));
+    //         mongoClient.close();
 
-            if (!one)
-                return false;
-            return true;
-        } catch (NullPointerException e) {
-            mongoClient.close();
-            System.out.println("denied");
-            return false;
-        }
-    }
+    //         if (!one)
+    //             return false;
+    //         return true;
+    //     } catch (NullPointerException e) {
+    //         mongoClient.close();
+    //         System.out.println("denied");
+    //         return false;
+    //     }
+    // }
     // public static boolean updateExam(Exam newExam) {
     //     try {
     //         mongoClient = new MongoClient("localhost",27017);
@@ -147,17 +147,132 @@ public class ServerDatabase {
     //     }
     // }
 
+    // the method for query, need query helper123
+    public String query(String fieldName, String key, ArrayList<String> want) {
+        MongoClient mongoClient = new MongoClient("localhost",27017);
+        DB db = mongoClient.getDB("testJavaMongo");
+        DBCollection user = db.getCollection("user");
+        DBCollection examBasic = db.getCollection("examBasic");
+        DBCollection examRecords = db.getCollection("examRecords");
 
-    //     try {
-    //         mongoClient = new MongoClient("localhost",27017);
-    //         db = mongoClient.getDB("testJavaMongo");
-    //         user = db.getCollection("user");
+        String result = query("fieldName", "key", want, user, examBasic, examRecords);
+        mongoClient.close();
+        return result;
+    }
 
+    // query helper1
+    public String query(String fieldName, String key, ArrayList<String> wantList, DBCollection user, DBCollection examBasic, DBCollection examRecords) throws UnknownHostException {
+        ArrayList<String> userCollection = new ArrayList<String>();
+                            userCollection.add("username");
+                            userCollection.add("md5");
+                            userCollection.add("realname");
+                            userCollection.add("domain");
+                            userCollection.add("coursecode");
+                            userCollection.add("coursetitle");
+                            userCollection.add("examid");
+        ArrayList<String> examBasicCollection = new ArrayList<String>();
+                            examBasicCollection.add("examid");
+                            examBasicCollection.add("starttime");
+                            examBasicCollection.add("endtime");
+                            examBasicCollection.add("coursecode");
+                            examBasicCollection.add("examaddress");
+        ArrayList<String> examRecordsCollection = new ArrayList<String>();
+                            examRecordsCollection.add("examid");
+                            examRecordsCollection.add("username");
+                            examRecordsCollection.add("result");
+                            examRecordsCollection.add("cameraid");
+                            examRecordsCollection.add("screenid");
+                            examRecordsCollection.add("conversationid");
+
+        DBCollection coll1;
+        DBCollection coll2;
+        String queryResult = "";
+        
+        Iterator<String> i = wantList.iterator();
+        while (i.hasNext()) {
+            String want = i.next();
             
+            coll1 = examRecords;
+            if (userCollection.contains(fieldName)) {
+                coll1 = user;
+            } else if (examBasicCollection.contains(fieldName)) {
+                coll1 = examBasic;
+            }
+            
+            coll2 = examRecords;
+            if (userCollection.contains(want)) {
+                coll2 = user;
+            } else if (examBasicCollection.contains(want)) {
+                coll2 = examBasic;
+            }
+            queryResult += query(fieldName, key, want, coll1, coll2);
+        }
+        
+        queryResult += "#";
+        return queryResult;
+    }
 
-    //         return true;
-    //     } catch (Exception e) {
-    //         System.out.println("failed");
-    //         return false;
-    //     }
+    // query helper2
+    public static HashSet<String> query(String one, String key, String two, DBCollection coll) {
+        HashSet<String> filter = new HashSet<String>();
+        
+        BasicDBObject queryfield = new BasicDBObject(one, key);
+        BasicDBObject wantfield = new BasicDBObject(two, 1);
+        
+        DBCursor cursor = coll.find(queryfield, wantfield);
+
+        while (cursor.hasNext()) {
+            String temp = (String) cursor.next().get(two);
+            filter.add(temp);
+        }
+        return filter;
+    }
+
+    // convert hashset to string
+    public static String toto(HashSet<String> xxx) {
+        Iterator<String> iter = xxx.iterator();
+        String temp = "";
+        while (iter.hasNext()) {
+            temp += "#" + iter.next();
+        }
+        return temp;
+    }
+
+    // query helper3
+    public static String query(String one, String key, String two, DBCollection coll1, DBCollection coll2) {
+        HashMap<String, String> userMap = new HashMap<String, String>();
+            userMap.put("examBasic", "examid");
+            userMap.put("examRecords", "username");
+            userMap.put("user", "username");
+        HashMap<String, String> examBasicMap = new HashMap<String, String>();
+            examBasicMap.put("user", "username");
+            examBasicMap.put("examRecords", "examid");
+            examBasicMap.put("examBasic", "examid");
+        HashMap<String, String> examRecordsMap = new HashMap<String, String>();
+            examRecordsMap.put("examBasic", "examid");
+            examRecordsMap.put("user", "username");
+            examRecordsMap.put("examRecords", "examid");
+            
+        String link;
+        if (coll1.getName().equals("user")) {
+            link = userMap.get(coll2.getName());
+        } else if (coll1.getName().equals("examBasic")) {
+            link = examBasicMap.get(coll2.getName());
+        } else {
+            link = examRecordsMap.get(coll2.getName());
+        }
+        
+        HashSet<String> bigFilter = new HashSet<String>();
+        
+        HashSet<String> firstResult = query(one, key, link, coll1);
+        HashSet<String> secondResult;
+        Iterator<String> iter = firstResult.iterator();
+        while (iter.hasNext()) {
+            String temp = iter.next();
+            secondResult = query(link, temp, two, coll2);
+            bigFilter.addAll(secondResult);
+        }
+
+        return "#" + bigFilter.size() + toto(bigFilter);
+    }
 }
