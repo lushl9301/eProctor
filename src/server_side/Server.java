@@ -8,8 +8,5 @@ public class Server {
     	new QueryServerThread(port1);
         new VideoServerThread(port2);
     }
-
-    public void query(String fieldName, String key, ArrayList<String> want) {
-
-    }
+    
 }
