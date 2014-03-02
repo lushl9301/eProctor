@@ -92,4 +92,8 @@ class clientThread extends Thread {
             System.err.println(e);
         }
     }
+
+    public void query(String fieldName, String key, ArrayList<String> want) {
+
+    }
 }

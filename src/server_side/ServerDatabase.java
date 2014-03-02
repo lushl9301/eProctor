@@ -10,30 +10,30 @@ public class ServerDatabase {
 
     }
 
-    public static boolean verifyUser(String userID, String md5, String domain) {
-        try {
-            mongoClient = new MongoClient("localhost",27017);
-            db = mongoClient.getDB("testJavaMongo");
-            coll = db.getCollection("hhh");
-        } catch (UnknownHostException e) {
-            System.out.println("fail to connect to database");
-            return false;
-        }
+    // public static boolean verifyUser(String userID, String md5, String domain) {
+    //     try {
+    //         mongoClient = new MongoClient("localhost",27017);
+    //         db = mongoClient.getDB("testJavaMongo");
+    //         coll = db.getCollection("hhh");
+    //     } catch (UnknownHostException e) {
+    //         System.out.println("fail to connect to database");
+    //         return false;
+    //     }
 
-        try {
-            DBObject one = coll.findOne(new BasicDBObject("username", "gongy0000")
-                                            .append("md5", "30e04e5dfa8b1f8b3d56"));
-            mongoClient.close();
+    //     try {
+    //         DBObject one = coll.findOne(new BasicDBObject("username", "gongy0000")
+    //                                         .append("md5", "30e04e5dfa8b1f8b3d56"));
+    //         mongoClient.close();
 
-            if (!one)
-                return false;
-            return true;
-        } catch (NullPointerException e) {
-            mongoClient.close();
-            System.out.println("denied");
-            return false;
-        }
-    }
+    //         if (!one)
+    //             return false;
+    //         return true;
+    //     } catch (NullPointerException e) {
+    //         mongoClient.close();
+    //         System.out.println("denied");
+    //         return false;
+    //     }
+    // }
     // public static boolean updateExam(Exam newExam) {
     //     try {
     //         mongoClient = new MongoClient("localhost",27017);
@@ -103,61 +103,67 @@ public class ServerDatabase {
     //         return null;
     //     }
     // }
-    // public ArrayList<Course> getRegisteredCourse(Student currentStudent) {
-    //     try {
-    //         mongoClient = new MongoClient("localhost",27017);
-    //         db = mongoClient.getDB("testJavaMongo");
-    //         coll = db.getCollection("hhh");
-    //     } catch (UnknownHostException e) {
-    //         System.out.println("fail to connect to database");
-    //         return false;
-    //     }
+    public ArrayList<Course> getRegisteredCourse(Student currentStudent) {
+        try {
+            mongoClient = new MongoClient("localhost",27017);
+            db = mongoClient.getDB("testJavaMongo");
+            coll = db.getCollection("hhh");
+        } catch (UnknownHostException e) {
+            System.out.println("fail to connect to database");
+            return false;
+        }
 
-    //     try {
-    //         DBObject one = coll.findOne(new BasicDBObject("username", "gongy0000"),
-    //                                     new BasicDBObject("courseCode", 1));
-    //         mongoClient.close();
+        try {
+            DBObject one = coll.findOne(new BasicDBObject("username", "gongy0000"),
+                                        new BasicDBObject("courseCode", 1));
+            mongoClient.close();
 
-    //         if (!one)
-    //             return null;
+            if (!one)
+                return null;
 
-    //         ArrayList<String> registeredCourse = (ArrayList)(BasicDBList)one.get("courseCode");
-    //         return registeredCourse;
-    //     } catch (NullPointerException e) {
-    //         mongoClient.close();
-    //         System.out.println("denied");
-    //         return null;
-    //     }
-    // }
+            ArrayList<String> registeredCourse = (ArrayList)(BasicDBList)one.get("courseCode");
+            return registeredCourse;
+        } catch (NullPointerException e) {
+            mongoClient.close();
+            System.out.println("denied");
+            return null;
+        }
+    }
 
-    // public static boolean verifyUser(String userID, String md5, String domain) {
-    //     try {
-    //         mongoClient = new MongoClient("localhost",27017);
-    //         db = mongoClient.getDB("testJavaMongo");
-    //         user = db.getCollection("user");
+    public static boolean verifyUser(String userID, String md5, String domain) {
+        // try {
+            mongoClient = new MongoClient("localhost",27017);
+            db = mongoClient.getDB("testJavaMongo");
+            user = db.getCollection("user");
 
-    //         if (!user.findOne(new BasicDBObject("userID", userID)
-    //                         .append("md5", md5)
-    //                         .append("domain", domain)))
-    //             return false;
-    //         return true;
-    //     } catch (Exception e) {
-    //         System.out.println("failed");
-    //         return false;
-    //     }
-    // }
+            if (!user.findOne(new BasicDBObject("userID", userID)
+                            .append("md5", md5)
+                            .append("domain", domain)))
+                return false;
+            return true;
+        // } catch (Exception e) {
+        //     System.out.println("failed");
+        //     return false;
+        // }
+    }
 
-
-    //     try {
-    //         mongoClient = new MongoClient("localhost",27017);
-    //         db = mongoClient.getDB("testJavaMongo");
-    //         user = db.getCollection("user");
-
+        // try {
+        //     mongoClient = new MongoClient("localhost",27017);
+        //     db = mongoClient.getDB("testJavaMongo");
+        //     user = db.getCollection("user");
             
+        //     return true;
+        // } catch (Exception e) {
+        //     System.out.println("failed");
+        //     return false;
+        // }
 
-    //         return true;
-    //     } catch (Exception e) {
-    //         System.out.println("failed");
-    //         return false;
-    //     }
+
+    public void query(String fieldName, String key, ArrayList<String> want) {
+        ArrayList<String> userCollection = new ArrayList().add("Username").add("Md5").add("RealName").add("Domain").add("CourseCode").add("CourseTitle");
+        ArrayList<String> examBasicCollection = new ArrayList().add("ExamId").add("StartTime").add("EndTime").add("CourseCode").add("Proctor").add("ExamAddress");
+        ArrayList<String> examRecordCollection = new ArrayList().add("ExamId").add("StudentId").add("Grade").add("CameraRecordingId").add("ScreenRecordingId").add("ConversationId");
+
+        if (fieldName)
+    }
 }
