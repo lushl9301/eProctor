@@ -12,7 +12,6 @@ public class Main {
 	public static LoginUI loginUI;
 	public static student_side.StudentHomeUI studentHomeUI;
 	public static student_side.StudentHomeController studentHomeController;
-	public static student_side.StudentSideController studentSideController;
 
 	public static void main(String[] args) throws ClassNotFoundException,
 			InstantiationException, IllegalAccessException,
