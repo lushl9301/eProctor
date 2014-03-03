@@ -1,3 +1,5 @@
+package client_side;
+
 import java.io.*;
 import java.util.*;
 
@@ -20,6 +22,9 @@ public class Client {
     private String server = "localhost";
     public static ArrayList<ArrayList<String>> receivedMsg = null;
 
+    public boolean verifyUser(String username, String mD5Password, String domain) {
+        return true;
+    }
     public ArrayList<ArrayList<String>> fetchData(int port, String tableName, String key, ArrayList<String> inFromControl) throws IOException {
         try {
             socket = new Socket(server, port);
@@ -51,6 +56,7 @@ public class Client {
                 System.out.println(a);
         return receivedMsg;
     }
+
 }
 
 class GrabberShow implements Runnable {

@@ -5,10 +5,13 @@ import java.awt.Font;
 import javax.swing.*;
 
 public class Main {
-	public static server_side.Server server;
+	
+	//public static server_side.Server server;
+	public static client_side.Client client;
 	public static LoginController loginController;
 	public static LoginUI loginUI;
 	public static student_side.StudentHomeUI studentHomeUI;
+	public static student_side.StudentHomeController studentHomeController;
 	public static student_side.StudentSideController studentSideController;
 
 	public static void main(String[] args) throws ClassNotFoundException,
@@ -23,7 +26,8 @@ public class Main {
 		loginController = new LoginController();
 		loginUI.setVisible(true);
 		
-		server = new server_side.Server();
+		client = new client_side.Client();
+		
 		
 	}
 }

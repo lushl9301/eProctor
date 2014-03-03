@@ -1,3 +1,5 @@
+package server_side;
+
 import java.io.*;
 
 public class Server {
@@ -8,5 +10,10 @@ public class Server {
     	new QueryServerThread(port1);
         new VideoServerThread(port2);
     }
+
+	public boolean verifyUser(String username, String mD5Password, String domain) {
+		// TODO Auto-generated method stub
+		return true;
+	}
     
 }

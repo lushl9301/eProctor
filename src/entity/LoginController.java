@@ -16,7 +16,7 @@ public class LoginController {
 		String MD5Password = LoginController.getMD5FromCharArray(Main.loginUI
 				.getPasswordField().getPassword(), false);
 		String domain = (String) Main.loginUI.getCbxDomain().getSelectedItem();
-		if (Main.server.verifyUser(username, MD5Password, domain)) {
+		if (Main.client.verifyUser(username, MD5Password, domain)) {
 			displayWelcome();
 		} else {
 			loginError();
@@ -58,6 +58,7 @@ public class LoginController {
 		Main.loginUI.getLblErrormessage().setText("");
 		Main.loginUI.setVisible(false);
 		if ("Student".equals(domain)) {
+		    Main.studentHomeController = new student_side.StudentHomeController();
 			Main.studentHomeUI = new student_side.StudentHomeUI();
 			Main.studentHomeUI.setVisible(true);
 		} else if ("Proctor".equals(domain)) {
