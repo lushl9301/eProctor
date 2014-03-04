@@ -16,99 +16,99 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-public class LoginUI extends JFrame{
+public class LoginUI extends JFrame {
 
-	private JTextField textFieldUsername;
-	private JPasswordField passwordField;
-	private JComboBox cbxDomain;
-	private String[] domainStrings = { "Student", "Proctor" };
-	private JLabel lblErrormessage;
+    private JTextField textFieldUsername;
+    private JPasswordField passwordField;
+    private JComboBox cbxDomain;
+    private String[] domainStrings = { "Student", "Proctor" };
+    private JLabel lblErrormessage;
 
-	public LoginUI() {
-		initialize();
-	}
+    public LoginUI() {
+        initialize();
+    }
 
-	private void initialize() {
-		
-		setResizable(false);
-		setBounds(500, 100, 350, 300);
-		setDefaultCloseOperation(EXIT_ON_CLOSE);
-		setTitle("Welcome to eProctor");
-		getContentPane().setLayout(null);
+    private void initialize() {
 
-		JLabel lblUsername = new JLabel("Username:");
-		lblUsername.setBounds(100, 50, 150, 14);
-		getContentPane().add(lblUsername);
+        setResizable(false);
+        setBounds(500, 100, 350, 300);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setTitle("Welcome to eProctor");
+        getContentPane().setLayout(null);
 
-		JLabel lblPassword = new JLabel("Password:");
-		lblPassword.setBounds(100, 100, 150, 14);
-		getContentPane().add(lblPassword);
+        JLabel lblUsername = new JLabel("Username:");
+        lblUsername.setBounds(100, 50, 150, 14);
+        getContentPane().add(lblUsername);
 
-		JLabel lblDomain = new JLabel("Domain:");
-		lblDomain.setBounds(100, 150, 150, 14);
-		getContentPane().add(lblDomain);
+        JLabel lblPassword = new JLabel("Password:");
+        lblPassword.setBounds(100, 100, 150, 14);
+        getContentPane().add(lblPassword);
 
-		setTextFieldUsername(new JTextField());
-		getTextFieldUsername().setBounds(100, 70, 150, 24);
-		getContentPane().add(getTextFieldUsername());
-		getTextFieldUsername().setColumns(10);
+        JLabel lblDomain = new JLabel("Domain:");
+        lblDomain.setBounds(100, 150, 150, 14);
+        getContentPane().add(lblDomain);
 
-		setPasswordField(new JPasswordField());
-		getPasswordField().setBounds(100, 120, 150, 24);
-		getContentPane().add(getPasswordField());
+        setTextFieldUsername(new JTextField());
+        getTextFieldUsername().setBounds(100, 70, 150, 24);
+        getContentPane().add(getTextFieldUsername());
+        getTextFieldUsername().setColumns(10);
 
-		final JButton btnLogin = new JButton("Login");
-		btnLogin.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				try {
-					Main.loginController.verifyUser();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-		btnLogin.setBounds(140, 201, 70, 30);
-		getContentPane().add(btnLogin);
+        setPasswordField(new JPasswordField());
+        getPasswordField().setBounds(100, 120, 150, 24);
+        getContentPane().add(getPasswordField());
 
-		setCbxDomain(new JComboBox(domainStrings));
-		getCbxDomain().setBounds(100, 170, 150, 24);
-		getContentPane().add(getCbxDomain());
+        final JButton btnLogin = new JButton("Login");
+        btnLogin.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                try {
+                    Main.loginController.verifyUser();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        btnLogin.setBounds(140, 201, 70, 30);
+        getContentPane().add(btnLogin);
 
-		setLblErrormessage(new JLabel(""));
-		getLblErrormessage().setForeground(Color.RED);
-		getLblErrormessage().setBounds(100, 230, 150, 18);
-		getContentPane().add(getLblErrormessage());
-	}
+        setCbxDomain(new JComboBox(domainStrings));
+        getCbxDomain().setBounds(100, 170, 150, 24);
+        getContentPane().add(getCbxDomain());
 
-	public JPasswordField getPasswordField() {
-		return passwordField;
-	}
+        setLblErrormessage(new JLabel(""));
+        getLblErrormessage().setForeground(Color.RED);
+        getLblErrormessage().setBounds(100, 230, 150, 18);
+        getContentPane().add(getLblErrormessage());
+    }
 
-	public void setPasswordField(JPasswordField passwordField) {
-		this.passwordField = passwordField;
-	}
+    public JPasswordField getPasswordField() {
+        return passwordField;
+    }
 
-	public JTextField getTextFieldUsername() {
-		return textFieldUsername;
-	}
+    public void setPasswordField(JPasswordField passwordField) {
+        this.passwordField = passwordField;
+    }
 
-	public void setTextFieldUsername(JTextField textFieldUsername) {
-		this.textFieldUsername = textFieldUsername;
-	}
+    public JTextField getTextFieldUsername() {
+        return textFieldUsername;
+    }
 
-	public JComboBox getCbxDomain() {
-		return cbxDomain;
-	}
+    public void setTextFieldUsername(JTextField textFieldUsername) {
+        this.textFieldUsername = textFieldUsername;
+    }
 
-	public void setCbxDomain(JComboBox cbxDomain) {
-		this.cbxDomain = cbxDomain;
-	}
+    public JComboBox getCbxDomain() {
+        return cbxDomain;
+    }
 
-	public JLabel getLblErrormessage() {
-		return lblErrormessage;
-	}
+    public void setCbxDomain(JComboBox cbxDomain) {
+        this.cbxDomain = cbxDomain;
+    }
 
-	public void setLblErrormessage(JLabel lblErrormessage) {
-		this.lblErrormessage = lblErrormessage;
-	}
+    public JLabel getLblErrormessage() {
+        return lblErrormessage;
+    }
+
+    public void setLblErrormessage(JLabel lblErrormessage) {
+        this.lblErrormessage = lblErrormessage;
+    }
 }

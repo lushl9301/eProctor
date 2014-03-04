@@ -41,14 +41,15 @@ public class QueryServerThread implements Runnable {
         String time = sdf.format(new Date()) + " " + msg;
         System.out.println(time);
     }
-//    private void display(ArrayList<ArrayList<String>> msg) {
-//        this.display("");
-//        for (ArrayList<String> s : msg) {
-//            for (String a : s) {
-//                System.out.println(a);
-//            }
-//        }
-//    }
+
+    // private void display(ArrayList<ArrayList<String>> msg) {
+    // this.display("");
+    // for (ArrayList<String> s : msg) {
+    // for (String a : s) {
+    // System.out.println(a);
+    // }
+    // }
+    // }
 
     synchronized void remove(int id) {
         for (int i = 0; i < al.size(); ++i) {
@@ -72,7 +73,8 @@ public class QueryServerThread implements Runnable {
         ClientThread(Socket socket) {
             id = ++uniqueId;
             this.socket = socket;
-            System.out.println("Thread trying to create Object Input/Output Streams");
+            System.out
+                    .println("Thread trying to create Object Input/Output Streams");
             try {
                 sOutput = new ObjectOutputStream(socket.getOutputStream());
                 sInput = new ObjectInputStream(socket.getInputStream());
@@ -88,73 +90,75 @@ public class QueryServerThread implements Runnable {
             try {
                 cm = (entity.ChatMessage) sInput.readObject();
                 int type = cm.getType();
-	            ArrayList<ArrayList<String>> message = cm.getMessage();
-	            
-	            String userId = message.get(0).get(0);
-	            
-	            switch (type) {
-	            case 1: {//UPDATE
-	                String tableName = message.get(1).get(0);
-	                String key = message.get(1).get(1);
-	                String examId = message.get(1).get(2);
-	                ArrayList<String> bookingInfo = message.get(2);
-	                /*
-	                 * database 看过来！看过来！看过来！
-	                 * dataBase.updateData(tableName, key, examId, bookingInfo);
-	                 */
-	                //no reply from server
-	                break;
-	            }
-	            
-	            case 2: {//MESSAGE
-	                String receiverId = message.get(1).get(0);
-                    //String sms = message.get(1).get(1);
-	                if (receiverId == null) {
-	                    //broadcast(id + ": " + sms);	                    
-	                } else {
-	                    //sendMessage(id + ": " + sms);
-	                }
-	                /*
-	                 * database 看过来！看过来！看过来！
-	                 * dataBase.saveMessage(senderId, receiverId, sms);
-	                 */
-	                //no reply from server;
-	                break;
-	            }
-	            
-	            default: {//QUERY
-	                String tableName = message.get(0).get(0);
+                ArrayList<ArrayList<String>> message = cm.getMessage();
+
+                String userId = message.get(0).get(0);
+
+                switch (type) {
+                case 1: {// UPDATE
+                    String tableName = message.get(1).get(0);
+                    String key = message.get(1).get(1);
+                    String examId = message.get(1).get(2);
+                    ArrayList<String> bookingInfo = message.get(2);
+                    /*
+                     * database 看过来！看过来！看过来！ dataBase.updateData(tableName, key,
+                     * examId, bookingInfo);
+                     */
+                    // no reply from server
+                    break;
+                }
+
+                case 2: {// MESSAGE
+                    String receiverId = message.get(1).get(0);
+                    // String sms = message.get(1).get(1);
+                    if (receiverId == null) {
+                        // broadcast(id + ": " + sms);
+                    } else {
+                        // sendMessage(id + ": " + sms);
+                    }
+                    /*
+                     * database 看过来！看过来！看过来！ dataBase.saveMessage(senderId,
+                     * receiverId, sms);
+                     */
+                    // no reply from server;
+                    break;
+                }
+
+                default: {// QUERY
+                    String tableName = message.get(0).get(0);
                     String key = message.get(0).get(1);
                     ArrayList<String> query = message.get(1);
                     /*
-                     * database 看过来！看过来！看过来！
-                     * replyMsg = dataBase.fetchData(tableName, key, query);
+                     * database 看过来！看过来！看过来！ replyMsg =
+                     * dataBase.fetchData(tableName, key, query);
                      */
-                    //test
-                    
-                        ArrayList<ArrayList<String>> replyMsg = new ArrayList<ArrayList<String>>();
-                        ArrayList<String> s = new ArrayList<String>();
-                                        s.add("1");
-                                        s.add("2");
-                                        replyMsg.add(s);
-                        ArrayList<String> b = new ArrayList<String>();
-                                        s.add("3");
-                                        s.add("4");
-                        replyMsg.add(b);
-                    //reply to client here
+                    // test
+
+                    ArrayList<ArrayList<String>> replyMsg = new ArrayList<ArrayList<String>>();
+                    ArrayList<String> s = new ArrayList<String>();
+                    s.add("1");
+                    s.add("2");
+                    replyMsg.add(s);
+                    ArrayList<String> b = new ArrayList<String>();
+                    s.add("3");
+                    s.add("4");
+                    replyMsg.add(b);
+                    // reply to client here
                     writeMsg(replyMsg);
                     break;
-	            }
-	            }
-	            remove(id);
-				socket.close();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+                }
+                }
+                remove(id);
+                socket.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
-        private boolean writeMsg(ArrayList<ArrayList<String>> msg) throws IOException {
+
+        private boolean writeMsg(ArrayList<ArrayList<String>> msg)
+                throws IOException {
             if (!socket.isConnected()) {
-            	socket.close();
+                socket.close();
                 return false;
             }
 

@@ -3,9 +3,11 @@ package client_side;
 import static com.googlecode.javacv.cpp.opencv_core.cvFlip;
 
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.net.UnknownHostException;
 
 import javax.imageio.ImageIO;
 
@@ -22,9 +24,17 @@ public class GrabberShow implements Runnable {
     private int port = Main.port2;
     private entity.User currentUser = Main.currentUser;
     private Socket sendUserIdsocket;
+    private Socket socket;
+    private boolean isSendRecord = true;
 
     public GrabberShow() {
         canvas.setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE);
+        new Thread(this, "send image").start();
+    }
+
+    public GrabberShow(String studentId) {
+        canvas.setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE);
+        this.isSendRecord = false;
         new Thread(this, "send image").start();
     }
 
@@ -42,13 +52,19 @@ public class GrabberShow implements Runnable {
             sendUserIdsocket = new Socket("localhost", port);
             sOutput = new ObjectOutputStream(sendUserIdsocket.getOutputStream());
             sOutput.writeObject(currentUser.getUserId());
-            while (true) {
-                img = grabber.grab();
-                buf = img.getBufferedImage();
-                if (img != null) {
-                    cvFlip(img, img, 1);// l-r = 90_degrees_steps_anti_clockwise
-                    canvas.showImage(img);
-                    send(buf);
+            if (this.isSendRecord) { // student send reocord
+                while (true) {
+                    img = grabber.grab();
+                    buf = img.getBufferedImage();
+                    if (img != null) {
+                        cvFlip(img, img, 1);// l-r = 90_degrees_steps_anti_clockwise
+                        canvas.showImage(img);
+                        send(buf);
+                    }
+                }
+            } else { // Proctor get record
+                while (true) {
+                    canvas.showImage(this.get());
                 }
             }
         } catch (Exception e) {
@@ -56,10 +72,19 @@ public class GrabberShow implements Runnable {
     }
 
     public void send(BufferedImage buf) throws Exception {
-        Socket socket = new Socket("localhost", port);
+        socket = new Socket("localhost", port);
         sOutput = new ObjectOutputStream(socket.getOutputStream());
         sOutput.writeObject(currentUser.getUserId());
         ImageIO.write(buf, "JPG", socket.getOutputStream());
         socket.close();
+        return;
+    }
+
+    public IplImage get() throws Exception {
+        socket = new Socket("localhost", port);
+        BufferedImage buf = ImageIO.read(socket.getInputStream());
+        IplImage toDisplay = IplImage.createFrom(buf);
+        socket.close();
+        return toDisplay;
     }
 }

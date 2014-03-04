@@ -22,7 +22,7 @@ public class VideoServerThread implements Runnable {
         threadHashMap = new HashMap<String, ReceiveImg>();
         new Thread(this, "videoserver").start();
     }
-    
+
     public void run() {
         try {
             System.out.println("here");
@@ -32,35 +32,36 @@ public class VideoServerThread implements Runnable {
             receiveUserIdSocket = serverSocket.accept();
             sInput = new ObjectInputStream(receiveUserIdSocket.getInputStream());
             String userId = (String) sInput.readObject();
-            
+
             ReceiveImg receiveImg = new ReceiveImg(serverSocket, threadHashMap);
             threadHashMap.put(userId, receiveImg);
             receiveImg.start();
-        }
-        catch (Exception e) {
-        	e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }
 
 class ReceiveImg extends Thread {
-    public HashMap<String, ReceiveImg> threadHashMap; 
+    public HashMap<String, ReceiveImg> threadHashMap;
     private ServerSocket serversocket;
     private Socket socket;
     private ObjectInputStream sInput;
     public CanvasFrame canvas;
-    ReceiveImg(ServerSocket serversocket, HashMap<String, ReceiveImg> threadHashMap) {
+
+    ReceiveImg(ServerSocket serversocket,
+            HashMap<String, ReceiveImg> threadHashMap) {
         this.serversocket = serversocket;
         this.threadHashMap = threadHashMap;
         System.out.println("newnewnew");
     }
 
     public void run() {
-    	try {
-    		canvas = new CanvasFrame("Web Cam On server");
+        try {
+            canvas = new CanvasFrame("Web Cam On server");
             while (true) {
-            	socket = serversocket.accept();
-            	sInput = new ObjectInputStream(socket.getInputStream());
+                socket = serversocket.accept();
+                sInput = new ObjectInputStream(socket.getInputStream());
                 String userId = (String) sInput.readObject();
                 BufferedImage buf = ImageIO.read(socket.getInputStream());
                 socket.close();
@@ -68,7 +69,7 @@ class ReceiveImg extends Thread {
                 ReceiveImg t = threadHashMap.get(userId);
                 t.canvas.showImage(toDisplay);
             }
-    	} catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

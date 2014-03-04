@@ -55,7 +55,7 @@ public class ProctorHomeUI extends JFrame {
         setAutoRequestFocus(true);
         setUndecorated(true);
         setResizable(false);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         getContentPane().setLayout(null);
 
         JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
@@ -94,6 +94,13 @@ public class ProctorHomeUI extends JFrame {
         JPanel pnInvigilate = new JPanel();
         tabbedPane.addTab("Invigilate", null, pnInvigilate, null);
         pnInvigilate.setLayout(null);
+        /*
+         * TODO
+         * 
+         * 1. get student list 2. display 3. Proctor select 4. build up socket
+         * after select 5. Server send video from hashMap.get(userId) to current
+         * Proctor
+         */
 
         JPanel pnBooking = new JPanel();
         tabbedPane.addTab("Booking", null, pnBooking, null);
@@ -217,10 +224,10 @@ public class ProctorHomeUI extends JFrame {
         scrollPane.setViewportView(getTableReview());
         getTableReview().setModel(
                 new DefaultTableModel(new Object[][] {
-                        {"43901341534", "CE2006 Software Engineering",
-                                "21/4/2014 1530-1730", "2 cheated"},
-                        {null, "", null, null}, }, new String[] {
-                        "Record ID", "Course", "Session", "Remark"}) {
+                        { "43901341534", "CE2006 Software Engineering",
+                                "21/4/2014 1530-1730", "2 cheated" },
+                        { null, "", null, null }, }, new String[] {
+                        "Record ID", "Course", "Session", "Remark" }) {
                     Class[] columnTypes = new Class[] { String.class,
                             String.class, String.class, String.class,
                             String.class };
@@ -233,7 +240,7 @@ public class ProctorHomeUI extends JFrame {
         getTableReview().getColumnModel().getColumn(1).setPreferredWidth(200);
         getTableReview().getColumnModel().getColumn(2).setPreferredWidth(170);
         getTableReview().getColumnModel().getColumn(3).setPreferredWidth(100);
-        //getTableReview().getColumnModel().getColumn(4).setPreferredWidth(90);
+        // getTableReview().getColumnModel().getColumn(4).setPreferredWidth(90);
 
         JPanel pnSetting = new JPanel();
         tabbedPane.addTab("Setting", null, pnSetting, null);

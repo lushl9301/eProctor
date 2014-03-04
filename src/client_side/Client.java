@@ -2,7 +2,6 @@ package client_side;
 
 import java.io.*;
 import java.util.*;
-
 import java.net.Socket;
 
 import entity.Main;
@@ -33,7 +32,8 @@ public class Client {
         ArrayList<ArrayList<String>> msg = new ArrayList<ArrayList<String>>();
         msg.add(info);
         msg.add(inFromControl);
-        sOutput.writeObject(new entity.ChatMessage(entity.ChatMessage.QUERY, msg));
+        sOutput.writeObject(new entity.ChatMessage(entity.ChatMessage.QUERY,
+                msg));
 
         @SuppressWarnings("unchecked")
         ArrayList<ArrayList<String>> readObject = (ArrayList<ArrayList<String>>) sInput
@@ -43,9 +43,9 @@ public class Client {
         sInput.close();
         sOutput.close();
         socket.close();
-//        for (ArrayList<String> s : receivedMsg)
-//            for (String a : s)
-//                System.out.println(a);
+        // for (ArrayList<String> s : receivedMsg)
+        // for (String a : s)
+        // System.out.println(a);
         return receivedMsg;
     }
 
@@ -61,14 +61,16 @@ public class Client {
         ArrayList<ArrayList<String>> msg = new ArrayList<ArrayList<String>>();
         send.add(message);
         msg.add(send);
-        sOutput.writeObject(new entity.ChatMessage(entity.ChatMessage.MESSAGE, msg));
+        sOutput.writeObject(new entity.ChatMessage(entity.ChatMessage.MESSAGE,
+                msg));
 
-        //assume there is not return;
+        // assume there is not return;
         sOutput.close();
         socket.close();
     }
-    
-    public void updateData(String tableName, String key, String examId, ArrayList<String> bookingInfo) throws Exception {
+
+    public void updateData(String tableName, String key, String examId,
+            ArrayList<String> bookingInfo) throws Exception {
         socket = new Socket(server, port);
 
         sOutput = new ObjectOutputStream(socket.getOutputStream());
@@ -80,11 +82,17 @@ public class Client {
         ArrayList<ArrayList<String>> msg = new ArrayList<ArrayList<String>>();
         msg.add(info);
         msg.add(bookingInfo);
-        sOutput.writeObject(new entity.ChatMessage(entity.ChatMessage.UPDATE, msg));
+        sOutput.writeObject(new entity.ChatMessage(entity.ChatMessage.UPDATE,
+                msg));
 
-        //assume there is no reply
+        // assume there is no reply
         sOutput.close();
         socket.close();
+    }
+
+    public void getRecord(String userId) {
+        // TODO Auto-generated method stub
+
     }
 
 }
