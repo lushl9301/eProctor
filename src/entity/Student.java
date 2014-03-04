@@ -1,4 +1,8 @@
-public class Student {
+package entity;
+
+import java.util.ArrayList;
+
+public class Student implements User{
 
     private String userName;
     private String userPassword;

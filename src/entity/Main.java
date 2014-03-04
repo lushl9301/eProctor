@@ -7,11 +7,17 @@ import javax.swing.*;
 public class Main {
 	
 	//public static server_side.Server server;
+    public static entity.User currentUser;
 	public static client_side.Client client;
+	public static int port1 = 6001;
+	public static int port2 = 6002;
 	public static LoginController loginController;
 	public static LoginUI loginUI;
 	public static student_side.StudentHomeUI studentHomeUI;
+	public static proctor_side.ProctorHomeUI proctorHomeUI;
 	public static student_side.StudentHomeController studentHomeController;
+	public static proctor_side.ProctorHomeController proctorHomeController;
+	public static entity.About about;
 
 	public static void main(String[] args) throws ClassNotFoundException,
 			InstantiationException, IllegalAccessException,
@@ -26,7 +32,6 @@ public class Main {
 		loginUI.setVisible(true);
 		
 		client = new client_side.Client();
-		
 		
 	}
 }

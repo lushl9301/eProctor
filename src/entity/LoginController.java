@@ -59,10 +59,12 @@ public class LoginController {
 		Main.loginUI.setVisible(false);
 		if ("Student".equals(domain)) {
 		    Main.studentHomeController = new student_side.StudentHomeController();
-			Main.studentHomeUI = new student_side.StudentHomeUI();
-			Main.studentHomeUI.setVisible(true);
+	        Main.studentHomeUI = new student_side.StudentHomeUI();
+	        Main.studentHomeUI.setVisible(true);
 		} else if ("Proctor".equals(domain)) {
-			
+			Main.proctorHomeController = new proctor_side.ProctorHomeController();
+	        Main.proctorHomeUI = new proctor_side.ProctorHomeUI();
+	        Main.proctorHomeUI.setVisible(true);
 		} else System.exit(0);
 	}
 }

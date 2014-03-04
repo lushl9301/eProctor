@@ -1,3 +1,5 @@
+package server_side;
+
 import java.io.*;
 import java.net.*;
 import java.text.SimpleDateFormat;
@@ -64,7 +66,7 @@ public class QueryServerThread implements Runnable {
         ObjectOutputStream sOutput;
 
         int id;
-        ChatMessage cm;
+        entity.ChatMessage cm;
         String date;
 
         ClientThread(Socket socket) {
@@ -84,22 +86,63 @@ public class QueryServerThread implements Runnable {
 
         public void run() {
             try {
-                cm = (ChatMessage) sInput.readObject();
+                cm = (entity.ChatMessage) sInput.readObject();
 	            // the messaage part of the ChatMessage
+                int type = cm.getType();
 	            ArrayList<ArrayList<String>> message = cm.getMessage();
-	            display(message);
-	
-	            ArrayList<ArrayList<String>> replyMsg = new ArrayList<ArrayList<String>>();
-	            ArrayList<String> s = new ArrayList<String>();
-	            					s.add("1");
-	            					s.add("2");
-	            replyMsg.add(s);
-	            ArrayList<String> b = new ArrayList<String>();
-	            					s.add("3");
-	            					s.add("4");
-	            replyMsg.add(b);
-	            writeMsg(replyMsg);
-	            // broadcast(id + ": " + message);
+	            switch (type) {
+	            case 1: {//UPDATE
+	                String tableName = message.get(0).get(0);
+	                String key = message.get(0).get(1);
+	                String examId = message.get(0).get(2);
+	                ArrayList<String> bookingInfo = message.get(1);
+	                /*
+	                 * database 看过来！看过来！看过来！
+	                 * dataBase.updateData(tableName, key, examId, bookingInfo);
+	                 */
+	                //no reply from server
+	                break;
+	            }
+	            
+	            case 2: {//MESSAGE
+	                String receiverId = message.get(0).get(0);
+	                if (receiverId == null) {
+	                    //broadcast(id + ": " + message);	                    
+	                } else {
+	                    String sms = message.get(0).get(1);
+	                }
+	                /*
+	                 * database 看过来！看过来！看过来！
+	                 * dataBase.saveMessage(senderId, receiverId, sms);
+	                 */
+	                //no reply from server;
+	                break;
+	            }
+	            
+	            default: {//QUERY
+	                String tableName = message.get(0).get(0);
+                    String key = message.get(0).get(1);
+                    ArrayList<String> query = message.get(1);
+                    /*
+                     * database 看过来！看过来！看过来！
+                     * replyMsg = dataBase.fetchData(tableName, key, query);
+                     */
+                    //test
+                    
+                        ArrayList<ArrayList<String>> replyMsg = new ArrayList<ArrayList<String>>();
+                        ArrayList<String> s = new ArrayList<String>();
+                                        s.add("1");
+                                        s.add("2");
+                                        replyMsg.add(s);
+                        ArrayList<String> b = new ArrayList<String>();
+                                        s.add("3");
+                                        s.add("4");
+                        replyMsg.add(b);
+                    //reply to client here
+                    writeMsg(replyMsg);
+                    break;
+	            }
+	            }
 	            remove(id);
 				socket.close();
 			} catch (Exception e) {

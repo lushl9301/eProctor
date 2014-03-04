@@ -1,77 +1,77 @@
-package student_side;
+package proctor_side;
 
 import java.util.ArrayList;
 
 import entity.Main;
 
-public class StudentHomeController {
+public class ProctorHomeController {
 
-    public StudentHomeController() {
+    public ProctorHomeController() {
     }
-	public void exit() {
-	    Main.studentHomeUI.setVisible(false);
-		System.exit(0);
-	}
+    public void exit() {
+        Main.proctorHomeUI.setVisible(false);
+        System.exit(0);
+    }
     public void logout() {
-        Main.studentHomeUI.setVisible(false);
+        Main.proctorHomeUI.setVisible(false);
         Main.loginUI.setVisible(true);
     }
     
-    public void sendMessage(String message) {
+    public void sendMessage(String message) throws Exception {
         Main.client.sendMessage(message);
     }
-	public String getInformation() {
+    public String getInformation() {
         
-	    //ArrayList<ArrayList<String>> information = Main.client.fetchData();
-	    ArrayList<ArrayList<String>> information = new ArrayList<ArrayList<String>>();
-	    {
-	        ArrayList<String> a = new ArrayList<String>();
-	        String b = "Welcome, Gong Yue from CE2006 BCE2";
-	        String c = "You have:   2 exams in the next week.";
-	        String d = "5 exams in the next few months.";
-	        a.add(b);
-	        a.add(c);
-	        ArrayList<String> aa = new ArrayList<String>();
-	        aa.add(d);
-	        information.add(a);
-	        information.add(aa);
-	    }
-	    String result = "";
-	    for (ArrayList<String> s : information) {
-	        for (String e : s) {
-	            result += "      " + e;
-	        }
-	        result +="\n";
-	    }
-	    return result.substring(6);
-	}
-	
-	public String getRecentMessage() {
-	  //ArrayList<ArrayList<String>> recentMessage = Main.client.fetchData();
-	    ArrayList<ArrayList<String>> recentMessage = new ArrayList<ArrayList<String>>();
-	    {
-	        ArrayList<String> a = new ArrayList<String>();
-	        String b = "Laoshi";
-	        String c = "03/03/2014 13:20";
-	        a.add(b);
-	        a.add(c);
-	        ArrayList<String> aa = new ArrayList<String>();
-	        String d = "ni jin tian biao xian hen hao";
-	        String e = "geilaozi qu si";
-	        String f = "haoba";
-	        aa.add(d); aa.add(e); aa.add(f);
-	        recentMessage.add(a);
-	        recentMessage.add(aa);
-	    }
-	    
-	    String result = "";
-	    result += "Send From: " + recentMessage.get(0).get(0) + "\n";
-	    result += "Time: " + recentMessage.get(0).get(1) + "\n";
+        //ArrayList<ArrayList<String>> information = Main.client.fetchData();
+        ArrayList<ArrayList<String>> information = new ArrayList<ArrayList<String>>();
+        {
+            ArrayList<String> a = new ArrayList<String>();
+            String b = "Welcome, Gong Yue from CE2006 BCE2";
+            String c = "You have:   2 exams in the next week.";
+            String d = "5 exams in the next few months.";
+            a.add(b);
+            a.add(c);
+            ArrayList<String> aa = new ArrayList<String>();
+            aa.add(d);
+            information.add(a);
+            information.add(aa);
+        }
+        String result = "";
+        for (ArrayList<String> s : information) {
+            for (String e : s) {
+                result += "      " + e;
+            }
+            result +="\n";
+        }
+        return result.substring(6);
+    }
+    
+    public String getRecentMessage() {
+      //ArrayList<ArrayList<String>> recentMessage = Main.client.fetchData();
+        ArrayList<ArrayList<String>> recentMessage = new ArrayList<ArrayList<String>>();
+        {
+            ArrayList<String> a = new ArrayList<String>();
+            String b = "Laoshi";
+            String c = "03/03/2014 13:20";
+            a.add(b);
+            a.add(c);
+            ArrayList<String> aa = new ArrayList<String>();
+            String d = "ni jin tian biao xian hen hao";
+            String e = "geilaozi qu si";
+            String f = "haoba";
+            aa.add(d); aa.add(e); aa.add(f);
+            recentMessage.add(a);
+            recentMessage.add(aa);
+        }
+        
+        String result = "";
+        result += "Send From: " + recentMessage.get(0).get(0) + "\n";
+        result += "Time: " + recentMessage.get(0).get(1) + "\n";
         for (String e : recentMessage.get(1)) {
                 result += "      " + e;
         }
-	    return result;
-	}
+        return result;
+    }
 
     public String[] getCurrentBookingList() {
       //ArrayList<ArrayList<String>> currentBookingList = Main.client.fetchData();
@@ -144,13 +144,10 @@ public class StudentHomeController {
         return result;
     }
 
-    public String[] getExamResultList() {
-        //TODO add fetchData and process
-        return null;
-    }
     public void getAboutMessage() {
-        // TODO Auto-generated method stub
-        
+//        Main.about = new entity.About();
+//        Main.about.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+//        Main.about.setVisible(true);
     }
 
 }
