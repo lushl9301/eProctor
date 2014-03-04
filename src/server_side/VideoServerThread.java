@@ -66,7 +66,7 @@ class ReceiveImg extends Thread {
                 BufferedImage buf = ImageIO.read(socket.getInputStream());
                 socket.close();
                 IplImage toDisplay = IplImage.createFrom(buf);
-                ReceiveImg t = threadHashMap.get(userId);
+                ReceiveImg t = threadHashMap.get(userId); // it is already a thread for one user, why do we new another ReceiveImg? - cly
                 t.canvas.showImage(toDisplay);
             }
         } catch (Exception e) {

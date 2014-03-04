@@ -20,8 +20,8 @@ public class Main {
     public static entity.About about;
 
     public static void main(String[] args) throws ClassNotFoundException,
-            InstantiationException, IllegalAccessException,
-            UnsupportedLookAndFeelException {
+                                                InstantiationException, IllegalAccessException,
+                                                UnsupportedLookAndFeelException {
         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         UIManager.put("Button.font", new Font("Segoe UI", Font.PLAIN, 14));
         UIManager.put("ComboBox.font", new Font("Segoe UI", Font.PLAIN, 14));

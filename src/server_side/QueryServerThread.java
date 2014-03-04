@@ -29,7 +29,7 @@ public class QueryServerThread implements Runnable {
                 display("Server waiting for Clients on port " + port + ".");
                 Socket socket = serverSocket.accept();
                 ClientThread t = new ClientThread(socket);
-                al.add(t); // add to thread ArrayList
+                al.add(t); // add to thread ArrayList // if one thread only process one request, why do we maintain those thread? - cly
                 new Thread(t).start();
             }
         } catch (IOException e) {
@@ -73,8 +73,7 @@ public class QueryServerThread implements Runnable {
         ClientThread(Socket socket) {
             id = ++uniqueId;
             this.socket = socket;
-            System.out
-                    .println("Thread trying to create Object Input/Output Streams");
+            System.out.println("Thread trying to create Object Input/Output Streams");
             try {
                 sOutput = new ObjectOutputStream(socket.getOutputStream());
                 sInput = new ObjectInputStream(socket.getInputStream());
@@ -95,58 +94,58 @@ public class QueryServerThread implements Runnable {
                 String userId = message.get(0).get(0);
 
                 switch (type) {
-                case 1: {// UPDATE
-                    String tableName = message.get(1).get(0);
-                    String key = message.get(1).get(1);
-                    String examId = message.get(1).get(2);
-                    ArrayList<String> bookingInfo = message.get(2);
-                    /*
-                     * database 看过来！看过来！看过来！ dataBase.updateData(tableName, key,
-                     * examId, bookingInfo);
-                     */
-                    // no reply from server
-                    break;
-                }
-
-                case 2: {// MESSAGE
-                    String receiverId = message.get(1).get(0);
-                    // String sms = message.get(1).get(1);
-                    if (receiverId == null) {
-                        // broadcast(id + ": " + sms);
-                    } else {
-                        // sendMessage(id + ": " + sms);
+                    case 1: {// UPDATE
+                        String tableName = message.get(1).get(0);
+                        String key = message.get(1).get(1);
+                        String examId = message.get(1).get(2);
+                        ArrayList<String> bookingInfo = message.get(2);
+                        /*
+                         * database 看过来！看过来！看过来！ dataBase.updateData(tableName, key,
+                         * examId, bookingInfo);
+                         */
+                        // no reply from server
+                        break;
                     }
-                    /*
-                     * database 看过来！看过来！看过来！ dataBase.saveMessage(senderId,
-                     * receiverId, sms);
-                     */
-                    // no reply from server;
-                    break;
-                }
 
-                default: {// QUERY
-                    String tableName = message.get(0).get(0);
-                    String key = message.get(0).get(1);
-                    ArrayList<String> query = message.get(1);
-                    /*
-                     * database 看过来！看过来！看过来！ replyMsg =
-                     * dataBase.fetchData(tableName, key, query);
-                     */
-                    // test
+                    case 2: {// MESSAGE
+                        String receiverId = message.get(1).get(0);
+                        // String sms = message.get(1).get(1);
+                        if (receiverId == null) {
+                            // broadcast(id + ": " + sms);
+                        } else {
+                            // sendMessage(id + ": " + sms);
+                        }
+                        /*
+                         * database 看过来！看过来！看过来！ dataBase.saveMessage(senderId,
+                         * receiverId, sms);
+                         */
+                        // no reply from server;
+                        break;
+                    }
 
-                    ArrayList<ArrayList<String>> replyMsg = new ArrayList<ArrayList<String>>();
-                    ArrayList<String> s = new ArrayList<String>();
-                    s.add("1");
-                    s.add("2");
-                    replyMsg.add(s);
-                    ArrayList<String> b = new ArrayList<String>();
-                    s.add("3");
-                    s.add("4");
-                    replyMsg.add(b);
-                    // reply to client here
-                    writeMsg(replyMsg);
-                    break;
-                }
+                    default: {// QUERY
+                        String tableName = message.get(0).get(0);
+                        String key = message.get(0).get(1);
+                        ArrayList<String> query = message.get(1);
+                        /*
+                         * database 看过来！看过来！看过来！ replyMsg =
+                         * dataBase.fetchData(tableName, key, query);
+                         */
+                        // test
+
+                        ArrayList<ArrayList<String>> replyMsg = new ArrayList<ArrayList<String>>();
+                        ArrayList<String> s = new ArrayList<String>();
+                        s.add("1");
+                        s.add("2");
+                        replyMsg.add(s);
+                        ArrayList<String> b = new ArrayList<String>();
+                        s.add("3");
+                        s.add("4");
+                        replyMsg.add(b);
+                        // reply to client here
+                        writeMsg(replyMsg);
+                        break;
+                    }
                 }
                 remove(id);
                 socket.close();
@@ -155,8 +154,7 @@ public class QueryServerThread implements Runnable {
             }
         }
 
-        private boolean writeMsg(ArrayList<ArrayList<String>> msg)
-                throws IOException {
+        private boolean writeMsg(ArrayList<ArrayList<String>> msg) throws IOException {
             if (!socket.isConnected()) {
                 socket.close();
                 return false;
