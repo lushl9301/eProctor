@@ -1,3 +1,6 @@
+package server_side;
+
+import java.io.ObjectInputStream;
 import java.net.*;
 import java.util.*;
 import java.awt.image.BufferedImage;
@@ -8,13 +11,15 @@ import com.googlecode.javacv.CanvasFrame;
 import com.googlecode.javacv.cpp.opencv_core.IplImage;
 
 public class VideoServerThread implements Runnable {
-    private static ArrayList<ReceiveImg> ril;
+    private HashMap<String, ReceiveImg> threadHashMap;
     private int port;
     private static ServerSocket serverSocket;
+    private Socket receiveUserIdSocket;
+    private ObjectInputStream sInput;
 
     public VideoServerThread(int port) {
         this.port = port;
-        ril = new ArrayList<ReceiveImg>();
+        threadHashMap = new HashMap<String, ReceiveImg>();
         new Thread(this, "videoserver").start();
     }
     
@@ -24,9 +29,13 @@ public class VideoServerThread implements Runnable {
             serverSocket = new ServerSocket(port);
 
             System.out.println("start receiveImg...");
-            ReceiveImg t = new ReceiveImg(serverSocket);
-            ril.add(t);
-            new Thread(t).start();
+            receiveUserIdSocket = serverSocket.accept();
+            sInput = new ObjectInputStream(receiveUserIdSocket.getInputStream());
+            String userId = (String) sInput.readObject();
+            
+            ReceiveImg receiveImg = new ReceiveImg(serverSocket, threadHashMap);
+            threadHashMap.put(userId, receiveImg);
+            receiveImg.start();
         }
         catch (Exception e) {
         	e.printStackTrace();
@@ -34,23 +43,30 @@ public class VideoServerThread implements Runnable {
     }
 }
 
-class ReceiveImg implements Runnable {
-    ServerSocket serversocket;
-    Socket socket;
-    ReceiveImg(ServerSocket serversocket) {
+class ReceiveImg extends Thread {
+    public HashMap<String, ReceiveImg> threadHashMap; 
+    private ServerSocket serversocket;
+    private Socket socket;
+    private ObjectInputStream sInput;
+    public CanvasFrame canvas;
+    ReceiveImg(ServerSocket serversocket, HashMap<String, ReceiveImg> threadHashMap) {
         this.serversocket = serversocket;
+        this.threadHashMap = threadHashMap;
         System.out.println("newnewnew");
     }
 
     public void run() {
     	try {
-    		CanvasFrame canvas = new CanvasFrame("Web Cam On server");
-            while (true) {     
+    		canvas = new CanvasFrame("Web Cam On server");
+            while (true) {
             	socket = serversocket.accept();
+            	sInput = new ObjectInputStream(socket.getInputStream());
+                String userId = (String) sInput.readObject();
                 BufferedImage buf = ImageIO.read(socket.getInputStream());
                 socket.close();
                 IplImage toDisplay = IplImage.createFrom(buf);
-                canvas.showImage(toDisplay);
+                ReceiveImg t = threadHashMap.get(userId);
+                t.canvas.showImage(toDisplay);
             }
     	} catch (Exception e) {
             e.printStackTrace();

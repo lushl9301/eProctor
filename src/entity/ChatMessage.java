@@ -15,6 +15,9 @@ public class ChatMessage implements Serializable {
     public ChatMessage(int type, ArrayList<ArrayList<String>> message) {
         this.type = type;
         this.message = message;
+        ArrayList<String> userId = new ArrayList<String>();
+        userId.add(currentUser.getUserId());
+        this.message.add(0, userId);
     }
     
     public String getCurrentUserId() {

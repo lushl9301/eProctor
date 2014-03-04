@@ -2,6 +2,7 @@ package student_side;
 
 import java.util.ArrayList;
 
+import client_side.GrabberShow;
 import entity.Main;
 
 public class StudentHomeController {
@@ -17,7 +18,7 @@ public class StudentHomeController {
         Main.loginUI.setVisible(true);
     }
     
-    public void sendMessage(String message) {
+    public void sendMessage(String message) throws Exception {
         Main.client.sendMessage(message);
     }
 	public String getInformation() {
@@ -151,6 +152,10 @@ public class StudentHomeController {
     public void getAboutMessage() {
         // TODO Auto-generated method stub
         
+    }
+    
+    public void sendRecording() {
+        new client_side.GrabberShow();
     }
 
 }

@@ -41,14 +41,14 @@ public class QueryServerThread implements Runnable {
         String time = sdf.format(new Date()) + " " + msg;
         System.out.println(time);
     }
-    private void display(ArrayList<ArrayList<String>> msg) {
-        this.display("");
-        for (ArrayList<String> s : msg) {
-            for (String a : s) {
-                System.out.println(a);
-            }
-        }
-    }
+//    private void display(ArrayList<ArrayList<String>> msg) {
+//        this.display("");
+//        for (ArrayList<String> s : msg) {
+//            for (String a : s) {
+//                System.out.println(a);
+//            }
+//        }
+//    }
 
     synchronized void remove(int id) {
         for (int i = 0; i < al.size(); ++i) {
@@ -87,15 +87,17 @@ public class QueryServerThread implements Runnable {
         public void run() {
             try {
                 cm = (entity.ChatMessage) sInput.readObject();
-	            // the messaage part of the ChatMessage
                 int type = cm.getType();
 	            ArrayList<ArrayList<String>> message = cm.getMessage();
+	            
+	            String userId = message.get(0).get(0);
+	            
 	            switch (type) {
 	            case 1: {//UPDATE
-	                String tableName = message.get(0).get(0);
-	                String key = message.get(0).get(1);
-	                String examId = message.get(0).get(2);
-	                ArrayList<String> bookingInfo = message.get(1);
+	                String tableName = message.get(1).get(0);
+	                String key = message.get(1).get(1);
+	                String examId = message.get(1).get(2);
+	                ArrayList<String> bookingInfo = message.get(2);
 	                /*
 	                 * database 看过来！看过来！看过来！
 	                 * dataBase.updateData(tableName, key, examId, bookingInfo);
@@ -105,11 +107,12 @@ public class QueryServerThread implements Runnable {
 	            }
 	            
 	            case 2: {//MESSAGE
-	                String receiverId = message.get(0).get(0);
+	                String receiverId = message.get(1).get(0);
+                    //String sms = message.get(1).get(1);
 	                if (receiverId == null) {
-	                    //broadcast(id + ": " + message);	                    
+	                    //broadcast(id + ": " + sms);	                    
 	                } else {
-	                    String sms = message.get(0).get(1);
+	                    //sendMessage(id + ": " + sms);
 	                }
 	                /*
 	                 * database 看过来！看过来！看过来！
