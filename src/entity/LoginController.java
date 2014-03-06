@@ -50,7 +50,7 @@ public class LoginController {
         Main.loginUI.getLblErrormessage().setText("Login error!");
     }
 
-    private static void displayWelcome() {
+    private static void displayWelcome() throws Exception {
         String domain = (String) Main.loginUI.getCbxDomain().getSelectedItem();
         Main.loginUI.getTextFieldUsername().setText("");
         Main.loginUI.getPasswordField().setText("");
@@ -64,7 +64,12 @@ public class LoginController {
             Main.proctorHomeController = new proctor_side.ProctorHomeController();
             Main.proctorHomeUI = new proctor_side.ProctorHomeUI();
             Main.proctorHomeUI.setVisible(true);
-        } else
+        } else if ("Coordinator".equals(domain)) {
+            Main.coordinatorHomeController = new proctor_side.CoordinatorHomeController();
+            Main.coordinatorHomeUI = new proctor_side.CoordinatorHomeUI();
+            Main.coordinatorHomeUI.setVisible(true);
+        } else {
             System.exit(0);
+        }
     }
 }
