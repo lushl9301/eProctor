@@ -24,8 +24,9 @@ public class ProctorHomeController {
     }
 
     public String getInformation() {
+//      ArrayList<String> neededInfoList = new ArrayList<String>(Arrays.asList("realname", "coursecode", "examid"));
+//      ArrayList<ArrayList<String>> information = Main.client.fetchData("username", Main.currentUser.getUserId(), neededInfoList);
 
-        // ArrayList<ArrayList<String>> information = Main.client.fetchData();
         ArrayList<ArrayList<String>> information = new ArrayList<ArrayList<String>>();
         {
             ArrayList<String> a = new ArrayList<String>();
@@ -77,10 +78,11 @@ public class ProctorHomeController {
         }
         return result;
     }
-
+    /*
     public String[] getCurrentBookingList() {
-        // ArrayList<ArrayList<String>> currentBookingList =
-        // Main.client.fetchData();
+//      ArrayList<String> neededInfoList = new ArrayList<String>(Arrays.asList("realname", "coursecode", "examid"));
+//      ArrayList<ArrayList<String>> currentBookingList = Main.client.fetchData("username", Main.currentUser.getUserName(), neededInfoList);
+        
         ArrayList<ArrayList<String>> currentBookingList = new ArrayList<ArrayList<String>>();
         {
             ArrayList<String> a = new ArrayList<String>();
@@ -111,15 +113,14 @@ public class ProctorHomeController {
     }
 
     public void makeRequestOfABooking(int index) {
-        System.out.println("asdfasdfasdf" + index);
         if (index != -1) {
             // TODO call client here
         }
     }
 
     public String[] getAvailableCourseList() {
-        // ArrayList<ArrayList<String>> availableCourseList =
-        // Main.client.fetchData();
+//      ArrayList<String> neededInfoList = new ArrayList<String>(Arrays.asList("realname", "coursecode", "courestitle"));
+//      ArrayList<ArrayList<String>> currentBookingList = Main.client.fetchData("username", Main.currentUser.getUserName(), neededInfoList);
         ArrayList<ArrayList<String>> availableCourseList = new ArrayList<ArrayList<String>>();
         {
             ArrayList<String> a = new ArrayList<String>();
@@ -159,9 +160,15 @@ public class ProctorHomeController {
 
         return result;
     }
+    */
 
     public String[] getStudentList() {
-        return null;
+        String currentExamId = "";
+//      ArrayList<String> neededInfoList = new ArrayList<String>(Arrays.asList("username", "realname"));
+//      ArrayList<ArrayList<String>> studentList = Main.client.fetchData("examid", currentExamId, neededInfoList);
+
+        String[] studentToShow = { " " };
+        return studentToShow;
     }
 
     public void invigilateAStudent(int index) {
@@ -170,6 +177,12 @@ public class ProctorHomeController {
             return;
         }
         new client_side.GrabberShow(studentId);
+    }
+    public void invigilateAStudent(String username) {
+        if (username == null) {
+            return;
+        }
+        new client_side.GrabberShow(username);
     }
     
     public void expelStudent(int index) {

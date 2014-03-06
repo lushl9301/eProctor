@@ -180,6 +180,7 @@ public class StudentHomeController {
 
         return result;
     }
+    //and one more choice/ Use overriding
     public String[] getAvailabelExamSession(String coursecode) throws Exception {
         ArrayList<String> neededInfoList = new ArrayList<String>(Arrays.asList("examid", "starttime", "endtime", "examaddress"));
         ArrayList<ArrayList<String>> availableExamSession = Main.client.fetchData("coursecode", coursecode, neededInfoList);

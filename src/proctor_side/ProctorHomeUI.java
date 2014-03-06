@@ -101,7 +101,7 @@ public class ProctorHomeUI extends JFrame {
          * after select 5. Server send video from hashMap.get(userId) to current
          * Proctor
          */
-
+        /*
         JPanel pnBooking = new JPanel();
         tabbedPane.addTab("Booking", null, pnBooking, null);
         pnBooking.setLayout(null);
@@ -203,11 +203,13 @@ public class ProctorHomeUI extends JFrame {
         JButton btnRefresh = new JButton("Refresh");
         btnRefresh.setBounds(screenSize.width / 2 + 261, 497, 89, 30);
         pnBooking.add(btnRefresh);
-
+        
+        
         JSeparator separator = new JSeparator();
         separator.setBounds(screenSize.width / 2 - 420, 302, 770, 10);
         pnBooking.add(separator);
-
+        */
+        
         JPanel pnReview = new JPanel();
         tabbedPane.addTab("Review", null, pnReview, null);
         pnReview.setLayout(null);
