@@ -2,7 +2,7 @@ package entity;
 
 import java.util.ArrayList;
 
-public class Proctor {
+public class Proctor implements User {
 
     private String userName;
     private String userPassword;
@@ -75,6 +75,12 @@ public class Proctor {
 
     public void setScreenRecordingIdList(ArrayList<String> screenRecordingIdList) {
         this.screenRecordingIdList = screenRecordingIdList;
+    }
+
+    @Override
+    public String getUserId() {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

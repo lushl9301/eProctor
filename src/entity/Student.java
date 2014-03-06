@@ -86,4 +86,10 @@ public class Student implements User{
         this.conversationIdList = conversationIdList;
     }
 
+    @Override
+    public String getUserId() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
 }
