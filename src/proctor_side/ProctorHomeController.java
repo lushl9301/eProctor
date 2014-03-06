@@ -171,6 +171,17 @@ public class ProctorHomeController {
         }
         new client_side.GrabberShow(studentId);
     }
+    
+    public void expelStudent(int index) {
+        String studentId = "";
+        if (index == -1) {
+            return;
+        }
+        //TODO
+        //So how to expel?
+        //I suggest we give a warning to student
+        //And keep a record that this student's record will no longer be update to server
+    }
 
     public void getAboutMessage() {
         // Main.about = new entity.About();

@@ -1,5 +1,7 @@
 package student_side;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 
 import client_side.GrabberShow;
@@ -113,9 +115,20 @@ public class StudentHomeController {
 
     public void makeRequestOfABooking(int index) {
         System.out.println("asdfasdfasdf" + index);
-        if (index != -1) {
-            // TODO call client here
+        if (index == -1) {
+            return;
         }
+        
+        String examId = "";
+        //get examId here
+        this.updateExamInfo(examId);
+    }
+    public void updateExamInfo(String examId) {
+        // TODO
+        // Open dialog/Frame
+        // fill in all previous info
+        // student modify
+        // update via client.java
     }
 
     public String[] getAvailableCourseList() {
@@ -173,6 +186,14 @@ public class StudentHomeController {
 
     public void sendRecording() {
         new client_side.GrabberShow();
+    }
+
+    public URL getExamLink() throws Exception {
+        String link = null;
+        // TODO Auto-generated method stub
+        // link = Main.client.fetchData("examId", examId, ArrayList<String>);
+        link = "https://docs.google.com/forms/d/1rEgKT7uRoRrxqenORs5aKo8wIkcsb1waph28glVWF1s/viewform";
+        return (new URL(link));
     }
 
 }

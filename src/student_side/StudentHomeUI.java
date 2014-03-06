@@ -19,7 +19,7 @@ public class StudentHomeUI extends JFrame {
 
     private JTable tableReview;
 
-    public StudentHomeUI() {
+    public StudentHomeUI() throws Exception {
         addWindowFocusListener(new WindowFocusListener() {
             public void windowGainedFocus(WindowEvent arg0) {
             }
@@ -31,7 +31,7 @@ public class StudentHomeUI extends JFrame {
         initialize();
     }
 
-    private void initialize() {
+    private void initialize() throws Exception {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (ClassNotFoundException | InstantiationException
@@ -110,7 +110,7 @@ public class StudentHomeUI extends JFrame {
         pnExam.add(spExampaper);
         try {
             dtrpnExampaper
-                    .setPage("https://docs.google.com/forms/d/1rEgKT7uRoRrxqenORs5aKo8wIkcsb1waph28glVWF1s/viewform");
+                    .setPage(Main.studentHomeController.getExamLink());
         } catch (IOException e) {
             dtrpnExampaper.setContentType("text/html");
             dtrpnExampaper.setText("<html>Could not load exam papers</html>");
