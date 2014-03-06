@@ -3,6 +3,7 @@ package student_side;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import client_side.GrabberShow;
 import entity.Main;
@@ -27,8 +28,9 @@ public class StudentHomeController {
     }
 
     public String getInformation() {
-
-        // ArrayList<ArrayList<String>> information = Main.client.fetchData();
+//        ArrayList<String> neededInfoList = new ArrayList<String>(Arrays.asList("realname", "coursecode", "examid"));
+//        ArrayList<ArrayList<String>> information = Main.client.fetchData("username", Main.currentUser.getUserId(), neededInfoList);
+        
         ArrayList<ArrayList<String>> information = new ArrayList<ArrayList<String>>();
         {
             ArrayList<String> a = new ArrayList<String>();
@@ -53,6 +55,7 @@ public class StudentHomeController {
     }
 
     public String getRecentMessage() {
+        // implement way: polling request
         // ArrayList<ArrayList<String>> recentMessage = Main.client.fetchData();
         ArrayList<ArrayList<String>> recentMessage = new ArrayList<ArrayList<String>>();
         {
@@ -82,8 +85,9 @@ public class StudentHomeController {
     }
 
     public String[] getCurrentBookingList() {
-        // ArrayList<ArrayList<String>> currentBookingList =
-        // Main.client.fetchData();
+//        ArrayList<String> neededInfoList = new ArrayList<String>(Arrays.asList("realname", "coursecode", "examid"));
+//        ArrayList<ArrayList<String>> currentBookingList = Main.client.fetchData("username", Main.currentUser.getUserName(), neededInfoList);
+        
         ArrayList<ArrayList<String>> currentBookingList = new ArrayList<ArrayList<String>>();
         {
             ArrayList<String> a = new ArrayList<String>();
@@ -114,26 +118,29 @@ public class StudentHomeController {
     }
 
     public void makeRequestOfABooking(int index) {
-        System.out.println("asdfasdfasdf" + index);
         if (index == -1) {
             return;
         }
+        //String examId = "";
+        //get examId for textbox!!!
+        //set up a new windows
+        //fill the windows with old data
         
-        String examId = "";
-        //get examId here
-        this.updateExamInfo(examId);
+        //I assume all the data already fetched during getCurrentBookingList();
     }
-    public void updateExamInfo(String examId) {
+    
+    //updateExamInfo(examId); called by UI listener
+    public void updateExamInfo(String examId) throws Exception {
         // TODO
-        // Open dialog/Frame
-        // fill in all previous info
-        // student modify
-        // update via client.java
+        // get text from boxes
+        // set as an arrayList
+        ArrayList<String> newBookingInfo = new ArrayList<String>();
+        Main.client.updateData("username", Main.currentUser.getUserName(), examId, newBookingInfo);
     }
 
     public String[] getAvailableCourseList() {
-        // ArrayList<ArrayList<String>> availableCourseList =
-        // Main.client.fetchData();
+//      ArrayList<String> neededInfoList = new ArrayList<String>(Arrays.asList("realname", "coursecode", "courestitle"));
+//      ArrayList<ArrayList<String>> currentBookingList = Main.client.fetchData("username", Main.currentUser.getUserName(), neededInfoList);
         ArrayList<ArrayList<String>> availableCourseList = new ArrayList<ArrayList<String>>();
         {
             ArrayList<String> a = new ArrayList<String>();
@@ -173,10 +180,22 @@ public class StudentHomeController {
 
         return result;
     }
-
-    public String[] getExamResultList() {
-        // TODO add fetchData and process
-        return null;
+    public String[] getAvailabelExamSession(String coursecode) throws Exception {
+        ArrayList<String> neededInfoList = new ArrayList<String>(Arrays.asList("examid", "starttime", "endtime", "examaddress"));
+        ArrayList<ArrayList<String>> availableExamSession = Main.client.fetchData("coursecode", coursecode, neededInfoList);
+        String[] result = new String[] { " " };
+        //convert availableExamSession to String[]
+        //write to UI
+        return result;
+    }
+    
+    public String[] getExamResultList() throws Exception {
+        ArrayList<String> neededInfoList = new ArrayList<String>(Arrays.asList("examid", "coursecode", "coursetitle", "result"));
+        ArrayList<ArrayList<String>> examResultList = Main.client.fetchData("username", Main.currentUser.getUserName(), neededInfoList);
+        String[] result = new String[] { " " };
+        //convert examResultList to String[]
+        //write to UI
+        return result;
     }
 
     public void getAboutMessage() {
@@ -190,7 +209,6 @@ public class StudentHomeController {
 
     public URL getExamLink() throws Exception {
         String link = null;
-        // TODO Auto-generated method stub
         // link = Main.client.fetchData("examId", examId, ArrayList<String>);
         link = "https://docs.google.com/forms/d/1rEgKT7uRoRrxqenORs5aKo8wIkcsb1waph28glVWF1s/viewform";
         return (new URL(link));

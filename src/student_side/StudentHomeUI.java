@@ -193,6 +193,8 @@ public class StudentHomeUI extends JFrame {
             String[] values = Main.studentHomeController
                     .getAvailableExamSession(listAvailableCourses
                             .getSelectedIndex());
+            //please modify it to get textBook content
+            //use Course title/code to select exam
 
             public int getSize() {
                 return values.length;
