@@ -94,55 +94,54 @@ public class QueryServerThread implements Runnable {
                 String userId = message.get(0).get(0);
 
                 switch (type) {
-                    case 1: {// UPDATE
-                        String tableName = message.get(1).get(0);
-                        String key = message.get(1).get(1);
+                    case 1: { // UPDATE
+                        // String tableName = message.get(1).get(0);
+                        // String key = message.get(1).get(1);
+                        // String examId = message.get(1).get(2);
+                        // ArrayList<String> bookingInfo = message.get(2);
+
+
+                        //
+                        // due to limited
+                        // only support updating exam information
+                        // which includes booked exam session, exam result, camera recording id, screen recording id
+                        //
+                        String tableName = message.get(1).get(0); // unused
+
+                        String username = message.get(1).get(1);
                         String examId = message.get(1).get(2);
-                        ArrayList<String> bookingInfo = message.get(2);
-                        /*
-                         * database 看过来！看过来！看过来！ dataBase.updateData(tableName, key,
-                         * examId, bookingInfo);
-                         */
-                        // no reply from server
+                        ArrayList<String> fieldNameToUpdate = null;
+                        ArrayList<String> fieldValueToUpdate = null;
+                        updateExamInfo(username, examId, fieldNameToUpdate, fieldValueToUpdate);
                         break;
                     }
 
-                    case 2: {// MESSAGE
+                    case 2: { // MESSAGE
                         String receiverId = message.get(1).get(0);
                         // String sms = message.get(1).get(1);
-                        if (receiverId == null) {
-                            // broadcast(id + ": " + sms);
-                        } else {
-                            // sendMessage(id + ": " + sms);
-                        }
-                        /*
-                         * database 看过来！看过来！看过来！ dataBase.saveMessage(senderId,
-                         * receiverId, sms);
-                         */
                         // no reply from server;
+                        storeMessage(String examId, String senderId, String receiverId, String messageContent, String sendTime);
                         break;
                     }
 
-                    default: {// QUERY
-                        String tableName = message.get(0).get(0);
-                        String key = message.get(0).get(1);
-                        ArrayList<String> query = message.get(1);
-                        /*
-                         * database 看过来！看过来！看过来！ replyMsg =
-                         * dataBase.fetchData(tableName, key, query);
-                         */
-                        // test
+                    default: { // QUERY
+                        String fieldName = message.get(0).get(0);
+                        String fieldValue = message.get(0).get(1);
+                        ArrayList<String> want = message.get(1);
 
                         ArrayList<ArrayList<String>> replyMsg = new ArrayList<ArrayList<String>>();
-                        ArrayList<String> s = new ArrayList<String>();
-                        s.add("1");
-                        s.add("2");
-                        replyMsg.add(s);
-                        ArrayList<String> b = new ArrayList<String>();
-                        s.add("3");
-                        s.add("4");
-                        replyMsg.add(b);
-                        // reply to client here
+                        ArrayList<String> oneField = new ArrayList<String>();
+
+                        String queryResult = query(fieldName, fieldValue, want);
+                        String[] splitedResult = queryResult.splite("#");
+                        for (int i = 0; i < splitedResult.length; i++) {
+                            ArrayList<String> oneField = new ArrayList<String>();
+                            for (int j = 0; j < splitedResult[Integer.parseInt(splitedResult[i]); j++) {
+                                oneField.add(splitedResult[j+i]);
+                            }
+                            i += j;
+                            replyMsg.add(oneField);
+                        }
                         writeMsg(replyMsg);
                         break;
                     }

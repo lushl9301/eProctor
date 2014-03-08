@@ -275,4 +275,51 @@ public class ServerDatabase {
 
         return "#" + bigFilter.size() + toto(bigFilter);
     }
+
+    public static void updateExamInfo(String username, String examId, ArrayList<String> fieldNameToUpdate, ArrayList<String> fieldValueToUpdate) {
+        MongoClient mongoClient = new MongoClient("localhost",27017);
+        DB db = mongoClient.getDB("testJavaMongo");
+        DBCollection user = db.getCollection("user");
+        DBCollection examRecords = db.getCollection("examRecords");
+
+        BasicDBObject query = new BasicDBObject("username", username).append("examid", examId);
+        BasicDBObject newUserValue = new BasicDBObject("examid", fieldValueToUpdate.get(fieldNameToUpdate.indexOf("examid")));
+        BasicDBObject newRecordValue = new BasicDBObject();
+                                        Iterator<String> iterN = fieldNameToUpdate.iterator();
+                                        Iterator<String> iterV = fieldValueToUpdate.iterator();
+                                        while (iterN.hasNext()) {
+                                            newRecordValue.append(iterN.next(), iterV.next());
+                                        }
+        user.update(query, newUserValue, true, true);
+        examRecords.update(query, newRecordValue, true, true);
+
+        mongoClient.close();
+    }
+
+    public static void storeMessage(String examId, String senderId, String receiverId, String messageContent, String sendTime) {
+        MongoClient mongoClient = new MongoClient("localhost",27017);
+        DB db = mongoClient.getDB("testJavaMongo");
+        DBCollection user = db.getCollection("user");
+        DBCollection examRecords = db.getCollection("examRecords");
+        
+        BasicDBObject oneRecord = new BasicDBObject("senderId", senderId)
+                                            .append("receiverid", receiverId==null?"":receiverId)
+                                            .append("message", messageContent)
+                                            .append("sendtime", sendTime);
+        if (receiverId == null) {
+            BasicDBObject query = new BasicDBObject("examid", examId);
+            examRecords.update(query, new BasicDBObject("$push", new BasicDBObject("conversation", oneRecord)), true, true);
+        } else {
+            String domain = (String) user.findOne(new BasicDBObject("username", senderId), new BasicDBObject("domain", 1)).get("domain");
+            if (domain.equals("student")) {
+                BasicDBObject query = new BasicDBObject("examid", examId).append("username", senderId);
+                examRecords.update(query, new BasicDBObject("$push", new BasicDBObject("conversation", oneRecord)), true, true);
+            } else {
+                BasicDBObject query = new BasicDBObject("examid", examId).append("username", receiverId);
+                examRecords.update(query, new BasicDBObject("$push", new BasicDBObject("conversation", oneRecord)), true, true);
+            }
+        }
+        
+        mongoClient.close();
+    }
 }
