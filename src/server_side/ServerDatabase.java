@@ -306,6 +306,10 @@ public class ServerDatabase {
                                             .append("receiverid", receiverId==null?"":receiverId)
                                             .append("message", messageContent)
                                             .append("sendtime", sendTime);
+
+        if (sendTime == null)
+            sendTime = new Date().toString();
+        
         if (receiverId == null) {
             BasicDBObject query = new BasicDBObject("examid", examId);
             examRecords.update(query, new BasicDBObject("$push", new BasicDBObject("conversation", oneRecord)), true, true);
