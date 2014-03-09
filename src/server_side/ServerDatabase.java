@@ -149,8 +149,10 @@ public class ServerDatabase {
 
     // the method for query, need query helper123
     public String query(String fieldName, String key, ArrayList<String> want) {
-        MongoClient mongoClient = new MongoClient("localhost",27017);
-        DB db = mongoClient.getDB("testJavaMongo");
+        MongoClient mongoClient = new MongoClient("emma.mongohq.com", 10052);
+        DB db = mongoClient.getDB("ce2006_cloud_mongodb");
+        boolean auth = db.authenticate("admin", "admin".toCharArray());
+
         DBCollection user = db.getCollection("user");
         DBCollection examBasic = db.getCollection("examBasic");
         DBCollection examRecords = db.getCollection("examRecords");
@@ -277,8 +279,10 @@ public class ServerDatabase {
     }
 
     public static void updateExamInfo(String username, String examId, ArrayList<String> fieldNameToUpdate, ArrayList<String> fieldValueToUpdate) {
-        MongoClient mongoClient = new MongoClient("localhost",27017);
-        DB db = mongoClient.getDB("testJavaMongo");
+        MongoClient mongoClient = new MongoClient("emma.mongohq.com", 10052);
+        DB db = mongoClient.getDB("ce2006_cloud_mongodb");
+        boolean auth = db.authenticate("admin", "admin".toCharArray());
+
         DBCollection user = db.getCollection("user");
         DBCollection examRecords = db.getCollection("examRecords");
 
@@ -297,8 +301,10 @@ public class ServerDatabase {
     }
 
     public static void storeMessage(String examId, String senderId, String receiverId, String messageContent, String sendTime) {
-        MongoClient mongoClient = new MongoClient("localhost",27017);
-        DB db = mongoClient.getDB("testJavaMongo");
+        MongoClient mongoClient = new MongoClient("emma.mongohq.com", 10052);
+        DB db = mongoClient.getDB("ce2006_cloud_mongodb");
+        boolean auth = db.authenticate("admin", "admin".toCharArray());
+
         DBCollection user = db.getCollection("user");
         DBCollection examRecords = db.getCollection("examRecords");
         
