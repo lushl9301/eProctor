@@ -1,3 +1,7 @@
+package entity;
+
+import java.util.ArrayList;
+
 public class Conversation {
 
     private ArrayList<Time> sendTimeList;
