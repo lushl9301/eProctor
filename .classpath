@@ -11,5 +11,6 @@
 			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="E:/Program Files/Java/opencv/build/x86/vc10/bin"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="D:/Yue/Downloads/mongo-java-driver-2.11.4.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
