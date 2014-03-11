@@ -1,3 +1,5 @@
+package videoMultiThreadSerializable;
+
 import static com.googlecode.javacv.cpp.opencv_core.*;
 
 import java.awt.image.BufferedImage;
@@ -15,7 +17,7 @@ public class GrabberShow implements Runnable {
     public CanvasFrame canvas = new CanvasFrame("Web Cam");
     private ObjectOutputStream sOutput;
     private int port = Main.port2;
-    private String userId = "1245";
+    private String userId;
     private Socket socket;
 
     public GrabberShow(int port, String userId) {

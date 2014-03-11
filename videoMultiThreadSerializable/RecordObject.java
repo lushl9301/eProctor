@@ -1,3 +1,5 @@
+package videoMultiThreadSerializable;
+
 import java.io.Serializable;
 
 public class RecordObject implements Serializable {
