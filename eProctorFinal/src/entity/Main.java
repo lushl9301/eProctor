@@ -23,6 +23,5 @@ public class Main {
 		user_id = new ObjectId("531ec0d07a0016ee1c000508");
 		mongoHQ = new server_side.MongoHQ();
 		studentHomeController = new student_side.StudentHomeController("gong0025");
-		
 	}
 }
