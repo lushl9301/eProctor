@@ -122,11 +122,10 @@ public class StudentHomeUI extends JFrame {
 		lblCurrentBookings.setBounds(screenSize.width / 2 - 420, 50, 150, 22);
 		pnBooking.add(lblCurrentBookings);
 
-//		listCurrentBookings = new JList<String>();
-//		listCurrentBookings
-//				.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-//		listCurrentBookings.setBounds(screenSize.width / 2 - 420, 78, 600, 213);
-//		pnBooking.add(listCurrentBookings);
+		listCurrentBookings = new JList<String>();
+		listCurrentBookings.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		listCurrentBookings.setBounds(screenSize.width / 2 - 420, 78, 600, 213);
+		pnBooking.add(listCurrentBookings);
 
 		JButton btnMakeARequest = new JButton("Make A Request");
 		btnMakeARequest.addMouseListener(new MouseAdapter() {
@@ -154,10 +153,8 @@ public class StudentHomeUI extends JFrame {
 				Main.studentHomeController.fetchListAvailableSessions();
 			}
 		});
-		listAvailableCourses
-				.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		listAvailableCourses.setBounds(screenSize.width / 2 - 420, 381, 405,
-				174);
+		listAvailableCourses.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		listAvailableCourses.setBounds(screenSize.width / 2 - 420, 381, 405, 174);
 		pnBooking.add(listAvailableCourses);
 
 		JLabel lblAvailableSessions = new JLabel("Available Sessions");
@@ -165,10 +162,8 @@ public class StudentHomeUI extends JFrame {
 		pnBooking.add(lblAvailableSessions);
 
 		listAvailableSessions = new JList();
-		listAvailableSessions
-				.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		listAvailableSessions
-				.setBounds(screenSize.width / 2 - 5, 381, 240, 174);
+		listAvailableSessions.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		listAvailableSessions.setBounds(screenSize.width / 2 - 5, 381, 240, 174);
 		pnBooking.add(listAvailableSessions);
 
 		JButton btnOk = new JButton("OK");
