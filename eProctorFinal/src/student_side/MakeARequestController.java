@@ -48,6 +48,14 @@ public class MakeARequestController {
 		return (String) tObj.get("code");
 	}
 
+	public String getCourseName() {
+		QueryBuilder qbQuery = new QueryBuilder();
+		qbQuery = new QueryBuilder();
+		qbQuery.put("_id").is(obj.get("course_id"));
+		tObj = Main.mongoHQ.course.findOne(qbQuery.get());
+		return (String) tObj.get("name");
+	}
+	
 	public String getSessionId() {
 		return obj.get("session_id").toString();
 	}

@@ -22,7 +22,7 @@ import java.awt.event.MouseEvent;
 public class MakeARequestUI extends JFrame {
 
 	private JPanel contentPane;
-	private JTextField txtCour;
+	private JTextField txtCourseName;
 	private JTextField txtSession;
 	private JTextField txtCourseCode;
 	private JTextField textStartTime;
@@ -35,7 +35,7 @@ public class MakeARequestUI extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public MakeARequestUI() {
+	public MakeARequestUI(final student_side.MakeARequestController controller) {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
 		contentPane = new JPanel();
@@ -47,7 +47,7 @@ public class MakeARequestUI extends JFrame {
 		btnDelete.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				Main.makeARequestController.deleteRecord();
+				controller.deleteRecord();
 			}
 		});
 		btnDelete.setBounds(152, 232, 157, 25);
@@ -57,7 +57,7 @@ public class MakeARequestUI extends JFrame {
 		btnCancel.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				Main.makeARequestController.cancel();
+				controller.cancel();
 				setVisible(false);
 			}
 		});
@@ -66,42 +66,42 @@ public class MakeARequestUI extends JFrame {
 		
 		txtCourseCode = new JTextField();
 		txtCourseCode.setEditable(false);
-		txtCourseCode.setText(Main.makeARequestController.getCourseCode());
+		txtCourseCode.setText(controller.getCourseCode());
 		txtCourseCode.setBounds(97, 50, 99, 22);
 		contentPane.add(txtCourseCode);
 		txtCourseCode.setColumns(10);
 		
-		txtCour = new JTextField();
-		txtCour.setEditable(false);
-		txtCour.setText(Main.makeARequestController.getCourseCode());
-		txtCour.setBounds(97, 85, 99, 22);
-		contentPane.add(txtCour);
-		txtCour.setColumns(10);
+		txtCourseName = new JTextField();
+		txtCourseName.setEditable(false);
+		txtCourseName.setText(controller.getCourseName());
+		txtCourseName.setBounds(97, 85, 99, 22);
+		contentPane.add(txtCourseName);
+		txtCourseName.setColumns(10);
 		
 		txtSession = new JTextField();
 		txtSession.setEditable(false);
-		txtSession.setText(Main.makeARequestController.getSessionId());
+		txtSession.setText(controller.getSessionId());
 		txtSession.setBounds(97, 120, 99, 22);
 		contentPane.add(txtSession);
 		txtSession.setColumns(10);
 		
 		txtLocation = new JTextField();
 		txtLocation.setEditable(false);
-		txtLocation.setText(Main.makeARequestController.getLocation());
+		txtLocation.setText(controller.getLocation());
 		txtLocation.setBounds(288, 50, 150, 22);
 		contentPane.add(txtLocation);
 		txtLocation.setColumns(10);
 		
 		textStartTime = new JTextField();
 		textStartTime.setEditable(false);
-		textStartTime.setText(Main.makeARequestController.getStartTime());
+		textStartTime.setText(controller.getStartTime());
 		textStartTime.setBounds(288, 85, 150, 22);
 		contentPane.add(textStartTime);
 		textStartTime.setColumns(10);
 		
 		textEndTime = new JTextField();
 		textEndTime.setEditable(false);
-		textEndTime.setText(Main.makeARequestController.getEndTime());
+		textEndTime.setText(controller.getEndTime());
 		textEndTime.setBounds(288, 120, 150, 22);
 		contentPane.add(textEndTime);
 		textEndTime.setColumns(10);
@@ -137,12 +137,12 @@ public class MakeARequestUI extends JFrame {
 		FYI.setBounds(68, 160, 370, 60);
 		contentPane.add(FYI);
 		
-		lblRecordid = new JLabel("Record: " + Main.makeARequestController.getRecordId());
-		lblRecordid.setBounds(28, 12, 117, 15);
+		lblRecordid = new JLabel("Exam Record: " + controller.getRecordId());
+		lblRecordid.setBounds(28, 12, 176, 15);
 		contentPane.add(lblRecordid);
 		
-		lblProctorName = new JLabel("Proctor: " + Main.makeARequestController.getProctorId());
-		lblProctorName.setBounds(150, 12, 117, 15);
+		lblProctorName = new JLabel("Proctor: " + controller.getProctorId());
+		lblProctorName.setBounds(224, 12, 139, 15);
 		contentPane.add(lblProctorName);
 	}
 }
