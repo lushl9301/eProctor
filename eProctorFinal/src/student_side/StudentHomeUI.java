@@ -3,9 +3,7 @@ package student_side;
 import java.awt.*;
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
-
-import entity.Main;
+import javax.swing.table.AbstractTableModel;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -15,20 +13,22 @@ import java.awt.event.WindowFocusListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.ListSelectionEvent;
 
 public class StudentHomeUI extends JFrame {
 
-	public JTable tableReview;
-	public JTextPane txtpnInformation;
-	public JTextPane txtpnRecentMessages;
-	public JList<String> listCurrentBookings;
-	public JTable tableCurrentBookings;
-	public JList listAvailableCourses;
-	public JList listAvailableSessions;
+	private StudentHomeController controller;
+	private JTable tableReview;
+	private JTextPane txtpnInformation;
+	private JTextPane txtpnRecentMessages;
+	private JList<String> listCurrentBookings;
+	private JTable tableCurrentBookings;
+	private JList listAvailableCourses;
+	private JList listAvailableSessions;
 
-	public StudentHomeUI() throws Exception {
+	public StudentHomeUI(StudentHomeController controller) throws Exception {
 //		addWindowFocusListener(new WindowFocusListener() {
 //			public void windowGainedFocus(WindowEvent arg0) {
 //			}
@@ -38,8 +38,30 @@ public class StudentHomeUI extends JFrame {
 //			}
 //		});
 		initialize();
+		this.controller = controller;
+		refreshUI();
 	}
 
+	private void refreshUI() {
+		txtpnInformation.setText(controller.getInformation());
+		txtpnRecentMessages.setText(controller.getRecentMessage());
+		tableCurrentBookings.setModel(new TableCurrentBookingsModel(controller.getTableCurrentBookings()));
+		tableCurrentBookings.getColumnModel().getColumn(0)
+				.setPreferredWidth(100);
+		tableCurrentBookings.getColumnModel().getColumn(1)
+				.setPreferredWidth(200);
+		tableCurrentBookings.getColumnModel().getColumn(2)
+				.setPreferredWidth(170);
+		listAvailableCourses.setModel(new ListArrayListModel(controller.getListAvailableCourses()));
+		listAvailableSessions.setModel(new ListArrayListModel(controller.getListAvailableSessions(-1)));
+		tableReview.setModel(new TableReviewModel(controller.getTableReview()));
+		tableReview.getColumnModel().getColumn(0).setPreferredWidth(50);
+		tableReview.getColumnModel().getColumn(1).setPreferredWidth(220);
+		tableReview.getColumnModel().getColumn(2).setPreferredWidth(300);
+		tableReview.getColumnModel().getColumn(3).setPreferredWidth(40);
+		tableReview.getColumnModel().getColumn(4).setPreferredWidth(90);
+	}
+	
 	private void initialize() throws Exception {
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -133,7 +155,7 @@ public class StudentHomeUI extends JFrame {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				int index = listCurrentBookings.getSelectedIndex();
-				Main.studentHomeController.makeRequestOfABooking(index);
+				controller.makeRequestOfABooking(index);
 			}
 		});
 		btnMakeARequest.setBounds(screenSize.width / 2 + 200, 150, 150, 30);
@@ -151,7 +173,7 @@ public class StudentHomeUI extends JFrame {
 		listAvailableCourses = new JList();
 		listAvailableCourses.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent arg0) {
-				Main.studentHomeController.fetchListAvailableSessions();
+				listAvailableSessions.setModel(new ListArrayListModel(controller.getListAvailableSessions(listAvailableCourses.getSelectedIndex())));
 			}
 		});
 		listAvailableCourses
@@ -175,7 +197,7 @@ public class StudentHomeUI extends JFrame {
 		btnOk.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				Main.studentHomeController.bookNewSession();
+				controller.bookNewSession(listAvailableSessions.getSelectedIndex(), listAvailableCourses.getSelectedIndex());
 			}
 		});
 		btnOk.setBounds(screenSize.width / 2 + 261, 403, 89, 30);
@@ -189,6 +211,7 @@ public class StudentHomeUI extends JFrame {
 		btnRefresh.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
+				refreshUI();
 			}
 		});
 		btnRefresh.setBounds(screenSize.width / 2 + 261, 497, 89, 30);
@@ -204,6 +227,7 @@ public class StudentHomeUI extends JFrame {
 		
 		tableCurrentBookings = new JTable();
 		scpCurrentBookings.setViewportView(tableCurrentBookings);
+		
 
 		JPanel pnReview = new JPanel();
 		tabbedPane.addTab("Review", null, pnReview, null);
@@ -219,7 +243,7 @@ public class StudentHomeUI extends JFrame {
 
 		tableReview = new JTable();
 		scrollPane.setViewportView(tableReview);
-
+		
 		JPanel pnSetting = new JPanel();
 		tabbedPane.addTab("Setting", null, pnSetting, null);
 
@@ -233,7 +257,7 @@ public class StudentHomeUI extends JFrame {
 		JMenuItem mntmLogout = new JMenuItem("Logout");
 		mntmLogout.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				Main.studentHomeController.logout();
+				controller.logout();
 			}
 		});
 		mnFile.add(mntmLogout);
@@ -241,7 +265,7 @@ public class StudentHomeUI extends JFrame {
 		JMenuItem mntmExit = new JMenuItem("Exit");
 		mntmExit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				Main.studentHomeController.exit();
+				controller.exit();
 			}
 		});
 		mnFile.add(mntmExit);
@@ -252,7 +276,7 @@ public class StudentHomeUI extends JFrame {
 		JMenuItem mntmAbout = new JMenuItem("About");
 		mntmAbout.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				Main.studentHomeController.getAboutMessage();
+				controller.getAboutMessage();
 			}
 		});
 		mnHelp.add(mntmAbout);
@@ -260,4 +284,100 @@ public class StudentHomeUI extends JFrame {
 		graphicsDevice.setFullScreenWindow(this);
 		validate();
 	}
+	public class TableCurrentBookingsModel extends AbstractTableModel {
+
+		private ArrayList<ArrayList<String>> records;
+
+		public TableCurrentBookingsModel(ArrayList<ArrayList<String>> records) {
+			this.records = records;
+		}
+
+		@Override
+		public int getRowCount() {
+			return records.size();
+		}
+
+		@Override
+		public int getColumnCount() {
+			return 3;
+		}
+
+		@Override
+		public String getColumnName(int column) {
+			switch (column) {
+			// "Record ID", "Course", "Session", "Grade", "Remark"
+			case 0:
+				return "Record ID";
+			case 1:
+				return "Course";
+			case 2:
+				return "Session";
+			default:
+				return "";
+			}
+		}
+
+		public Object getValueAt(int rowIndex, int columnIndex) {
+			return records.get(rowIndex).get(columnIndex);
+		}
+	}
+
+	public class ListArrayListModel extends AbstractListModel {
+
+		private ArrayList<String> records;
+
+		public ListArrayListModel(ArrayList<String> records) {
+			this.records = records;
+		}
+
+		public Object getElementAt(int index) {
+			return records.get(index);
+		}
+
+		public int getSize() {
+			if (records == null)
+				return 0;
+			return records.size();
+		}
+
+	}
+	
+	public class TableReviewModel extends AbstractTableModel {
+
+		private ArrayList<ArrayList<String>> records;
+
+		public TableReviewModel(ArrayList<ArrayList<String>> records) {
+			this.records = records;
+		}
+
+		public int getRowCount() {
+			return records.size();
+		}
+
+		public int getColumnCount() {
+			return 5;
+		}
+
+		public String getColumnName(int column) {
+			switch (column) {
+			case 0:
+				return "Record ID";
+			case 1:
+				return "Course";
+			case 2:
+				return "Session";
+			case 3:
+				return "Grade";
+			case 4:
+				return "Remark";
+			default:
+				return "";
+			}
+		}
+
+		public Object getValueAt(int rowIndex, int columnIndex) {
+			return records.get(rowIndex).get(columnIndex);
+		}
+	}
 }
+
