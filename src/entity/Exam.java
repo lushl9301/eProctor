@@ -1,7 +1,3 @@
-package entity;
-
-import java.util.ArrayList;
-
 public class Exam {
 
     private Time startTime;

@@ -1,10 +1,9 @@
-import static com.googlecode.javacv.cpp.opencv_core.cvFlip;
+package videoMultiThreadSerializable;
 
-import java.io.ByteArrayInputStream;
-import java.io.ObjectInputStream;
+import java.awt.image.BufferedImage;
+import java.io.*;
 import java.net.*;
 import java.util.*;
-import java.awt.image.BufferedImage;
 
 import javax.imageio.ImageIO;
 
@@ -12,21 +11,22 @@ import com.googlecode.javacv.CanvasFrame;
 import com.googlecode.javacv.cpp.opencv_core.IplImage;
 
 public class VideoServerThread implements Runnable {
-    private HashMap<String, ReceiveImg> threadHashMap;
+    private HashMap<String, PassImg> passHashMap;
+    private HashMap<String, RecordObject> receivedList = new HashMap<String, RecordObject>();
+    
     private int port;
     private static ServerSocket serverSocket;
     private Socket socket;
     private ObjectInputStream sInput;
-
+    
     public VideoServerThread(int port) {
         this.port = port;
-        threadHashMap = new HashMap<String, ReceiveImg>();
+        passHashMap = new HashMap<String, PassImg>();
         new Thread(this, "videoserver").start();
     }
 
     public void run() {
         try {
-            System.out.println("here");
             serverSocket = new ServerSocket(port);
 
             System.out.println("start receiveImg...");
@@ -35,14 +35,17 @@ public class VideoServerThread implements Runnable {
                 sInput = new ObjectInputStream(socket.getInputStream());
                 RecordObject recordObject = (RecordObject) sInput.readObject();
                 socket.close();
+                
                 String userId = recordObject.getUserId();
-                ReceiveImg receiveImg = threadHashMap.get(userId);
-                if (receiveImg == null) {
-                    receiveImg = new ReceiveImg(threadHashMap);
-                    threadHashMap.put(userId, receiveImg);
+                synchronized(this){
+                	receivedList.put(userId, recordObject);
                 }
-                receiveImg.recordObject = recordObject;
-                receiveImg.run();
+                
+                if (passHashMap.get(userId) == null) {
+                	PassImg passImg = new PassImg(receivedList, userId);
+                    passHashMap.put(userId, passImg);
+                    passImg.start();
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -50,32 +53,34 @@ public class VideoServerThread implements Runnable {
     }
 }
 
-class ReceiveImg extends Thread {
-    public HashMap<String, ReceiveImg> threadHashMap;
-    public CanvasFrame canvas;
-    public RecordObject recordObject;
+class PassImg extends Thread {
+	public HashMap<String, RecordObject> receivedList;
+	public String userId;
+	public ObjectOutputStream sOutput;
+	public Socket socket;
+	
+  PassImg(HashMap<String, RecordObject> receivedList, String userId) {
+	  this.receivedList = receivedList;
+	  this.userId = userId;
+  }
 
-    ReceiveImg(HashMap<String, ReceiveImg> threadHashMap) {
-        this.threadHashMap = threadHashMap;
-        canvas = new CanvasFrame("Web Cam On server");
-        System.out.println("newnewnew");
-    }
-
-    public void run() {
-        try {
-            // System.out.print("here");
-            byte[] imageBytes = recordObject.getImageBytes();
-            BufferedImage bufC = ImageIO.read(new ByteArrayInputStream(
-                    imageBytes));
-            IplImage toDisplay = IplImage.createFrom(bufC);
-            ReceiveImg t = threadHashMap.get(recordObject.getUserId());
-            // t.canvas.showImage(toDisplay);
-            cvFlip(toDisplay, toDisplay, 1);
-            canvas.showImage(toDisplay);
-
-            this.join();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+  public void run() {
+	  try {
+		Thread.sleep(2000);
+	} catch (InterruptedException e1) {
+		e1.printStackTrace();
+	}
+      try {
+		  while (true) {
+			if (receivedList.containsKey(userId) && receivedList.get(userId) != null) {
+				socket = new Socket("localhost", 6002);
+				sOutput = new ObjectOutputStream(socket.getOutputStream());
+				sOutput.writeObject(receivedList.get(userId));
+				socket.close();
+			}	
+		  }
+      } catch (Exception e) {
+          e.printStackTrace();
+      }
+  }
 }

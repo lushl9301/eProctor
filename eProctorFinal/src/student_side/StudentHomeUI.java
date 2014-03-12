@@ -211,22 +211,22 @@ public class StudentHomeUI extends JFrame {
 
 		JMenu mnFile = new JMenu("File");
 		menuBar.add(mnFile);
-				
-						JMenuItem mntmLogout = new JMenuItem("Logout");
-						mnFile.add(mntmLogout);
-						
-								JMenuItem mntmExit = new JMenuItem("Exit");
-								mnFile.add(mntmExit);
-								mntmExit.addActionListener(new ActionListener() {
-									public void actionPerformed(ActionEvent arg0) {
-										Main.studentHomeController.exit();
-									}
-								});
-						mntmLogout.addActionListener(new ActionListener() {
-							public void actionPerformed(ActionEvent arg0) {
-								Main.studentHomeController.logout();
-							}
-						});
+
+		JMenuItem mntmLogout = new JMenuItem("Logout");
+		mntmLogout.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				Main.studentHomeController.logout();
+			}
+		});
+		mnFile.add(mntmLogout);
+
+		JMenuItem mntmExit = new JMenuItem("Exit");
+		mntmExit.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				Main.studentHomeController.exit();
+			}
+		});
+		mnFile.add(mntmExit);
 
 		JMenu mnHelp = new JMenu("Help");
 		menuBar.add(mnHelp);
@@ -238,15 +238,6 @@ public class StudentHomeUI extends JFrame {
 			}
 		});
 		mnHelp.add(mntmAbout);
-		
-		JMenuItem mnExit = new JMenuItem("Exit");
-		mnExit.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				Main.studentHomeController.exit();
-			}
-		});
-		menuBar.add(mnExit);
 
 		graphicsDevice.setFullScreenWindow(this);
 		validate();

@@ -1,10 +1,10 @@
-package server_side;
+package control;
 
 import java.util.*;
 
 class ExamSystem {
 
-    private ArrayList<entity.Exam> examList = new ArrayList<entity.Exam>();
+    private ArrayList<Exam> examList = new ArrayList<Exam>();
     
     public void setExaminationHall() {
         /*
