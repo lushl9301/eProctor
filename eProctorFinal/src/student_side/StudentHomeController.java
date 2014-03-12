@@ -21,8 +21,12 @@ public class StudentHomeController {
 	private ArrayList<ObjectId>	sessionIdRecord;
 
 	public StudentHomeController(String username) throws Exception {
+		Main.studentHomeUI = new StudentHomeUI();
+		Main.studentHomeUI.setVisible(true);
 		courseIdRecord = new ArrayList<ObjectId>();
 		sessionIdRecord = new ArrayList<ObjectId>();
+		fetchPnReview();
+		fetchPnBooking();
 	}
 
 	public void exit() {
@@ -38,7 +42,25 @@ public class StudentHomeController {
 
 	}
 
-	public ArrayList<ArrayList<String>> getTableCurrentBookings() {
+	public void fetchPnStatus() {
+		Main.studentHomeUI.txtpnInformation.setText(Main.studentHomeController
+				.getInformation());
+		Main.studentHomeUI.txtpnRecentMessages
+				.setText(Main.studentHomeController.getRecentMessage());
+	}
+
+	public void fetchPnBooking() {
+		fetchTableCurrentBookings();
+		fetchListAvailableCourses();
+		ListArrayListModel listArrayListModel = new ListArrayListModel(new ArrayList());
+		Main.studentHomeUI.listAvailableSessions.setModel(listArrayListModel);
+	}
+
+	public void refreshPnBooking() {
+		fetchPnBooking();
+	}
+	
+	public void fetchTableCurrentBookings() {
 		QueryBuilder qb = new QueryBuilder();
 		qb.put("student_id").is(Main.user_id).put("takenStatus").is(false);
 		DBCursor cursor = Main.mongoHQ.record.find(qb.get());
@@ -70,10 +92,19 @@ public class StudentHomeController {
 			
 			currentBookingsRecords.add(temp);
 		}
-		return currentBookingsRecords;
+		TableCurrentBookingsModel tableCurrentBookingsModel = new TableCurrentBookingsModel(
+				currentBookingsRecords);
+		Main.studentHomeUI.tableCurrentBookings
+				.setModel(tableCurrentBookingsModel);
+		Main.studentHomeUI.tableReview.getColumnModel().getColumn(0)
+				.setPreferredWidth(100);
+		Main.studentHomeUI.tableReview.getColumnModel().getColumn(1)
+				.setPreferredWidth(200);
+		Main.studentHomeUI.tableReview.getColumnModel().getColumn(2)
+				.setPreferredWidth(170);
 	}
 
-	public ArrayList<String> getListAvailableCourses() {
+	public void fetchListAvailableCourses() {
 		BasicDBObject query = new BasicDBObject();
 		query.put("_id", Main.user_id);
 		DBObject obj = Main.mongoHQ.student.findOne(query);
@@ -87,13 +118,14 @@ public class StudentHomeController {
 			courseIdRecord.add((ObjectId) obj.get("_id"));
 			coursesRecord.add((String) obj.get("code") + " " + ((String) obj.get("name")));
 		}
-		return coursesRecord;
+		
+		ListArrayListModel listArrayListModel = new ListArrayListModel(
+				coursesRecord);
+		Main.studentHomeUI.listAvailableCourses.setModel(listArrayListModel);
 	}
 
-	public ArrayList<String> getListAvailableSessions(int selectedCourseIndex) {
-		if (selectedCourseIndex == -1)
-			return null;
-		ObjectId courseId = courseIdRecord.get(selectedCourseIndex);
+	public void fetchListAvailableSessions() {
+		ObjectId courseId = courseIdRecord.get(Main.studentHomeUI.listAvailableCourses.getSelectedIndex());
 		QueryBuilder qb = new QueryBuilder();
 		qb.put("_id").is(courseId);
 		
@@ -112,10 +144,12 @@ public class StudentHomeController {
 			String str = startFormat.format(startDate) + endFormat.format(endDate);
 			sessionsRecord.add(str);
 		}
-		return sessionsRecord;
+		ListArrayListModel listArrayListModel = new ListArrayListModel(
+				sessionsRecord);
+		Main.studentHomeUI.listAvailableSessions.setModel(listArrayListModel);
 	}
 
-	public ArrayList<ArrayList<String>> getTableReview() {
+	public void fetchPnReview() {
 		//BasicDBObject query = new BasicDBObject();
 		QueryBuilder qb = new QueryBuilder();
 		qb.put("student_id").is(Main.user_id).put("takenStatus").is(true);
@@ -148,9 +182,18 @@ public class StudentHomeController {
 			temp.add((String) obj.get("remark"));
 			reviewRecords.add(temp);
 		}
-		return reviewRecords;
-		
-		
+		TableReviewModel tableReviewModel = new TableReviewModel(reviewRecords);
+		Main.studentHomeUI.tableReview.setModel(tableReviewModel);
+//		Main.studentHomeUI.tableReview.getColumnModel().getColumn(0)
+//				.setPreferredWidth(50);
+//		Main.studentHomeUI.tableReview.getColumnModel().getColumn(1)
+//				.setPreferredWidth(220);
+//		Main.studentHomeUI.tableReview.getColumnModel().getColumn(2)
+//				.setPreferredWidth(300);
+//		Main.studentHomeUI.tableReview.getColumnModel().getColumn(3)
+//				.setPreferredWidth(40);
+//		Main.studentHomeUI.tableReview.getColumnModel().getColumn(4)
+//				.setPreferredWidth(90);
 	}
 
 	public String getInformation() {
@@ -225,11 +268,11 @@ public class StudentHomeController {
 		// I assume all the data already fetched during getCurrentBookingList();
 	}
 	
-	public void bookNewSession(int selectedCourseIndex, int selectedSessionIndex) {
-		if (selectedSessionIndex == -1)
+	public void bookNewSession() {
+		if (Main.studentHomeUI.listAvailableSessions.getSelectedIndex() == -1)
 			return;
-		ObjectId courseId = courseIdRecord.get(selectedCourseIndex);
-		ObjectId sessionId = sessionIdRecord.get(selectedSessionIndex);
+		ObjectId courseId = courseIdRecord.get(Main.studentHomeUI.listAvailableCourses.getSelectedIndex());
+		ObjectId sessionId = sessionIdRecord.get(Main.studentHomeUI.listAvailableSessions.getSelectedIndex());
 //		Student enrolledNotTested
 //		Record
 		DBObject listItem = new BasicDBObject("enrolledNotTested", courseId);
@@ -259,4 +302,97 @@ public class StudentHomeController {
 		return (new URL(link));
 	}
 
+	public class TableReviewModel extends AbstractTableModel {
+
+		private ArrayList<ArrayList<String>> records;
+
+		public TableReviewModel(ArrayList<ArrayList<String>> records) {
+			this.records = records;
+		}
+
+		public int getRowCount() {
+			return records.size();
+		}
+
+		public int getColumnCount() {
+			return 5;
+		}
+
+		public String getColumnName(int column) {
+			switch (column) {
+			case 0:
+				return "Record ID";
+			case 1:
+				return "Course";
+			case 2:
+				return "Session";
+			case 3:
+				return "Grade";
+			case 4:
+				return "Remark";
+			default:
+				return "";
+			}
+		}
+
+		public Object getValueAt(int rowIndex, int columnIndex) {
+			return records.get(rowIndex).get(columnIndex);
+		}
+	}
+
+	public class TableCurrentBookingsModel extends AbstractTableModel {
+
+		private ArrayList<ArrayList<String>> records;
+
+		public TableCurrentBookingsModel(ArrayList<ArrayList<String>> records) {
+			this.records = records;
+		}
+
+		@Override
+		public int getRowCount() {
+			return records.size();
+		}
+
+		@Override
+		public int getColumnCount() {
+			return 3;
+		}
+
+		@Override
+		public String getColumnName(int column) {
+			switch (column) {
+			// "Record ID", "Course", "Session", "Grade", "Remark"
+			case 0:
+				return "Record ID";
+			case 1:
+				return "Course";
+			case 2:
+				return "Session";
+			default:
+				return "";
+			}
+		}
+
+		public Object getValueAt(int rowIndex, int columnIndex) {
+			return records.get(rowIndex).get(columnIndex);
+		}
+	}
+
+	public class ListArrayListModel extends AbstractListModel {
+
+		private ArrayList<String> records;
+
+		public ListArrayListModel(ArrayList<String> records) {
+			this.records = records;
+		}
+
+		public Object getElementAt(int index) {
+			return records.get(index);
+		}
+
+		public int getSize() {
+			return records.size();
+		}
+
+	}
 }
