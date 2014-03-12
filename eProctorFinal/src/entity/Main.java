@@ -1,11 +1,12 @@
 package entity;
 
 import java.awt.Font;
-import java.net.UnknownHostException;
 
 import javax.swing.*;
 
 import org.bson.types.ObjectId;
+
+import student_side.StudentHomeUI;
 
 public class Main {
 	public static student_side.StudentHomeUI studentHomeUI;
