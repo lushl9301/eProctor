@@ -15,6 +15,8 @@ import java.awt.event.WindowFocusListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.event.ListSelectionEvent;
 
 public class StudentHomeUI extends JFrame {
 
@@ -147,6 +149,11 @@ public class StudentHomeUI extends JFrame {
 		pnBooking.add(lblAvailableCourses);
 
 		listAvailableCourses = new JList();
+		listAvailableCourses.addListSelectionListener(new ListSelectionListener() {
+			public void valueChanged(ListSelectionEvent arg0) {
+				Main.studentHomeController.fetchListAvailableSessions();
+			}
+		});
 		listAvailableCourses
 				.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		listAvailableCourses.setBounds(screenSize.width / 2 - 420, 381, 405,
@@ -165,6 +172,12 @@ public class StudentHomeUI extends JFrame {
 		pnBooking.add(listAvailableSessions);
 
 		JButton btnOk = new JButton("OK");
+		btnOk.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				Main.studentHomeController.bookNewSession();
+			}
+		});
 		btnOk.setBounds(screenSize.width / 2 + 261, 403, 89, 30);
 		pnBooking.add(btnOk);
 
@@ -173,6 +186,11 @@ public class StudentHomeUI extends JFrame {
 		pnBooking.add(btnReset);
 
 		JButton btnRefresh = new JButton("Refresh");
+		btnRefresh.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+			}
+		});
 		btnRefresh.setBounds(screenSize.width / 2 + 261, 497, 89, 30);
 		pnBooking.add(btnRefresh);
 
