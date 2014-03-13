@@ -43,7 +43,6 @@ public class StudentHomeController {
 	}
 
 	public void fetchPnStatus() {
-
 		Main.studentHomeUI.txtpnInformation.setText(Main.studentHomeController
 				.getInformation());
 		Main.studentHomeUI.txtpnRecentMessages
@@ -185,6 +184,7 @@ public class StudentHomeController {
 		}
 		TableReviewModel tableReviewModel = new TableReviewModel(reviewRecords);
 		Main.studentHomeUI.tableReview.setModel(tableReviewModel);
+
 	}
 
 	public String getInformation() {
