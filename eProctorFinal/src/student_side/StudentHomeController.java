@@ -185,6 +185,16 @@ public class StudentHomeController {
 		TableReviewModel tableReviewModel = new TableReviewModel(reviewRecords);
 		Main.studentHomeUI.tableReview.setModel(tableReviewModel);
 
+		Main.studentHomeUI.tableReview.getColumnModel().getColumn(0)
+				.setPreferredWidth(50);
+		Main.studentHomeUI.tableReview.getColumnModel().getColumn(1)
+				.setPreferredWidth(220);
+		Main.studentHomeUI.tableReview.getColumnModel().getColumn(2)
+				.setPreferredWidth(300);
+		Main.studentHomeUI.tableReview.getColumnModel().getColumn(3)
+				.setPreferredWidth(40);
+		Main.studentHomeUI.tableReview.getColumnModel().getColumn(4)
+				.setPreferredWidth(90);
 	}
 
 	public String getInformation() {
