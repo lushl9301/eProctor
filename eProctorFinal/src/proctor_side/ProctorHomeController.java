@@ -1,4 +1,4 @@
-package student_side;
+package proctor_side;
 
 import java.net.URL;
 import java.text.SimpleDateFormat;
@@ -15,12 +15,12 @@ import org.bson.types.ObjectId;
 
 import entity.Main;
 
-public class StudentHomeController {
+public class ProctorHomeController {
 
 	private ArrayList<ObjectId> courseIdRecord;
 	private ArrayList<ObjectId>	sessionIdRecord;
 
-	public StudentHomeController(String username) throws Exception {
+	public ProctorHomeController(String username) throws Exception {
 		courseIdRecord = new ArrayList<ObjectId>();
 		sessionIdRecord = new ArrayList<ObjectId>();
 	}
@@ -54,20 +54,20 @@ public class StudentHomeController {
 			qbQuery.put("_id").is(obj.get("course_id"));
 			DBObject tObj = Main.mongoHQ.course.findOne(qbQuery.get());
 			temp.add((String) tObj.get("name"));
-
+			
 			//Session
 			qbQuery = new QueryBuilder();
 			qbQuery.put("_id").is(obj.get("session_id"));
 			tObj = Main.mongoHQ.session.findOne(qbQuery.get());
-
+			
 			Date startDate = new Date(Long.parseLong((String) tObj.get("start")));
 			Date endDate = new Date(Long.parseLong((String) tObj.get("end")));
 			SimpleDateFormat startFormat = new SimpleDateFormat ("dd.MM.yyyy E kk:mm");
 			SimpleDateFormat endFormat = new SimpleDateFormat ("'-'kk:mm");
 			String str = startFormat.format(startDate) + endFormat.format(endDate);
-
+			
 			temp.add(str);
-
+			
 			currentBookingsRecords.add(temp);
 		}
 		return currentBookingsRecords;
@@ -96,7 +96,7 @@ public class StudentHomeController {
 		ObjectId courseId = courseIdRecord.get(selectedCourseIndex);
 		QueryBuilder qb = new QueryBuilder();
 		qb.put("_id").is(courseId);
-
+		
 		DBObject obj = Main.mongoHQ.course.findOne(qb.get());
 		BasicDBList e = (BasicDBList) obj.get("sessions");
 		ArrayList<String> sessionsRecord = new ArrayList<String>();
@@ -132,7 +132,7 @@ public class StudentHomeController {
 			qbQuery.put("_id").is(obj.get("course_id"));
 			DBObject tObj = Main.mongoHQ.course.findOne(qbQuery.get());
 			temp.add((String) tObj.get("name"));
-
+			
 			//Session
 			qbQuery = new QueryBuilder();
 			qbQuery.put("_id").is(obj.get("session_id"));
@@ -143,14 +143,14 @@ public class StudentHomeController {
 			SimpleDateFormat endFormat = new SimpleDateFormat ("'-'kk:mm");
 			String str = startFormat.format(startDate) + endFormat.format(endDate);
 			temp.add(str);
-
+			
 			temp.add((String) obj.get("grade"));
 			temp.add((String) obj.get("remark"));
 			reviewRecords.add(temp);
 		}
 		return reviewRecords;
-
-
+		
+		
 	}
 
 	public String getInformation() {
@@ -224,7 +224,7 @@ public class StudentHomeController {
 
 		// I assume all the data already fetched during getCurrentBookingList();
 	}
-
+	
 	public void bookNewSession(int selectedCourseIndex, int selectedSessionIndex) {
 		if (selectedSessionIndex == -1)
 			return;
@@ -235,9 +235,9 @@ public class StudentHomeController {
 		DBObject listItem = new BasicDBObject("enrolledNotTested", courseId);
 		DBObject findQuery = new BasicDBObject("_id", Main.user_id);
 		DBObject updateQuery = new BasicDBObject("$pull", new BasicDBObject("enrolledNotTested", courseId));
-
+		
 		Main.mongoHQ.student.update(findQuery, updateQuery);
-
+		
 		BasicDBObjectBuilder document = new BasicDBObjectBuilder();
 		document.add("course_id", courseId).add("session_id", sessionId).add("grade", "").add("remark", "").add("student_id", Main.user_id).add("takenStatus", false);
 		Main.mongoHQ.record.insert(document.get());

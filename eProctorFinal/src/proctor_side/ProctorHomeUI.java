@@ -1,4 +1,4 @@
-package student_side;
+package proctor_side;
 
 import java.awt.*;
 
@@ -17,9 +17,9 @@ import java.awt.event.ActionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.ListSelectionEvent;
 
-public class StudentHomeUI extends JFrame {
+public class ProctorHomeUI extends JFrame {
 
-	private StudentHomeController controller;
+	private ProctorHomeController controller;
 	private JTable tableReview;
 	private JTextPane txtpnInformation;
 	private JTextPane txtpnRecentMessages;
@@ -28,7 +28,7 @@ public class StudentHomeUI extends JFrame {
 	private JList listAvailableCourses;
 	private JList listAvailableSessions;
 
-	public StudentHomeUI(StudentHomeController controller) throws Exception {
+	public ProctorHomeUI(ProctorHomeController controller) throws Exception {
 		initialize();
 		this.controller = controller;
 		refreshUI();
@@ -108,9 +108,9 @@ public class StudentHomeUI extends JFrame {
 		txtpnRecentMessages.setBounds(screenSize.width / 2, 70, 400, 450);
 		pnStatus.add(txtpnRecentMessages);
 
-		JPanel pnExam = new JPanel();
-		tabbedPane.addTab("Exam", null, pnExam, null);
-		pnExam.setLayout(null);
+		JPanel pnInvigilate = new JPanel();
+		tabbedPane.addTab("Invigilate", null, pnInvigilate, null);
+		pnInvigilate.setLayout(null);
 
 		JEditorPane dtrpnExampaper = new JEditorPane();
 		dtrpnExampaper.setFont(new Font("Segoe UI", Font.PLAIN, 14));
@@ -119,7 +119,7 @@ public class StudentHomeUI extends JFrame {
 		JScrollPane spExampaper = new JScrollPane(dtrpnExampaper);
 		spExampaper.setBounds(screenSize.width / 2 - 420, 70, 600,
 				screenSize.height - 200);
-		pnExam.add(spExampaper);
+		pnInvigilate.add(spExampaper);
 		try {
 			// dtrpnExampaper.setPage(Main.studentHomeController.getExamLink());
 			dtrpnExampaper.setPage("about:blank");
@@ -128,14 +128,14 @@ public class StudentHomeUI extends JFrame {
 			dtrpnExampaper.setText("<html>Could not load exam papers</html>");
 		}
 
-		JPanel pnBooking = new JPanel();
-		tabbedPane.addTab("Booking", null, pnBooking, null);
-		pnBooking.setLayout(null);
+		JPanel pnCheck = new JPanel();
+		tabbedPane.addTab("Check", null, pnCheck, null);
+		pnCheck.setLayout(null);
 
 		JLabel lblCurrentBookings = new JLabel("Current Bookings");
 		lblCurrentBookings.setFont(new Font("Segoe UI", Font.BOLD, 16));
 		lblCurrentBookings.setBounds(screenSize.width / 2 - 420, 50, 150, 22);
-		pnBooking.add(lblCurrentBookings);
+		pnCheck.add(lblCurrentBookings);
 
 //		listCurrentBookings = new JList<String>();
 //		listCurrentBookings
@@ -152,16 +152,16 @@ public class StudentHomeUI extends JFrame {
 			}
 		});
 		btnMakeARequest.setBounds(screenSize.width / 2 + 200, 150, 150, 30);
-		pnBooking.add(btnMakeARequest);
+		pnCheck.add(btnMakeARequest);
 
 		JLabel lblNewBooking = new JLabel("New booking");
 		lblNewBooking.setFont(new Font("Segoe UI", Font.BOLD, 16));
 		lblNewBooking.setBounds(screenSize.width / 2 - 420, 323, 150, 22);
-		pnBooking.add(lblNewBooking);
+		pnCheck.add(lblNewBooking);
 
 		JLabel lblAvailableCourses = new JLabel("Available Courses");
 		lblAvailableCourses.setBounds(screenSize.width / 2 - 420, 352, 150, 18);
-		pnBooking.add(lblAvailableCourses);
+		pnCheck.add(lblAvailableCourses);
 
 		listAvailableCourses = new JList();
 		listAvailableCourses.addListSelectionListener(new ListSelectionListener() {
@@ -173,18 +173,18 @@ public class StudentHomeUI extends JFrame {
 				.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		listAvailableCourses.setBounds(screenSize.width / 2 - 420, 381, 405,
 				174);
-		pnBooking.add(listAvailableCourses);
+		pnCheck.add(listAvailableCourses);
 
 		JLabel lblAvailableSessions = new JLabel("Available Sessions");
 		lblAvailableSessions.setBounds(screenSize.width / 2 - 5, 352, 150, 18);
-		pnBooking.add(lblAvailableSessions);
+		pnCheck.add(lblAvailableSessions);
 
 		listAvailableSessions = new JList();
 		listAvailableSessions
 				.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		listAvailableSessions
 				.setBounds(screenSize.width / 2 - 5, 381, 240, 174);
-		pnBooking.add(listAvailableSessions);
+		pnCheck.add(listAvailableSessions);
 
 		JButton btnOk = new JButton("OK");
 		btnOk.addMouseListener(new MouseAdapter() {
@@ -194,11 +194,11 @@ public class StudentHomeUI extends JFrame {
 			}
 		});
 		btnOk.setBounds(screenSize.width / 2 + 261, 403, 89, 30);
-		pnBooking.add(btnOk);
+		pnCheck.add(btnOk);
 
 		JButton btnReset = new JButton("Reset");
 		btnReset.setBounds(screenSize.width / 2 + 261, 450, 89, 30);
-		pnBooking.add(btnReset);
+		pnCheck.add(btnReset);
 
 		JButton btnRefresh = new JButton("Refresh");
 		btnRefresh.addMouseListener(new MouseAdapter() {
@@ -208,15 +208,15 @@ public class StudentHomeUI extends JFrame {
 			}
 		});
 		btnRefresh.setBounds(screenSize.width / 2 + 261, 497, 89, 30);
-		pnBooking.add(btnRefresh);
+		pnCheck.add(btnRefresh);
 
 		JSeparator separator = new JSeparator();
 		separator.setBounds(screenSize.width / 2 - 420, 302, 770, 10);
-		pnBooking.add(separator);
+		pnCheck.add(separator);
 		
 		JScrollPane scpCurrentBookings = new JScrollPane();
 		scpCurrentBookings.setBounds(screenSize.width / 2 - 420, 78, 600, 213);
-		pnBooking.add(scpCurrentBookings);
+		pnCheck.add(scpCurrentBookings);
 		
 		tableCurrentBookings = new JTable();
 		scpCurrentBookings.setViewportView(tableCurrentBookings);
