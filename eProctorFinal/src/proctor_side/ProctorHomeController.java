@@ -1,4 +1,4 @@
-package student_side;
+package proctor_side;
 
 import java.net.URL;
 import java.text.SimpleDateFormat;
@@ -15,12 +15,12 @@ import org.bson.types.ObjectId;
 
 import entity.Main;
 
-public class StudentHomeController {
+public class ProctorHomeController {
 
 	private ArrayList<ObjectId> courseIdRecord;
 	private ArrayList<ObjectId>	sessionIdRecord;
 
-	public StudentHomeController(String username) throws Exception {
+	public ProctorHomeController(String username) throws Exception {
 		courseIdRecord = new ArrayList<ObjectId>();
 		sessionIdRecord = new ArrayList<ObjectId>();
 	}
