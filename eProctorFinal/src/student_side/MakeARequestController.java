@@ -74,6 +74,7 @@ public class MakeARequestController {
 		qbQuery.put("_id").is(obj.get("session_id"));
 		tObj = Main.mongoHQ.session.findOne(qbQuery.get());
 		Date startDate = new Date(Long.parseLong((String) tObj.get("start")));
+//		Date startDate = new Date();
 		SimpleDateFormat startFormat = new SimpleDateFormat ("dd.MM.yyyy E kk:mm");
 		return (String) startFormat.format(startDate);
 	}
