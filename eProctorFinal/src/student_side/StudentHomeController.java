@@ -60,10 +60,10 @@ public class StudentHomeController {
 			qbQuery.put("_id").is(obj.get("session_id"));
 			tObj = Main.mongoHQ.session.findOne(qbQuery.get());
 
-			Date startDate = new Date(Long.parseLong((String) tObj.get("start")));
-			Date endDate = new Date(Long.parseLong((String) tObj.get("end")));
-//			Date startDate = (Date) tObj.get("start");
-//			Date endDate = (Date) tObj.get("end");
+//			Date startDate = new Date(Long.parseLong((String) tObj.get("start")));
+//			Date endDate = new Date(Long.parseLong((String) tObj.get("end")));
+			Date startDate = (Date) tObj.get("start");
+			Date endDate = (Date) tObj.get("end");
 			SimpleDateFormat startFormat = new SimpleDateFormat ("dd.MM.yyyy E kk:mm");
 			SimpleDateFormat endFormat = new SimpleDateFormat ("'-'kk:mm");
 			String str = startFormat.format(startDate) + endFormat.format(endDate);
