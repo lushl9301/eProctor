@@ -54,59 +54,22 @@ public class StudentHomeController {
 			qbQuery.put("_id").is(obj.get("course_id"));
 			DBObject tObj = Main.mongoHQ.course.findOne(qbQuery.get());
 			temp.add((String) tObj.get("name"));
-			
+
 			//Session
 			qbQuery = new QueryBuilder();
 			qbQuery.put("_id").is(obj.get("session_id"));
 			tObj = Main.mongoHQ.session.findOne(qbQuery.get());
-			
-			Date startDate = new Date(Long.parseLong((String) tObj.get("start")));
-			Date endDate = new Date(Long.parseLong((String) tObj.get("end")));
+			Date startDate = (Date) tObj.get("start");
+			Date endDate = (Date) tObj.get("end");
 			SimpleDateFormat startFormat = new SimpleDateFormat ("dd.MM.yyyy E kk:mm");
 			SimpleDateFormat endFormat = new SimpleDateFormat ("'-'kk:mm");
 			String str = startFormat.format(startDate) + endFormat.format(endDate);
-			
+
 			temp.add(str);
-			
+
 			currentBookingsRecords.add(temp);
 		}
 		return currentBookingsRecords;
-	}
-	
-	public ArrayList<ArrayList<String>> getTableReview() {
-		//BasicDBObject query = new BasicDBObject();
-		QueryBuilder qb = new QueryBuilder();
-		qb.put("student_id").is(Main.user_id).put("takenStatus").is(true);
-		DBCursor cursor = Main.mongoHQ.record.find(qb.get());
-		ArrayList<ArrayList<String>> reviewRecords = new ArrayList<ArrayList<String>>();
-		while (cursor.hasNext()) {
-			ArrayList<String> temp = new ArrayList<String>();
-			DBObject obj = cursor.next();
-			//ID
-			temp.add(((ObjectId) obj.get("_id")).toString());
-
-			// Course
-			QueryBuilder qbQuery = new QueryBuilder();
-			qbQuery.put("_id").is(obj.get("course_id"));
-			DBObject tObj = Main.mongoHQ.course.findOne(qbQuery.get());
-			temp.add((String) tObj.get("name"));
-			
-			//Session
-			qbQuery = new QueryBuilder();
-			qbQuery.put("_id").is(obj.get("session_id"));
-			tObj = Main.mongoHQ.session.findOne(qbQuery.get());
-			Date startDate = new Date(Long.parseLong((String) tObj.get("start")));
-			Date endDate = new Date(Long.parseLong((String) tObj.get("end")));
-			SimpleDateFormat startFormat = new SimpleDateFormat ("dd.MM.yyyy E kk:mm");
-			SimpleDateFormat endFormat = new SimpleDateFormat ("'-'kk:mm");
-			String str = startFormat.format(startDate) + endFormat.format(endDate);
-			temp.add(str);
-			
-			temp.add((String) obj.get("grade"));
-			temp.add((String) obj.get("remark"));
-			reviewRecords.add(temp);
-		}
-		return reviewRecords;		
 	}
 
 	public ArrayList<String> getListAvailableCourses() {
@@ -132,7 +95,7 @@ public class StudentHomeController {
 		ObjectId courseId = courseIdRecord.get(selectedCourseIndex);
 		QueryBuilder qb = new QueryBuilder();
 		qb.put("_id").is(courseId);
-		
+
 		DBObject obj = Main.mongoHQ.course.findOne(qb.get());
 		BasicDBList e = (BasicDBList) obj.get("sessions");
 		ArrayList<String> sessionsRecord = new ArrayList<String>();
@@ -141,8 +104,8 @@ public class StudentHomeController {
 			qb.put("_id").is(t);
 			obj = Main.mongoHQ.session.findOne(qb.get());
 			sessionIdRecord.add((ObjectId) obj.get("_id"));
-			Date startDate = new Date(Long.parseLong((String) obj.get("start")));
-			Date endDate = new Date(Long.parseLong((String) obj.get("end")));
+			Date startDate = (Date) obj.get("start");
+			Date endDate = (Date)obj.get("end");
 			SimpleDateFormat startFormat = new SimpleDateFormat ("dd.MM.yyyy E kk:mm");
 			SimpleDateFormat endFormat = new SimpleDateFormat ("'-'kk:mm");
 			String str = startFormat.format(startDate) + endFormat.format(endDate);
@@ -151,7 +114,50 @@ public class StudentHomeController {
 		return sessionsRecord;
 	}
 
+	public ArrayList<ArrayList<String>> getTableReview() {
+		//BasicDBObject query = new BasicDBObject();
+		QueryBuilder qb = new QueryBuilder();
+		qb.put("student_id").is(Main.user_id).put("takenStatus").is(true);
+		DBCursor cursor = Main.mongoHQ.record.find(qb.get());
+		ArrayList<ArrayList<String>> reviewRecords = new ArrayList<ArrayList<String>>();
+		while (cursor.hasNext()) {
+			ArrayList<String> temp = new ArrayList<String>();
+			DBObject obj = cursor.next();
+			//ID
+			temp.add(((ObjectId) obj.get("_id")).toString());
+
+			// Course
+			QueryBuilder qbQuery = new QueryBuilder();
+			qbQuery.put("_id").is(obj.get("course_id"));
+			DBObject tObj = Main.mongoHQ.course.findOne(qbQuery.get());
+			temp.add((String) tObj.get("name"));
+
+			//Session
+			qbQuery = new QueryBuilder();
+			qbQuery.put("_id").is(obj.get("session_id"));
+			tObj = Main.mongoHQ.session.findOne(qbQuery.get());
+			Date startDate = (Date) tObj.get("start");
+			Date endDate = (Date) tObj.get("end");
+			SimpleDateFormat startFormat = new SimpleDateFormat ("dd.MM.yyyy E kk:mm");
+			SimpleDateFormat endFormat = new SimpleDateFormat ("'-'kk:mm");
+			String str = startFormat.format(startDate) + endFormat.format(endDate);
+			temp.add(str);
+
+			temp.add((String) obj.get("grade"));
+			temp.add((String) obj.get("remark"));
+			reviewRecords.add(temp);
+		}
+		return reviewRecords;
+
+
+	}
+
 	public String getInformation() {
+		// ArrayList<String> neededInfoList = new
+		// ArrayList<String>(Arrays.asList("realname", "coursecode", "examid"));
+		// ArrayList<ArrayList<String>> information =
+		// Main.client.fetchData("username", Main.currentUser.getUserId(),
+		// neededInfoList);
 
 		ArrayList<ArrayList<String>> information = new ArrayList<ArrayList<String>>();
 		{
@@ -177,6 +183,8 @@ public class StudentHomeController {
 	}
 
 	public String getRecentMessage() {
+		// implement way: polling request
+		// ArrayList<ArrayList<String>> recentMessage = Main.client.fetchData();
 		ArrayList<ArrayList<String>> recentMessage = new ArrayList<ArrayList<String>>();
 		{
 			ArrayList<String> a = new ArrayList<String>();
@@ -204,6 +212,18 @@ public class StudentHomeController {
 		return result;
 	}
 
+	public void makeRequestOfABooking(int index) {
+		if (index == -1) {
+			return;
+		}
+		// String examId = "";
+		// get examId for textbox!!!
+		// set up a new windows
+		// fill the windows with old data
+
+		// I assume all the data already fetched during getCurrentBookingList();
+	}
+
 	public void bookNewSession(int selectedCourseIndex, int selectedSessionIndex) {
 		if (selectedSessionIndex == -1)
 			return;
@@ -214,9 +234,9 @@ public class StudentHomeController {
 		DBObject listItem = new BasicDBObject("enrolledNotTested", courseId);
 		DBObject findQuery = new BasicDBObject("_id", Main.user_id);
 		DBObject updateQuery = new BasicDBObject("$pull", new BasicDBObject("enrolledNotTested", courseId));
-		
+
 		Main.mongoHQ.student.update(findQuery, updateQuery);
-		
+
 		BasicDBObjectBuilder document = new BasicDBObjectBuilder();
 		document.add("course_id", courseId).add("session_id", sessionId).add("grade", "").add("remark", "").add("student_id", Main.user_id).add("takenStatus", false);
 		Main.mongoHQ.record.insert(document.get());
@@ -238,14 +258,4 @@ public class StudentHomeController {
 		return (new URL(link));
 	}
 
-	public void makeRequestOfABooking(String object_id) {
-		if (object_id == null) {
-			return;
-		}
-	}
-	public void checkDetailsOf(String object_id) {
-		if (object_id == null) {
-			return;
-		}
-	}
 }

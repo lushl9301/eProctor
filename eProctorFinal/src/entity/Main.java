@@ -27,8 +27,8 @@ public class Main {
 		
 		user_id = new ObjectId("531ec0d07a0016ee1c000508");
 		mongoHQ = new server_side.MongoHQ();
-		//studentHomeController = new student_side.StudentHomeController("gong0025");
-		//studentHomeUI = new student_side.StudentHomeUI(studentHomeController);
+//		studentHomeController = new student_side.StudentHomeController("gong0025");
+//		studentHomeUI = new student_side.StudentHomeUI(studentHomeController);
 		proctorHomeController = new proctor_side.ProctorHomeController("cly753");
 		proctorHomeUI = new proctor_side.ProctorHomeUI(proctorHomeController);
 	}
