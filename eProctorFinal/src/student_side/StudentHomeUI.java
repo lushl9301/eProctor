@@ -27,10 +27,12 @@ public class StudentHomeUI extends JFrame {
 	private JTable tableCurrentBookings;
 	private JList listAvailableCourses;
 	private JList listAvailableSessions;
+	private ArrayList<ArrayList<String>> currentBookingRecords;
+	private TableCurrentBookingsModel tableCurrentBookingModel;
 
 	public StudentHomeUI(StudentHomeController controller) throws Exception {
-		initialize();
 		this.controller = controller;
+		initialize();
 		refreshUI();
 		setVisible(true);
 	}
@@ -45,8 +47,8 @@ public class StudentHomeUI extends JFrame {
 				.setPreferredWidth(200);
 		tableCurrentBookings.getColumnModel().getColumn(2)
 				.setPreferredWidth(170);
-		listAvailableCourses.setModel(new ListArrayListModel(controller.getListAvailableCourses()));
-		listAvailableSessions.setModel(new ListArrayListModel(controller.getListAvailableSessions(-1)));
+//		listAvailableCourses.setModel(new ListArrayListModel(controller.getListAvailableCourses()));
+//		listAvailableSessions.setModel(new ListArrayListModel(controller.getListAvailableSessions(-1)));
 		tableReview.setModel(new TableReviewModel(controller.getTableReview()));
 		tableReview.getColumnModel().getColumn(0).setPreferredWidth(50);
 		tableReview.getColumnModel().getColumn(1).setPreferredWidth(220);
@@ -132,25 +134,26 @@ public class StudentHomeUI extends JFrame {
 		tabbedPane.addTab("Booking", null, pnBooking, null);
 		pnBooking.setLayout(null);
 
+		currentBookingRecords = controller.getTableCurrentBookings();
+		tableCurrentBookingModel = new TableCurrentBookingsModel(currentBookingRecords);
 		JLabel lblCurrentBookings = new JLabel("Current Bookings");
 		lblCurrentBookings.setFont(new Font("Segoe UI", Font.BOLD, 16));
 		lblCurrentBookings.setBounds(screenSize.width / 2 - 420, 50, 150, 22);
 		pnBooking.add(lblCurrentBookings);
 
-//		listCurrentBookings = new JList<String>();
-//		listCurrentBookings
-//				.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-//		listCurrentBookings.setBounds(screenSize.width / 2 - 420, 78, 600, 213);
-//		pnBooking.add(listCurrentBookings);
-
 		JButton btnMakeARequest = new JButton("Make A Request");
 		btnMakeARequest.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				int index = listCurrentBookings.getSelectedIndex();
-				controller.makeRequestOfABooking(index);
+				if (currentBookingRecords != null) {
+					int index = tableCurrentBookings.getSelectedRow();
+					if (index != -1) {
+						controller.makeRequestOfABooking((String) tableCurrentBookings.getValueAt(index, 0));
+					}
+				}
 			}
 		});
+
 		btnMakeARequest.setBounds(screenSize.width / 2 + 200, 150, 150, 30);
 		pnBooking.add(btnMakeARequest);
 
@@ -218,24 +221,34 @@ public class StudentHomeUI extends JFrame {
 		scpCurrentBookings.setBounds(screenSize.width / 2 - 420, 78, 600, 213);
 		pnBooking.add(scpCurrentBookings);
 		
-		tableCurrentBookings = new JTable();
-		scpCurrentBookings.setViewportView(tableCurrentBookings);
-		
-
 		JPanel pnReview = new JPanel();
 		tabbedPane.addTab("Review", null, pnReview, null);
 		pnReview.setLayout(null);
 
+		currentBookingRecords = controller.getTableReview();
+		tableCurrentBookingModel = new TableCurrentBookingsModel(currentBookingRecords);
+		tableCurrentBookings = new JTable();
+		tableCurrentBookings.setModel(tableCurrentBookingModel);
+		scpCurrentBookings.setViewportView(tableCurrentBookings);
+		
 		JButton btnCheckDetails = new JButton("Check Details");
+		btnCheckDetails.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if (currentBookingRecords != null) {
+					int index = tableCurrentBookings.getSelectedRow();
+					if (index != -1) {
+						controller.checkDetailsOf((String) tableCurrentBookings.getValueAt(index, 0));
+					}
+				}
+			}
+		});
 		btnCheckDetails.setBounds(screenSize.width / 2 + 210, 73, 150, 30);
 		pnReview.add(btnCheckDetails);
 
 		JScrollPane scrollPane = new JScrollPane();
 		scrollPane.setBounds(screenSize.width / 2 - 420, 70, 600, 290);
 		pnReview.add(scrollPane);
-
-		tableReview = new JTable();
-		scrollPane.setViewportView(tableReview);
 		
 		JPanel pnSetting = new JPanel();
 		tabbedPane.addTab("Setting", null, pnSetting, null);
@@ -250,7 +263,9 @@ public class StudentHomeUI extends JFrame {
 		JMenuItem mntmLogout = new JMenuItem("Logout");
 		mntmLogout.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				controller.logout();
+				//controller.logout();
+				setVisible(false);
+				//restart loginUI
 			}
 		});
 		mnFile.add(mntmLogout);
@@ -258,7 +273,9 @@ public class StudentHomeUI extends JFrame {
 		JMenuItem mntmExit = new JMenuItem("Exit");
 		mntmExit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				controller.exit();
+				//controller.exit();
+				setVisible(false);
+				System.exit(0);
 			}
 		});
 		mnFile.add(mntmExit);

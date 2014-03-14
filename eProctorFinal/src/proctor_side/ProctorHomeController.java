@@ -26,21 +26,21 @@ public class ProctorHomeController {
 	}
 
 	public void exit() {
-		Main.studentHomeUI.setVisible(false);
+		Main.proctorHomeUI.setVisible(false);
 		System.exit(0);
 	}
 
 	public void logout() {
-		Main.studentHomeUI.setVisible(false);
+		Main.proctorHomeUI.setVisible(false);
 	}
 
 	public void about() {
 
 	}
 
-	public ArrayList<ArrayList<String>> getTableCurrentBookings() {
+	public ArrayList<ArrayList<String>> getTableCurrentBookings(boolean status) {
 		QueryBuilder qb = new QueryBuilder();
-		qb.put("student_id").is(Main.user_id).put("takenStatus").is(false);
+		qb.put("student_id").is(Main.user_id).put("takenStatus").is(status);
 		DBCursor cursor = Main.mongoHQ.record.find(qb.get());
 		ArrayList<ArrayList<String>> currentBookingsRecords = new ArrayList<ArrayList<String>>();
 		while (cursor.hasNext()) {
@@ -65,12 +65,19 @@ public class ProctorHomeController {
 			SimpleDateFormat startFormat = new SimpleDateFormat ("dd.MM.yyyy E kk:mm");
 			SimpleDateFormat endFormat = new SimpleDateFormat ("'-'kk:mm");
 			String str = startFormat.format(startDate) + endFormat.format(endDate);
-			
 			temp.add(str);
 			
 			currentBookingsRecords.add(temp);
 		}
 		return currentBookingsRecords;
+	}
+	
+	public ArrayList<ArrayList<String>> getStudentListFor() {
+		BasicDBObject query = new BasicDBObject();
+		query.put("_id", sessionIdRecord);
+		DBObject obj = Main.mongoHQ.session.findOne(query);
+		//TODO
+		return null;
 	}
 
 	public ArrayList<String> getListAvailableCourses() {
@@ -154,38 +161,10 @@ public class ProctorHomeController {
 	}
 
 	public String getInformation() {
-		// ArrayList<String> neededInfoList = new
-		// ArrayList<String>(Arrays.asList("realname", "coursecode", "examid"));
-		// ArrayList<ArrayList<String>> information =
-		// Main.client.fetchData("username", Main.currentUser.getUserId(),
-		// neededInfoList);
-
-		ArrayList<ArrayList<String>> information = new ArrayList<ArrayList<String>>();
-		{
-			ArrayList<String> a = new ArrayList<String>();
-			String b = "Welcome, Gong Yue from CE2006 BCE2";
-			String c = "You have:   2 exams in the next week.";
-			String d = "5 exams in the next few months.";
-			a.add(b);
-			a.add(c);
-			ArrayList<String> aa = new ArrayList<String>();
-			aa.add(d);
-			information.add(a);
-			information.add(aa);
-		}
-		String result = "";
-		for (ArrayList<String> s : information) {
-			for (String e : s) {
-				result += "      " + e;
-			}
-			result += "\n";
-		}
-		return result.substring(6);
+		return "hehe\nhehe\nTODO here\n";
 	}
 
 	public String getRecentMessage() {
-		// implement way: polling request
-		// ArrayList<ArrayList<String>> recentMessage = Main.client.fetchData();
 		ArrayList<ArrayList<String>> recentMessage = new ArrayList<ArrayList<String>>();
 		{
 			ArrayList<String> a = new ArrayList<String>();
@@ -212,18 +191,6 @@ public class ProctorHomeController {
 		}
 		return result;
 	}
-
-	public void makeRequestOfABooking(int index) {
-		if (index == -1) {
-			return;
-		}
-		// String examId = "";
-		// get examId for textbox!!!
-		// set up a new windows
-		// fill the windows with old data
-
-		// I assume all the data already fetched during getCurrentBookingList();
-	}
 	
 	public void bookNewSession(int selectedCourseIndex, int selectedSessionIndex) {
 		if (selectedSessionIndex == -1)
@@ -248,15 +215,22 @@ public class ProctorHomeController {
 
 	}
 
-	public void sendRecording() {
-		// new client_side.GrabberShow();
-	}
+	public void makeRequestOfABooking(String object_id) {
+		if (object_id == null) {
+			return;
+		}
+		// String examId = "";
+		// get examId for textbox!!!
+		// set up a new windows
+		// fill the windows with old data
 
-	public URL getExamLink() throws Exception {
-		String link = null;
-		// link = Main.client.fetchData("examId", examId, ArrayList<String>);
-		link = "https://docs.google.com/forms/d/1rEgKT7uRoRrxqenORs5aKo8wIkcsb1waph28glVWF1s/viewform";
-		return (new URL(link));
+		// I assume all the data already fetched during getCurrentBookingList();
+	}
+	public void checkDetailsOf(String object_id) {
+		if (object_id == null) {
+			return;
+		}
+		
 	}
 
 }
