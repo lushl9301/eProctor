@@ -23,7 +23,6 @@ public class StudentHomeUI extends JFrame {
 	private JTable tableReview;
 	private JTextPane txtpnInformation;
 	private JTextPane txtpnRecentMessages;
-	private JList<String> listCurrentBookings;
 	private JTable tableCurrentBookings;
 	private JList listAvailableCourses;
 	private JList listAvailableSessions;
@@ -145,18 +144,15 @@ public class StudentHomeUI extends JFrame {
 		lblCurrentBookings.setBounds(screenSize.width / 2 - 420, 50, 150, 22);
 		pnBooking.add(lblCurrentBookings);
 
-//		listCurrentBookings = new JList<String>();
-//		listCurrentBookings
-//				.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-//		listCurrentBookings.setBounds(screenSize.width / 2 - 420, 78, 600, 213);
-//		pnBooking.add(listCurrentBookings);
-
 		JButton btnMakeARequest = new JButton("Make A Request");
 		btnMakeARequest.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				int index = listCurrentBookings.getSelectedIndex();
-				controller.makeRequestOfABooking(index);
+				if (tableCurrentBookings != null) {
+					int index = tableCurrentBookings.getSelectedRow();
+					if (index != -1) {
+						controller.makeRequestOfABooking((String) tableCurrentBookings.getValueAt(index, 0));				}
+					}
 			}
 		});
 		btnMakeARequest.setBounds(screenSize.width / 2 + 200, 150, 150, 30);
@@ -235,6 +231,17 @@ public class StudentHomeUI extends JFrame {
 		pnReview.setLayout(null);
 
 		JButton btnCheckDetails = new JButton("Check Details");
+		btnCheckDetails.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if (tableReview != null) {
+					int index = tableReview.getSelectedRow();
+					if (index != -1) {
+						controller.checkDetailsOf((String) tableReview.getValueAt(index, 0));
+					}
+				}
+			}
+		});
 		btnCheckDetails.setBounds(screenSize.width / 2 + 210, 73, 150, 30);
 		pnReview.add(btnCheckDetails);
 

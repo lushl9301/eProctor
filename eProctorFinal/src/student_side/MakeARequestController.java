@@ -17,9 +17,10 @@ public class MakeARequestController {
 	private ObjectId record_id;
 	private DBObject obj, tObj;
 
-	public MakeARequestController() {
+	public MakeARequestController(String record_id) {
 		//Main.makeARequestUI.setVisible(true);
-		this.record_id = new ObjectId("531dc95e2ad939b68700001f");
+		System.out.println(record_id);
+		this.record_id = new ObjectId(record_id);
 		QueryBuilder qb = new QueryBuilder();
 		qb.put("_id").is(record_id);
 		DBCursor cursor = Main.mongoHQ.record.find(qb.get());

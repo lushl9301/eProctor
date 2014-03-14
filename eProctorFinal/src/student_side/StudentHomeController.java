@@ -212,18 +212,6 @@ public class StudentHomeController {
 		return result;
 	}
 
-	public void makeRequestOfABooking(int index) {
-		if (index == -1) {
-			return;
-		}
-		// String examId = "";
-		// get examId for textbox!!!
-		// set up a new windows
-		// fill the windows with old data
-
-		// I assume all the data already fetched during getCurrentBookingList();
-	}
-
 	public void bookNewSession(int selectedCourseIndex, int selectedSessionIndex) {
 		if (selectedSessionIndex == -1)
 			return;
@@ -256,6 +244,23 @@ public class StudentHomeController {
 		// link = Main.client.fetchData("examId", examId, ArrayList<String>);
 		link = "https://docs.google.com/forms/d/1rEgKT7uRoRrxqenORs5aKo8wIkcsb1waph28glVWF1s/viewform";
 		return (new URL(link));
+	}
+	
+	public void makeRequestOfABooking(String object_id) {
+		if (object_id == null) {
+			return;
+		}
+		//System.out.println(object_id);
+		Main.makeARequestController = new student_side.MakeARequestController(object_id);
+		Main.makeARequestUI = new student_side.MakeARequestUI(Main.makeARequestController);
+	}
+	public void checkDetailsOf(String object_id) {
+		if (object_id == null) {
+			return;
+		}
+		//System.out.println(object_id);
+		Main.checkDetailsController = new student_side.CheckDetailsController(object_id);
+		Main.checkDetailsUI = new student_side.CheckDetailsUI(Main.checkDetailsController);
 	}
 
 }
