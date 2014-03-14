@@ -59,9 +59,6 @@ public class StudentHomeController {
 			qbQuery = new QueryBuilder();
 			qbQuery.put("_id").is(obj.get("session_id"));
 			tObj = Main.mongoHQ.session.findOne(qbQuery.get());
-
-//			Date startDate = new Date(Long.parseLong((String) tObj.get("start")));
-//			Date endDate = new Date(Long.parseLong((String) tObj.get("end")));
 			Date startDate = (Date) tObj.get("start");
 			Date endDate = (Date) tObj.get("end");
 			SimpleDateFormat startFormat = new SimpleDateFormat ("dd.MM.yyyy E kk:mm");
@@ -107,8 +104,8 @@ public class StudentHomeController {
 			qb.put("_id").is(t);
 			obj = Main.mongoHQ.session.findOne(qb.get());
 			sessionIdRecord.add((ObjectId) obj.get("_id"));
-			Date startDate = new Date(Long.parseLong((String) obj.get("start")));
-			Date endDate = new Date(Long.parseLong((String) obj.get("end")));
+			Date startDate = (Date) obj.get("start");
+			Date endDate = (Date)obj.get("end");
 			SimpleDateFormat startFormat = new SimpleDateFormat ("dd.MM.yyyy E kk:mm");
 			SimpleDateFormat endFormat = new SimpleDateFormat ("'-'kk:mm");
 			String str = startFormat.format(startDate) + endFormat.format(endDate);
@@ -139,8 +136,8 @@ public class StudentHomeController {
 			qbQuery = new QueryBuilder();
 			qbQuery.put("_id").is(obj.get("session_id"));
 			tObj = Main.mongoHQ.session.findOne(qbQuery.get());
-			Date startDate = new Date(Long.parseLong((String) tObj.get("start")));
-			Date endDate = new Date(Long.parseLong((String) tObj.get("end")));
+			Date startDate = (Date) tObj.get("start");
+			Date endDate = (Date) tObj.get("end");
 			SimpleDateFormat startFormat = new SimpleDateFormat ("dd.MM.yyyy E kk:mm");
 			SimpleDateFormat endFormat = new SimpleDateFormat ("'-'kk:mm");
 			String str = startFormat.format(startDate) + endFormat.format(endDate);

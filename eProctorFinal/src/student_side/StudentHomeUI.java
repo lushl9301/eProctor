@@ -29,10 +29,17 @@ public class StudentHomeUI extends JFrame {
 	private JList listAvailableSessions;
 
 	public StudentHomeUI(StudentHomeController controller) throws Exception {
+//		addWindowFocusListener(new WindowFocusListener() {
+//			public void windowGainedFocus(WindowEvent arg0) {
+//			}
+//
+//			public void windowLostFocus(WindowEvent arg0) {
+//				toFront();
+//			}
+//		});
 		initialize();
 		this.controller = controller;
 		refreshUI();
-		setVisible(true);
 	}
 
 	private void refreshUI() {
@@ -103,6 +110,7 @@ public class StudentHomeUI extends JFrame {
 		JLabel lblRecentMessages = new JLabel("Recent Messages");
 		lblRecentMessages.setBounds(screenSize.width / 2, 50, 150, 18);
 		pnStatus.add(lblRecentMessages);
+
 
 		txtpnRecentMessages = new JTextPane();
 		txtpnRecentMessages.setBounds(screenSize.width / 2, 70, 400, 450);
