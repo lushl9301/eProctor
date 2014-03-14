@@ -33,7 +33,7 @@ public class StudentHomeUI extends JFrame {
 	public StudentHomeUI(StudentHomeController controller) throws Exception {
 		this.controller = controller;
 		initialize();
-		refreshUI();
+		//refreshUI();
 		setVisible(true);
 	}
 
@@ -41,12 +41,9 @@ public class StudentHomeUI extends JFrame {
 		txtpnInformation.setText(controller.getInformation());
 		txtpnRecentMessages.setText(controller.getRecentMessage());
 		tableCurrentBookings.setModel(new TableCurrentBookingsModel(controller.getTableCurrentBookings()));
-		tableCurrentBookings.getColumnModel().getColumn(0)
-				.setPreferredWidth(100);
-		tableCurrentBookings.getColumnModel().getColumn(1)
-				.setPreferredWidth(200);
-		tableCurrentBookings.getColumnModel().getColumn(2)
-				.setPreferredWidth(170);
+		tableCurrentBookings.getColumnModel().getColumn(0).setPreferredWidth(100);
+		tableCurrentBookings.getColumnModel().getColumn(1).setPreferredWidth(200);
+		tableCurrentBookings.getColumnModel().getColumn(2).setPreferredWidth(170);
 //		listAvailableCourses.setModel(new ListArrayListModel(controller.getListAvailableCourses()));
 //		listAvailableSessions.setModel(new ListArrayListModel(controller.getListAvailableSessions(-1)));
 		tableReview.setModel(new TableReviewModel(controller.getTableReview()));

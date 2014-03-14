@@ -35,7 +35,7 @@ public class ProctorHomeUI extends JFrame {
 	public ProctorHomeUI(ProctorHomeController controller) throws Exception {
 		this.controller = controller;
 		initialize();
-		refreshUI();
+		//refreshUI()
 		setVisible(true);
 	}
 
