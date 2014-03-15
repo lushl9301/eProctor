@@ -17,7 +17,11 @@ import java.awt.event.ActionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.ListSelectionEvent;
 
-public class StudentHomeUI extends JFrame {
+import org.bson.types.ObjectId;
+import javax.swing.event.InternalFrameAdapter;
+import javax.swing.event.InternalFrameEvent;
+
+public class StudentHomeUI extends JInternalFrame {
 
 	private StudentHomeController controller;
 	private JTable tableReview;
@@ -38,10 +42,9 @@ public class StudentHomeUI extends JFrame {
 //		});
 		initialize();
 		this.controller = controller;
-		refreshUI();
 	}
 
-	private void refreshUI() {
+	public void refreshUI() {
 		txtpnInformation.setText(controller.getInformation());
 		txtpnRecentMessages.setText(controller.getRecentMessage());
 		tableCurrentBookings.setModel(new TableCurrentBookingsModel(controller.getTableCurrentBookings()));
@@ -77,20 +80,13 @@ public class StudentHomeUI extends JFrame {
 		UIManager.put("TabbedPane.font", new Font("Tahoma", Font.PLAIN, 14));
 		UIManager.put("Table.font", new Font("Segoe UI", Font.PLAIN, 14));
 		UIManager.put("TextPane.font", new Font("Segoe UI", Font.PLAIN, 14));
-		GraphicsEnvironment graphicsEnvironment = GraphicsEnvironment
-				.getLocalGraphicsEnvironment();
-		GraphicsDevice[] devices = graphicsEnvironment.getScreenDevices();
-		GraphicsDevice graphicsDevice = devices[0];
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-		setAlwaysOnTop(true);
-		setAutoRequestFocus(true);
-		setUndecorated(true);
 		setResizable(false);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
 		getContentPane().setLayout(null);
 
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-		tabbedPane.setBounds(10, 27, screenSize.width - 20,
+		tabbedPane.setBounds(0, 0, screenSize.width - 20,
 				screenSize.height - 60);
 		getContentPane().add(tabbedPane);
 
@@ -151,8 +147,10 @@ public class StudentHomeUI extends JFrame {
 				if (tableCurrentBookings != null) {
 					int index = tableCurrentBookings.getSelectedRow();
 					if (index != -1) {
-						controller.makeRequestOfABooking((String) tableCurrentBookings.getValueAt(index, 0));				}
+						controller
+								.makeRequestOfABooking(new ObjectId((String) tableCurrentBookings.getValueAt(index, 0)));
 					}
+				}
 			}
 		});
 		btnMakeARequest.setBounds(screenSize.width / 2 + 200, 150, 150, 30);
@@ -254,43 +252,6 @@ public class StudentHomeUI extends JFrame {
 		
 		JPanel pnSetting = new JPanel();
 		tabbedPane.addTab("Setting", null, pnSetting, null);
-
-		JMenuBar menuBar = new JMenuBar();
-		menuBar.setBounds(0, 0, screenSize.width, 25);
-		getContentPane().add(menuBar);
-
-		JMenu mnFile = new JMenu("File");
-		menuBar.add(mnFile);
-
-		JMenuItem mntmLogout = new JMenuItem("Logout");
-		mntmLogout.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				controller.logout();
-			}
-		});
-		mnFile.add(mntmLogout);
-
-		JMenuItem mntmExit = new JMenuItem("Exit");
-		mntmExit.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				controller.exit();
-			}
-		});
-		mnFile.add(mntmExit);
-
-		JMenu mnHelp = new JMenu("Help");
-		menuBar.add(mnHelp);
-
-		JMenuItem mntmAbout = new JMenuItem("About");
-		mntmAbout.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				controller.getAboutMessage();
-			}
-		});
-		mnHelp.add(mntmAbout);
-
-		graphicsDevice.setFullScreenWindow(this);
-		validate();
 	}
 	public class TableCurrentBookingsModel extends AbstractTableModel {
 

@@ -30,15 +30,6 @@ public class CheckDetailsController {
 			System.out.println("hehe");
 		}
 	}
-	
-	public void deleteRecord() {
-		// TODO Auto-generated method stub
-		Main.checkDetailsUI.setVisible(false);
-	}
-
-	public void cancel() {
-		Main.checkDetailsUI.setVisible(false);
-	}
 
 	public String getCourseCode() {
 		QueryBuilder qbQuery = new QueryBuilder();

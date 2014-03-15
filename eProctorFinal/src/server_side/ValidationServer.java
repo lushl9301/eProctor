@@ -4,23 +4,17 @@ import java.net.UnknownHostException;
 
 import com.mongodb.*;
 
-public class MongoHQ {
-	public DBCollection record;
-	public DBCollection course;
-	public DBCollection session;
-	public DBCollection student;
+public class ValidationServer {
+	public DBCollection user;
 
 	private boolean connected = false;
 
-	public MongoHQ(String strUrl, String strDb) throws Exception {
+	public ValidationServer(String strUrl, String strDb) throws Exception {
 		System.out.println("Starting connection");
 		MongoClientURI uri = new MongoClientURI(strUrl);
 		MongoClient mongoClient = new MongoClient(uri);
 		DB db = mongoClient.getDB(strDb);
-		record = db.getCollection("Record");
-		course = db.getCollection("Course");
-		session = db.getCollection("Session");
-		student = db.getCollection("Student");
+		user = db.getCollection("User");
 		connected = true;
 		System.out.println("connected");
 	}

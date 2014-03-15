@@ -15,21 +15,19 @@ import entity.Main;
 public class MakeARequestController {
 
 	private ObjectId record_id;
-	private DBObject obj, tObj;
+	private DBObject objRecord, objSession, objCourse;
 
-	public MakeARequestController(String record_id) {
+	public MakeARequestController(ObjectId record_id) {
 		//Main.makeARequestUI.setVisible(true);
 		System.out.println(record_id);
-		this.record_id = new ObjectId(record_id);
+		this.record_id = record_id;
 		QueryBuilder qb = new QueryBuilder();
 		qb.put("_id").is(record_id);
-		DBCursor cursor = Main.mongoHQ.record.find(qb.get());
-		if (cursor.hasNext()) {
-			obj = cursor.next();
-		}
-		if (obj == null) {
-			System.out.println("hehe");
-		}
+		objRecord = Main.mongoHQ.record.findOne(qb.get());
+		qb.put("_id").is(objRecord.get("course_id"));
+		objCourse = Main.mongoHQ.course.findOne(qb.get());
+		qb.put("_id").is(objRecord.get("session_id"));
+		objSession = Main.mongoHQ.session.findOne(qb.get());
 	}
 	
 	public void deleteRecord() {
@@ -42,50 +40,29 @@ public class MakeARequestController {
 	}
 
 	public String getCourseCode() {
-		QueryBuilder qbQuery = new QueryBuilder();
-		qbQuery = new QueryBuilder();
-		qbQuery.put("_id").is(obj.get("course_id"));
-		tObj = Main.mongoHQ.course.findOne(qbQuery.get());
-		return (String) tObj.get("code");
+		return (String) objCourse.get("code");
 	}
 
 	public String getCourseName() {
-		QueryBuilder qbQuery = new QueryBuilder();
-		qbQuery = new QueryBuilder();
-		qbQuery.put("_id").is(obj.get("course_id"));
-		tObj = Main.mongoHQ.course.findOne(qbQuery.get());
-		return (String) tObj.get("name");
+		return (String) objCourse.get("name");
 	}
 	
 	public String getSessionId() {
-		return obj.get("session_id").toString();
+		return objRecord.get("session_id").toString();
 	}
 
 	public String getLocation() {
-		QueryBuilder qbQuery = new QueryBuilder();
-		qbQuery = new QueryBuilder();
-		qbQuery.put("_id").is(obj.get("session_id"));
-		tObj = Main.mongoHQ.session.findOne(qbQuery.get());
-		return (String) tObj.get("name");
+		return (String) objSession.get("name");
 	}
 
 	public String getStartTime() {
-		QueryBuilder qbQuery = new QueryBuilder();
-		qbQuery = new QueryBuilder();
-		qbQuery.put("_id").is(obj.get("session_id"));
-		tObj = Main.mongoHQ.session.findOne(qbQuery.get());
-		Date startDate = new Date(Long.parseLong((String) tObj.get("start")));
-//		Date startDate = new Date();
+		Date startDate = (Date) objSession.get("start");
 		SimpleDateFormat startFormat = new SimpleDateFormat ("dd.MM.yyyy E kk:mm");
 		return (String) startFormat.format(startDate);
 	}
 
 	public String getEndTime() {
-		QueryBuilder qbQuery = new QueryBuilder();
-		qbQuery = new QueryBuilder();
-		qbQuery.put("_id").is(obj.get("session_id"));
-		tObj = Main.mongoHQ.session.findOne(qbQuery.get());
-		Date endDate = new Date(Long.parseLong((String) tObj.get("end")));
+		Date endDate = (Date) objSession.get("end");
 		SimpleDateFormat endFormat = new SimpleDateFormat ("dd.MM.yyyy E kk:mm");
 		return (String) endFormat.format(endDate);
 	}
@@ -95,7 +72,7 @@ public class MakeARequestController {
 	}
 
 	public String getProctorId() {
-		return (String) obj.get("proctor");
+		return (String) objRecord.get("proctor");
 	}
 
 }

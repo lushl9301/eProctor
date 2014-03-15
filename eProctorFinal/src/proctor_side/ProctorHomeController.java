@@ -20,27 +20,27 @@ public class ProctorHomeController {
 	private ArrayList<ObjectId> courseIdRecord;
 	private ArrayList<ObjectId>	sessionIdRecord;
 
-	public ProctorHomeController(String username) throws Exception {
+	public ProctorHomeController() throws Exception {
 		courseIdRecord = new ArrayList<ObjectId>();
 		sessionIdRecord = new ArrayList<ObjectId>();
 	}
 
 	public void exit() {
-		Main.proctorHomeUI.setVisible(false);
+		Main.studentHomeUI.setVisible(false);
 		System.exit(0);
 	}
 
 	public void logout() {
-		Main.proctorHomeUI.setVisible(false);
+		Main.studentHomeUI.setVisible(false);
 	}
 
 	public void about() {
 
 	}
 
-	public ArrayList<ArrayList<String>> getTableCurrentBookings(boolean status) {
+	public ArrayList<ArrayList<String>> getTableCurrentBookings() {
 		QueryBuilder qb = new QueryBuilder();
-		qb.put("student_id").is(Main.user_id).put("takenStatus").is(status);
+		qb.put("student_id").is(Main.user_id).put("takenStatus").is(false);
 		DBCursor cursor = Main.mongoHQ.record.find(qb.get());
 		ArrayList<ArrayList<String>> currentBookingsRecords = new ArrayList<ArrayList<String>>();
 		while (cursor.hasNext()) {
@@ -60,24 +60,17 @@ public class ProctorHomeController {
 			qbQuery.put("_id").is(obj.get("session_id"));
 			tObj = Main.mongoHQ.session.findOne(qbQuery.get());
 			
-			Date startDate = (Date) tObj.get("start");
-			Date endDate = (Date) tObj.get("end");
+			Date startDate = new Date(Long.parseLong((String) tObj.get("start")));
+			Date endDate = new Date(Long.parseLong((String) tObj.get("end")));
 			SimpleDateFormat startFormat = new SimpleDateFormat ("dd.MM.yyyy E kk:mm");
 			SimpleDateFormat endFormat = new SimpleDateFormat ("'-'kk:mm");
 			String str = startFormat.format(startDate) + endFormat.format(endDate);
+			
 			temp.add(str);
 			
 			currentBookingsRecords.add(temp);
 		}
 		return currentBookingsRecords;
-	}
-	
-	public ArrayList<ArrayList<String>> getStudentListFor() {
-		BasicDBObject query = new BasicDBObject();
-		query.put("_id", sessionIdRecord);
-		DBObject obj = Main.mongoHQ.session.findOne(query);
-		//TODO
-		return null;
 	}
 
 	public ArrayList<String> getListAvailableCourses() {
@@ -161,10 +154,38 @@ public class ProctorHomeController {
 	}
 
 	public String getInformation() {
-		return "hehe\nhehe\nTODO here\n";
+		// ArrayList<String> neededInfoList = new
+		// ArrayList<String>(Arrays.asList("realname", "coursecode", "examid"));
+		// ArrayList<ArrayList<String>> information =
+		// Main.client.fetchData("username", Main.currentUser.getUserId(),
+		// neededInfoList);
+
+		ArrayList<ArrayList<String>> information = new ArrayList<ArrayList<String>>();
+		{
+			ArrayList<String> a = new ArrayList<String>();
+			String b = "Welcome, Gong Yue from CE2006 BCE2";
+			String c = "You have:   2 exams in the next week.";
+			String d = "5 exams in the next few months.";
+			a.add(b);
+			a.add(c);
+			ArrayList<String> aa = new ArrayList<String>();
+			aa.add(d);
+			information.add(a);
+			information.add(aa);
+		}
+		String result = "";
+		for (ArrayList<String> s : information) {
+			for (String e : s) {
+				result += "      " + e;
+			}
+			result += "\n";
+		}
+		return result.substring(6);
 	}
 
 	public String getRecentMessage() {
+		// implement way: polling request
+		// ArrayList<ArrayList<String>> recentMessage = Main.client.fetchData();
 		ArrayList<ArrayList<String>> recentMessage = new ArrayList<ArrayList<String>>();
 		{
 			ArrayList<String> a = new ArrayList<String>();
@@ -191,6 +212,18 @@ public class ProctorHomeController {
 		}
 		return result;
 	}
+
+	public void makeRequestOfABooking(int index) {
+		if (index == -1) {
+			return;
+		}
+		// String examId = "";
+		// get examId for textbox!!!
+		// set up a new windows
+		// fill the windows with old data
+
+		// I assume all the data already fetched during getCurrentBookingList();
+	}
 	
 	public void bookNewSession(int selectedCourseIndex, int selectedSessionIndex) {
 		if (selectedSessionIndex == -1)
@@ -215,22 +248,15 @@ public class ProctorHomeController {
 
 	}
 
-	public void makeRequestOfABooking(String object_id) {
-		if (object_id == null) {
-			return;
-		}
-		// String examId = "";
-		// get examId for textbox!!!
-		// set up a new windows
-		// fill the windows with old data
-
-		// I assume all the data already fetched during getCurrentBookingList();
+	public void sendRecording() {
+		// new client_side.GrabberShow();
 	}
-	public void checkDetailsOf(String object_id) {
-		if (object_id == null) {
-			return;
-		}
-		
+
+	public URL getExamLink() throws Exception {
+		String link = null;
+		// link = Main.client.fetchData("examId", examId, ArrayList<String>);
+		link = "https://docs.google.com/forms/d/1rEgKT7uRoRrxqenORs5aKo8wIkcsb1waph28glVWF1s/viewform";
+		return (new URL(link));
 	}
 
 }

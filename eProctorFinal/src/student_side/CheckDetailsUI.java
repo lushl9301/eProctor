@@ -6,6 +6,7 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+import javax.swing.JInternalFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JTextArea;
@@ -18,7 +19,7 @@ import entity.Main;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-public class CheckDetailsUI extends JFrame {
+public class CheckDetailsUI extends JInternalFrame {
 
 	private JPanel contentPane;
 	private JTextField txtCourseName;
@@ -42,13 +43,7 @@ public class CheckDetailsUI extends JFrame {
 		contentPane.setLayout(null);
 		
 		JButton btnClose = new JButton("Close");
-		btnClose.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				controller.cancel();
-				setVisible(false);
-			}
-		});
+
 		btnClose.setBounds(321, 232, 117, 25);
 		contentPane.add(btnClose);
 		

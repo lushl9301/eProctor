@@ -17,9 +17,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.ListSelectionEvent;
 
-import org.bson.types.ObjectId;
-
-public class ProctorHomeUI extends JFrame {
+public class ProctorHomeUI extends JInternalFrame {
 
 	private ProctorHomeController controller;
 	private JTable tableReview;
@@ -29,24 +27,26 @@ public class ProctorHomeUI extends JFrame {
 	private JTable tableCurrentBookings;
 	private JList listAvailableCourses;
 	private JList listAvailableSessions;
-	private ArrayList<ArrayList<String>> currentBookingRecords;
-	private TableCurrentBookingsModel tableCurrentBookingModel;
 
 	public ProctorHomeUI(ProctorHomeController controller) throws Exception {
-		this.controller = controller;
 		initialize();
-		//refreshUI()
+		this.controller = controller;
+		refreshUI();
 		setVisible(true);
 	}
 
 	private void refreshUI() {
 		txtpnInformation.setText(controller.getInformation());
 		txtpnRecentMessages.setText(controller.getRecentMessage());
-		tableCurrentBookings.setModel(new TableCurrentBookingsModel(controller.getTableCurrentBookings(false)));
-		tableCurrentBookings.getColumnModel().getColumn(0).setPreferredWidth(100);
-		tableCurrentBookings.getColumnModel().getColumn(1).setPreferredWidth(200);
-		tableCurrentBookings.getColumnModel().getColumn(2).setPreferredWidth(170);
-		
+		tableCurrentBookings.setModel(new TableCurrentBookingsModel(controller.getTableCurrentBookings()));
+		tableCurrentBookings.getColumnModel().getColumn(0)
+				.setPreferredWidth(100);
+		tableCurrentBookings.getColumnModel().getColumn(1)
+				.setPreferredWidth(200);
+		tableCurrentBookings.getColumnModel().getColumn(2)
+				.setPreferredWidth(170);
+		listAvailableCourses.setModel(new ListArrayListModel(controller.getListAvailableCourses()));
+		listAvailableSessions.setModel(new ListArrayListModel(controller.getListAvailableSessions(-1)));
 		tableReview.setModel(new TableReviewModel(controller.getTableReview()));
 		tableReview.getColumnModel().getColumn(0).setPreferredWidth(50);
 		tableReview.getColumnModel().getColumn(1).setPreferredWidth(220);
@@ -71,14 +71,7 @@ public class ProctorHomeUI extends JFrame {
 		UIManager.put("TabbedPane.font", new Font("Tahoma", Font.PLAIN, 14));
 		UIManager.put("Table.font", new Font("Segoe UI", Font.PLAIN, 14));
 		UIManager.put("TextPane.font", new Font("Segoe UI", Font.PLAIN, 14));
-		GraphicsEnvironment graphicsEnvironment = GraphicsEnvironment
-				.getLocalGraphicsEnvironment();
-		GraphicsDevice[] devices = graphicsEnvironment.getScreenDevices();
-		GraphicsDevice graphicsDevice = devices[0];
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-		setAlwaysOnTop(true);
-		setAutoRequestFocus(true);
-		setUndecorated(true);
 		setResizable(false);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		getContentPane().setLayout(null);
@@ -94,7 +87,6 @@ public class ProctorHomeUI extends JFrame {
 
 		txtpnInformation = new JTextPane();
 		txtpnInformation.setBounds(screenSize.width / 2 - 420, 70, 400, 450);
-		txtpnInformation.setText(controller.getInformation());
 		pnStatus.add(txtpnInformation);
 
 		JLabel lblInformation = new JLabel("Information");
@@ -117,30 +109,41 @@ public class ProctorHomeUI extends JFrame {
 		dtrpnExampaper.setFont(new Font("Segoe UI", Font.PLAIN, 14));
 		dtrpnExampaper.setEditable(false);
 
+		JScrollPane spExampaper = new JScrollPane(dtrpnExampaper);
+		spExampaper.setBounds(screenSize.width / 2 - 420, 70, 600,
+				screenSize.height - 200);
+		pnInvigilate.add(spExampaper);
+		try {
+			// dtrpnExampaper.setPage(Main.studentHomeController.getExamLink());
+			dtrpnExampaper.setPage("about:blank");
+		} catch (IOException e) {
+			dtrpnExampaper.setContentType("text/html");
+			dtrpnExampaper.setText("<html>Could not load exam papers</html>");
+		}
+
 		JPanel pnCheck = new JPanel();
 		tabbedPane.addTab("Check", null, pnCheck, null);
 		pnCheck.setLayout(null);
 
-		currentBookingRecords = controller.getTableCurrentBookings(false);
-		tableCurrentBookingModel = new TableCurrentBookingsModel(currentBookingRecords);
 		JLabel lblCurrentBookings = new JLabel("Current Bookings");
 		lblCurrentBookings.setFont(new Font("Segoe UI", Font.BOLD, 16));
 		lblCurrentBookings.setBounds(screenSize.width / 2 - 420, 50, 150, 22);
 		pnCheck.add(lblCurrentBookings);
 
+//		listCurrentBookings = new JList<String>();
+//		listCurrentBookings
+//				.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+//		listCurrentBookings.setBounds(screenSize.width / 2 - 420, 78, 600, 213);
+//		pnBooking.add(listCurrentBookings);
+
 		JButton btnMakeARequest = new JButton("Make A Request");
 		btnMakeARequest.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				if (currentBookingRecords != null) {
-					int index = tableCurrentBookings.getSelectedRow();
-					if (index != -1) {
-						controller.makeRequestOfABooking((String) tableCurrentBookings.getValueAt(index, 0));
-					}
-				}
+				int index = listCurrentBookings.getSelectedIndex();
+				controller.makeRequestOfABooking(index);
 			}
 		});
-		
 		btnMakeARequest.setBounds(screenSize.width / 2 + 200, 150, 150, 30);
 		pnCheck.add(btnMakeARequest);
 
@@ -159,7 +162,8 @@ public class ProctorHomeUI extends JFrame {
 				listAvailableSessions.setModel(new ListArrayListModel(controller.getListAvailableSessions(listAvailableCourses.getSelectedIndex())));
 			}
 		});
-		listAvailableCourses.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		listAvailableCourses
+				.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		listAvailableCourses.setBounds(screenSize.width / 2 - 420, 381, 405,
 				174);
 		pnCheck.add(listAvailableCourses);
@@ -168,12 +172,12 @@ public class ProctorHomeUI extends JFrame {
 		lblAvailableSessions.setBounds(screenSize.width / 2 - 5, 352, 150, 18);
 		pnCheck.add(lblAvailableSessions);
 
-/*		listAvailableSessions = new JList();
+		listAvailableSessions = new JList();
 		listAvailableSessions
 				.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		listAvailableSessions
 				.setBounds(screenSize.width / 2 - 5, 381, 240, 174);
-		pnCheck.add(listAvailableSessions);*/
+		pnCheck.add(listAvailableSessions);
 
 		JButton btnOk = new JButton("OK");
 		btnOk.addMouseListener(new MouseAdapter() {
@@ -205,36 +209,26 @@ public class ProctorHomeUI extends JFrame {
 		
 		JScrollPane scpCurrentBookings = new JScrollPane();
 		scpCurrentBookings.setBounds(screenSize.width / 2 - 420, 78, 600, 213);
-		pnCheck.add(scpCurrentBookings);		
+		pnCheck.add(scpCurrentBookings);
+		
+		tableCurrentBookings = new JTable();
+		scpCurrentBookings.setViewportView(tableCurrentBookings);
+		
 
 		JPanel pnReview = new JPanel();
 		tabbedPane.addTab("Review", null, pnReview, null);
 		pnReview.setLayout(null);
 
-		currentBookingRecords = controller.getTableCurrentBookings(true);
-		tableCurrentBookingModel = new TableCurrentBookingsModel(currentBookingRecords);
-		tableCurrentBookings = new JTable();
-		tableCurrentBookings.setModel(tableCurrentBookingModel);
-		scpCurrentBookings.setViewportView(tableCurrentBookings);
-		
 		JButton btnCheckDetails = new JButton("Check Details");
-		btnCheckDetails.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				if (currentBookingRecords != null) {
-					int index = tableCurrentBookings.getSelectedRow();
-					if (index != -1) {
-						controller.checkDetailsOf((String) tableCurrentBookings.getValueAt(index, 0));
-					}
-				}
-			}
-		});
 		btnCheckDetails.setBounds(screenSize.width / 2 + 210, 73, 150, 30);
 		pnReview.add(btnCheckDetails);
 
 		JScrollPane scrollPane = new JScrollPane();
 		scrollPane.setBounds(screenSize.width / 2 - 420, 70, 600, 290);
 		pnReview.add(scrollPane);
+
+		tableReview = new JTable();
+		scrollPane.setViewportView(tableReview);
 		
 		JPanel pnSetting = new JPanel();
 		tabbedPane.addTab("Setting", null, pnSetting, null);
@@ -249,9 +243,7 @@ public class ProctorHomeUI extends JFrame {
 		JMenuItem mntmLogout = new JMenuItem("Logout");
 		mntmLogout.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				//controller.logout();
-				setVisible(false);
-				//restart loginUI
+				controller.logout();
 			}
 		});
 		mnFile.add(mntmLogout);
@@ -259,9 +251,7 @@ public class ProctorHomeUI extends JFrame {
 		JMenuItem mntmExit = new JMenuItem("Exit");
 		mntmExit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				//controller.exit();
-				setVisible(false);
-				System.exit(0);
+				controller.exit();
 			}
 		});
 		mnFile.add(mntmExit);
@@ -276,9 +266,6 @@ public class ProctorHomeUI extends JFrame {
 			}
 		});
 		mnHelp.add(mntmAbout);
-
-		graphicsDevice.setFullScreenWindow(this);
-		validate();
 	}
 	public class TableCurrentBookingsModel extends AbstractTableModel {
 
