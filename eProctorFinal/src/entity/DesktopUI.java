@@ -98,7 +98,7 @@ public class DesktopUI extends JFrame {
         for (MouseListener listener : basicInternalFrameUI.getNorthPane().getMouseListeners())
         	basicInternalFrameUI.getNorthPane().removeMouseListener(listener);
         Main.loginUI.remove(basicInternalFrameUI.getNorthPane());
-        
+                
 		desktopPane.add(Main.loginUI);
 		Main.loginUI.setVisible(true);
 	}

@@ -74,6 +74,9 @@ public class StudentHomeUI extends JInternalFrame {
 		UIManager.put("TextPane.font", new Font("Segoe UI", Font.PLAIN, 14));
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		setResizable(false);
+		
+		setBorder(null);
+		
 		setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
 		getContentPane().setLayout(null);
 

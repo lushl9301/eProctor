@@ -1,5 +1,6 @@
 package entity;
 
+import java.awt.event.MouseListener;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -7,6 +8,8 @@ import java.security.NoSuchAlgorithmException;
 import com.mongodb.*;
 
 import java.util.Arrays;
+
+import javax.swing.plaf.basic.BasicInternalFrameUI;
 
 import org.bson.types.ObjectId;
 
@@ -22,8 +25,7 @@ public class LoginController {
 
 		QueryBuilder qb = new QueryBuilder();
 		qb.put("username").is(username).put("password")
-				//.is((String) getMD5FromCharArray(password, true))
-				.is("A41ACC7EFFE601DE1DC2099A4E2FDD7C")
+				.is((String) getMD5FromCharArray(password, true))
 				.put("domain").is(domain);
 		System.out.println(getMD5FromCharArray(password, true));
 		DBObject obj = Main.validationServer.user.findOne(qb.get());
@@ -72,6 +74,14 @@ public class LoginController {
 			Main.studentHomeController = new student_side.StudentHomeController();
 			Main.studentHomeUI = new student_side.StudentHomeUI(
 					Main.studentHomeController);
+			
+	        BasicInternalFrameUI basicInternalFrameUI = ((javax.swing.plaf.basic.BasicInternalFrameUI) Main.studentHomeUI.getUI());
+	        for (MouseListener listener : basicInternalFrameUI.getNorthPane().getMouseListeners())
+	        	basicInternalFrameUI.getNorthPane().removeMouseListener(listener);
+	        Main.studentHomeUI.remove(basicInternalFrameUI.getNorthPane());
+			Main.studentHomeUI.setLocation(0, 0);
+			Main.studentHomeUI.setSize(1024, 768);
+	        
 			Main.studentHomeController.open();
 		} else if ("Proctor".equals(domain)) {
 			Main.proctorHomeController = new proctor_side.ProctorHomeController();
