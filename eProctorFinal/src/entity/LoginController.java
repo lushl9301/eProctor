@@ -77,8 +77,7 @@ public class LoginController {
 			Main.proctorHomeController = new proctor_side.ProctorHomeController();
 			Main.proctorHomeUI = new proctor_side.ProctorHomeUI(
 					Main.proctorHomeController);
-			Main.desktopController.addComponent(Main.proctorHomeUI);
-			Main.proctorHomeUI.setVisible(true);
+			Main.proctorHomeController.open();
 		} else {
 			System.exit(0);
 		}

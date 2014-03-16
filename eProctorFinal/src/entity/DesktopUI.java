@@ -19,6 +19,8 @@ import java.awt.Color;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JSeparator;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class DesktopUI extends JFrame {
 
@@ -26,7 +28,7 @@ public class DesktopUI extends JFrame {
 	public JDesktopPane desktopPane;
 	public DesktopController controller;
 
-	public DesktopUI(DesktopController controller) throws Exception {
+	public DesktopUI(final DesktopController controller) throws Exception {
 		GraphicsEnvironment graphicsEnvironment = GraphicsEnvironment
 				.getLocalGraphicsEnvironment();
 		GraphicsDevice[] devices = graphicsEnvironment.getScreenDevices();
@@ -56,6 +58,13 @@ public class DesktopUI extends JFrame {
 		mnFile.add(separator);
 
 		JMenuItem mntmExit = new JMenuItem("Exit");
+		mntmExit.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				setVisible(false);
+				System.exit(0);
+			}
+		});
 		mnFile.add(mntmExit);
 
 		JMenu mnHelp = new JMenu("Help");
@@ -84,13 +93,4 @@ public class DesktopUI extends JFrame {
 		Main.loginUI.setVisible(true);
 	}
 
-	// public void showStudentHome() {
-	// student_side.StudentHomeController controller = new
-	// student_side.StudentHomeController("gong0025");
-	// student_side.StudentHomeUI home = new
-	// student_side.StudentHomeUI(controller);
-	// home.setBounds(0, 0, screenSize.width - 10, screenSize.height - 50);
-	// desktopPane.add(home);
-	// home.setVisible(true);
-	// }
 }

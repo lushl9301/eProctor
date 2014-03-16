@@ -23,4 +23,9 @@ public class DesktopController {
 		Main.desktopUI.desktopPane.remove(comp);
 		Main.desktopUI.repaint();
 	}
+
+	public void exit() {
+		// TODO Auto-generated method stub
+		
+	}
 }

@@ -32,14 +32,6 @@ public class StudentHomeUI extends JInternalFrame {
 	private JList listAvailableSessions;
 
 	public StudentHomeUI(StudentHomeController controller) throws Exception {
-//		addWindowFocusListener(new WindowFocusListener() {
-//			public void windowGainedFocus(WindowEvent arg0) {
-//			}
-//
-//			public void windowLostFocus(WindowEvent arg0) {
-//				toFront();
-//			}
-//		});
 		initialize();
 		this.controller = controller;
 	}
@@ -235,11 +227,12 @@ public class StudentHomeUI extends JInternalFrame {
 				if (tableReview != null) {
 					int index = tableReview.getSelectedRow();
 					if (index != -1) {
-						controller.checkDetailsOf((String) tableReview.getValueAt(index, 0));
+						controller.checkDetailsOf(new ObjectId((String) tableReview.getValueAt(index, 0)));
 					}
 				}
 			}
 		});
+
 		btnCheckDetails.setBounds(screenSize.width / 2 + 210, 73, 150, 30);
 		pnReview.add(btnCheckDetails);
 

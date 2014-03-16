@@ -1,5 +1,6 @@
 package proctor_side;
 
+import java.awt.Toolkit;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -14,6 +15,7 @@ import com.mongodb.*;
 import org.bson.types.ObjectId;
 
 import entity.Main;
+import entity.MakeARequestUI;
 
 public class ProctorHomeController {
 
@@ -25,13 +27,22 @@ public class ProctorHomeController {
 		sessionIdRecord = new ArrayList<ObjectId>();
 	}
 
+	public void open() {
+		Main.proctorHomeUI.setBounds(0, 0, Toolkit.getDefaultToolkit()
+				.getScreenSize().width - 10, Toolkit.getDefaultToolkit()
+				.getScreenSize().height - 32);
+		Main.desktopController.addComponent(Main.proctorHomeUI);
+		Main.proctorHomeUI.setVisible(true);
+		Main.proctorHomeUI.refreshUI();
+	}
+	
 	public void exit() {
-		Main.studentHomeUI.setVisible(false);
+		Main.proctorHomeUI.setVisible(false);
 		System.exit(0);
 	}
 
 	public void logout() {
-		Main.studentHomeUI.setVisible(false);
+		Main.proctorHomeUI.setVisible(false);
 	}
 
 	public void about() {
@@ -46,7 +57,7 @@ public class ProctorHomeController {
 		while (cursor.hasNext()) {
 			ArrayList<String> temp = new ArrayList<String>();
 			DBObject obj = cursor.next();
-			//ID
+			// ID
 			temp.add(((ObjectId) obj.get("_id")).toString());
 
 			// Course
@@ -54,20 +65,21 @@ public class ProctorHomeController {
 			qbQuery.put("_id").is(obj.get("course_id"));
 			DBObject tObj = Main.mongoHQ.course.findOne(qbQuery.get());
 			temp.add((String) tObj.get("name"));
-			
-			//Session
+
+			// Session
 			qbQuery = new QueryBuilder();
 			qbQuery.put("_id").is(obj.get("session_id"));
 			tObj = Main.mongoHQ.session.findOne(qbQuery.get());
-			
-			Date startDate = new Date(Long.parseLong((String) tObj.get("start")));
-			Date endDate = new Date(Long.parseLong((String) tObj.get("end")));
-			SimpleDateFormat startFormat = new SimpleDateFormat ("dd.MM.yyyy E kk:mm");
-			SimpleDateFormat endFormat = new SimpleDateFormat ("'-'kk:mm");
-			String str = startFormat.format(startDate) + endFormat.format(endDate);
-			
+			Date startDate = (Date) tObj.get("start");
+			Date endDate = (Date) tObj.get("end");
+			SimpleDateFormat startFormat = new SimpleDateFormat(
+					"dd.MM.yyyy E kk:mm");
+			SimpleDateFormat endFormat = new SimpleDateFormat("'-'kk:mm");
+			String str = startFormat.format(startDate)
+					+ endFormat.format(endDate);
+
 			temp.add(str);
-			
+
 			currentBookingsRecords.add(temp);
 		}
 		return currentBookingsRecords;
@@ -116,7 +128,7 @@ public class ProctorHomeController {
 	}
 
 	public ArrayList<ArrayList<String>> getTableReview() {
-		//BasicDBObject query = new BasicDBObject();
+		// BasicDBObject query = new BasicDBObject();
 		QueryBuilder qb = new QueryBuilder();
 		qb.put("student_id").is(Main.user_id).put("takenStatus").is(true);
 		DBCursor cursor = Main.mongoHQ.record.find(qb.get());
@@ -124,7 +136,7 @@ public class ProctorHomeController {
 		while (cursor.hasNext()) {
 			ArrayList<String> temp = new ArrayList<String>();
 			DBObject obj = cursor.next();
-			//ID
+			// ID
 			temp.add(((ObjectId) obj.get("_id")).toString());
 
 			// Course
@@ -132,25 +144,26 @@ public class ProctorHomeController {
 			qbQuery.put("_id").is(obj.get("course_id"));
 			DBObject tObj = Main.mongoHQ.course.findOne(qbQuery.get());
 			temp.add((String) tObj.get("name"));
-			
-			//Session
+
+			// Session
 			qbQuery = new QueryBuilder();
 			qbQuery.put("_id").is(obj.get("session_id"));
 			tObj = Main.mongoHQ.session.findOne(qbQuery.get());
-			Date startDate = new Date(Long.parseLong((String) tObj.get("start")));
-			Date endDate = new Date(Long.parseLong((String) tObj.get("end")));
-			SimpleDateFormat startFormat = new SimpleDateFormat ("dd.MM.yyyy E kk:mm");
-			SimpleDateFormat endFormat = new SimpleDateFormat ("'-'kk:mm");
-			String str = startFormat.format(startDate) + endFormat.format(endDate);
+			Date startDate = (Date) tObj.get("start");
+			Date endDate = (Date) tObj.get("end");
+			SimpleDateFormat startFormat = new SimpleDateFormat(
+					"dd.MM.yyyy E kk:mm");
+			SimpleDateFormat endFormat = new SimpleDateFormat("'-'kk:mm");
+			String str = startFormat.format(startDate)
+					+ endFormat.format(endDate);
 			temp.add(str);
-			
+
 			temp.add((String) obj.get("grade"));
 			temp.add((String) obj.get("remark"));
 			reviewRecords.add(temp);
 		}
 		return reviewRecords;
-		
-		
+
 	}
 
 	public String getInformation() {
@@ -212,25 +225,13 @@ public class ProctorHomeController {
 		}
 		return result;
 	}
-
-	public void makeRequestOfABooking(int index) {
-		if (index == -1) {
-			return;
-		}
-		// String examId = "";
-		// get examId for textbox!!!
-		// set up a new windows
-		// fill the windows with old data
-
-		// I assume all the data already fetched during getCurrentBookingList();
-	}
 	
 	public void bookNewSession(int selectedCourseIndex, int selectedSessionIndex) {
 		if (selectedSessionIndex == -1)
 			return;
 		ObjectId courseId = courseIdRecord.get(selectedCourseIndex);
 		ObjectId sessionId = sessionIdRecord.get(selectedSessionIndex);
-//		Student enrolledNotTested
+//		Proctor enrolledNotTested
 //		Record
 		DBObject listItem = new BasicDBObject("enrolledNotTested", courseId);
 		DBObject findQuery = new BasicDBObject("_id", Main.user_id);
@@ -257,6 +258,29 @@ public class ProctorHomeController {
 		// link = Main.client.fetchData("examId", examId, ArrayList<String>);
 		link = "https://docs.google.com/forms/d/1rEgKT7uRoRrxqenORs5aKo8wIkcsb1waph28glVWF1s/viewform";
 		return (new URL(link));
+	}
+	
+	public void makeRequestOfABooking(ObjectId object_id) {
+		if (object_id == null) {
+			return;
+		}
+		Main.makeARequestController = new entity.MakeARequestController(
+				object_id);
+		Main.makeARequestUI = new MakeARequestUI(Main.makeARequestController);
+		Main.desktopController.addComponent(Main.makeARequestUI);
+		Main.makeARequestUI.setVisible(true);
+	}
+
+	public void checkDetailsOf(ObjectId object_id) {
+		if (object_id == null) {
+			return;
+		}
+		Main.checkDetailsController = new entity.CheckDetailsController(
+				object_id);
+		Main.checkDetailsUI = new entity.CheckDetailsUI(
+				Main.checkDetailsController);
+		Main.desktopController.addComponent(Main.checkDetailsUI);
+		Main.checkDetailsUI.setVisible(true);
 	}
 
 }

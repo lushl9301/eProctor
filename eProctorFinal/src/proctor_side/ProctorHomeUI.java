@@ -17,6 +17,8 @@ import java.awt.event.ActionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.ListSelectionEvent;
 
+import org.bson.types.ObjectId;
+
 public class ProctorHomeUI extends JInternalFrame {
 
 	private ProctorHomeController controller;
@@ -31,11 +33,9 @@ public class ProctorHomeUI extends JInternalFrame {
 	public ProctorHomeUI(ProctorHomeController controller) throws Exception {
 		initialize();
 		this.controller = controller;
-		refreshUI();
-		setVisible(true);
 	}
 
-	private void refreshUI() {
+	public void refreshUI() {
 		txtpnInformation.setText(controller.getInformation());
 		txtpnRecentMessages.setText(controller.getRecentMessage());
 		tableCurrentBookings.setModel(new TableCurrentBookingsModel(controller.getTableCurrentBookings()));
@@ -77,7 +77,7 @@ public class ProctorHomeUI extends JInternalFrame {
 		getContentPane().setLayout(null);
 
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-		tabbedPane.setBounds(10, 27, screenSize.width - 20,
+		tabbedPane.setBounds(0, 0, screenSize.width - 20,
 				screenSize.height - 60);
 		getContentPane().add(tabbedPane);
 
@@ -104,22 +104,7 @@ public class ProctorHomeUI extends JInternalFrame {
 		JPanel pnInvigilate = new JPanel();
 		tabbedPane.addTab("Invigilate", null, pnInvigilate, null);
 		pnInvigilate.setLayout(null);
-
-		JEditorPane dtrpnExampaper = new JEditorPane();
-		dtrpnExampaper.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-		dtrpnExampaper.setEditable(false);
-
-		JScrollPane spExampaper = new JScrollPane(dtrpnExampaper);
-		spExampaper.setBounds(screenSize.width / 2 - 420, 70, 600,
-				screenSize.height - 200);
-		pnInvigilate.add(spExampaper);
-		try {
-			// dtrpnExampaper.setPage(Main.studentHomeController.getExamLink());
-			dtrpnExampaper.setPage("about:blank");
-		} catch (IOException e) {
-			dtrpnExampaper.setContentType("text/html");
-			dtrpnExampaper.setText("<html>Could not load exam papers</html>");
-		}
+		//TODO add canvas here
 
 		JPanel pnCheck = new JPanel();
 		tabbedPane.addTab("Check", null, pnCheck, null);
@@ -140,8 +125,13 @@ public class ProctorHomeUI extends JInternalFrame {
 		btnMakeARequest.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				int index = listCurrentBookings.getSelectedIndex();
-				controller.makeRequestOfABooking(index);
+				if (tableCurrentBookings != null) {
+					int index = tableCurrentBookings.getSelectedRow();
+					if (index != -1) {
+						controller
+								.makeRequestOfABooking(new ObjectId((String) tableCurrentBookings.getValueAt(index, 0)));
+					}
+				}
 			}
 		});
 		btnMakeARequest.setBounds(screenSize.width / 2 + 200, 150, 150, 30);
@@ -220,6 +210,18 @@ public class ProctorHomeUI extends JInternalFrame {
 		pnReview.setLayout(null);
 
 		JButton btnCheckDetails = new JButton("Check Details");
+		btnCheckDetails.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if (tableReview != null) {
+					int index = tableReview.getSelectedRow();
+					if (index != -1) {
+						controller.checkDetailsOf(new ObjectId((String) tableReview.getValueAt(index, 0)));
+					}
+				}
+			}
+		});
+		
 		btnCheckDetails.setBounds(screenSize.width / 2 + 210, 73, 150, 30);
 		pnReview.add(btnCheckDetails);
 
@@ -232,40 +234,6 @@ public class ProctorHomeUI extends JInternalFrame {
 		
 		JPanel pnSetting = new JPanel();
 		tabbedPane.addTab("Setting", null, pnSetting, null);
-
-		JMenuBar menuBar = new JMenuBar();
-		menuBar.setBounds(0, 0, screenSize.width, 25);
-		getContentPane().add(menuBar);
-
-		JMenu mnFile = new JMenu("File");
-		menuBar.add(mnFile);
-
-		JMenuItem mntmLogout = new JMenuItem("Logout");
-		mntmLogout.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				controller.logout();
-			}
-		});
-		mnFile.add(mntmLogout);
-
-		JMenuItem mntmExit = new JMenuItem("Exit");
-		mntmExit.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				controller.exit();
-			}
-		});
-		mnFile.add(mntmExit);
-
-		JMenu mnHelp = new JMenu("Help");
-		menuBar.add(mnHelp);
-
-		JMenuItem mntmAbout = new JMenuItem("About");
-		mntmAbout.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				controller.getAboutMessage();
-			}
-		});
-		mnHelp.add(mntmAbout);
 	}
 	public class TableCurrentBookingsModel extends AbstractTableModel {
 

@@ -1,4 +1,4 @@
-package student_side;
+package entity;
 
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
@@ -14,8 +14,6 @@ import javax.swing.JTextPane;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
-
-import entity.Main;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -36,7 +34,7 @@ public class MakeARequestUI extends JInternalFrame {
 	/**
 	 * Create the frame.
 	 */
-	public MakeARequestUI(final student_side.MakeARequestController controller) {
+	public MakeARequestUI(final entity.MakeARequestController controller) {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 670, 300);
 		contentPane = new JPanel();
@@ -49,6 +47,7 @@ public class MakeARequestUI extends JInternalFrame {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				controller.deleteRecord();
+				setVisible(false);
 			}
 		});
 		btnDelete.setBounds(410, 232, 100, 25);
@@ -58,7 +57,6 @@ public class MakeARequestUI extends JInternalFrame {
 		btnCancel.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				controller.cancel();
 				setVisible(false);
 			}
 		});

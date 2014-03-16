@@ -1,4 +1,4 @@
-package student_side;
+package entity;
 
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
@@ -14,8 +14,6 @@ import javax.swing.JTextPane;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
-
-import entity.Main;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -34,7 +32,7 @@ public class CheckDetailsUI extends JInternalFrame {
 	/**
 	 * Create the frame.
 	 */
-	public CheckDetailsUI(final student_side.CheckDetailsController controller) {
+	public CheckDetailsUI(final entity.CheckDetailsController controller) {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
 		contentPane = new JPanel();
@@ -43,6 +41,12 @@ public class CheckDetailsUI extends JInternalFrame {
 		contentPane.setLayout(null);
 		
 		JButton btnClose = new JButton("Close");
+		btnClose.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				setVisible(false);
+			}
+		});
 
 		btnClose.setBounds(321, 232, 117, 25);
 		contentPane.add(btnClose);

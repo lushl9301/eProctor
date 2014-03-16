@@ -1,4 +1,4 @@
-package student_side;
+package entity;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -10,16 +10,12 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.QueryBuilder;
 
-import entity.Main;
-
 public class MakeARequestController {
 
 	private ObjectId record_id;
 	private DBObject objRecord, objSession, objCourse;
 
 	public MakeARequestController(ObjectId record_id) {
-		//Main.makeARequestUI.setVisible(true);
-		System.out.println(record_id);
 		this.record_id = record_id;
 		QueryBuilder qb = new QueryBuilder();
 		qb.put("_id").is(record_id);
@@ -32,12 +28,12 @@ public class MakeARequestController {
 	
 	public void deleteRecord() {
 		// TODO Auto-generated method stub
-		Main.makeARequestUI.setVisible(false);
+//		Main.makeARequestUI.setVisible(false);
 	}
 
-	public void cancel() {
+/*	public void cancel() {
 		Main.makeARequestUI.setVisible(false);
-	}
+	}*/
 
 	public String getCourseCode() {
 		return (String) objCourse.get("code");

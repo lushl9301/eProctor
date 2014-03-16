@@ -16,6 +16,7 @@ import com.mongodb.*;
 import org.bson.types.ObjectId;
 
 import entity.Main;
+import entity.MakeARequestUI;
 
 public class StudentHomeController {
 
@@ -270,20 +271,20 @@ public class StudentHomeController {
 		if (object_id == null) {
 			return;
 		}
-		Main.makeARequestController = new student_side.MakeARequestController(
+		Main.makeARequestController = new entity.MakeARequestController(
 				object_id);
 		Main.makeARequestUI = new MakeARequestUI(Main.makeARequestController);
 		Main.desktopController.addComponent(Main.makeARequestUI);
 		Main.makeARequestUI.setVisible(true);
 	}
 
-	public void checkDetailsOf(String object_id) {
+	public void checkDetailsOf(ObjectId object_id) {
 		if (object_id == null) {
 			return;
 		}
-		Main.checkDetailsController = new student_side.CheckDetailsController(
+		Main.checkDetailsController = new entity.CheckDetailsController(
 				object_id);
-		Main.checkDetailsUI = new student_side.CheckDetailsUI(
+		Main.checkDetailsUI = new entity.CheckDetailsUI(
 				Main.checkDetailsController);
 		Main.desktopController.addComponent(Main.checkDetailsUI);
 		Main.checkDetailsUI.setVisible(true);

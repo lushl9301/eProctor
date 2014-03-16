@@ -18,10 +18,10 @@ public class Main {
 	public static student_side.StudentHomeController studentHomeController;
 	public static proctor_side.ProctorHomeUI proctorHomeUI;
 	public static proctor_side.ProctorHomeController proctorHomeController;
-	public static student_side.MakeARequestUI makeARequestUI;
-	public static student_side.MakeARequestController makeARequestController;
-	public static student_side.CheckDetailsUI checkDetailsUI;
-	public static student_side.CheckDetailsController checkDetailsController;
+	public static entity.MakeARequestUI makeARequestUI;
+	public static entity.MakeARequestController makeARequestController;
+	public static entity.CheckDetailsUI checkDetailsUI;
+	public static entity.CheckDetailsController checkDetailsController;
 
 	public static void main(String[] args) throws Exception {
 		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());

@@ -1,4 +1,4 @@
-package student_side;
+package entity;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -10,16 +10,13 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.QueryBuilder;
 
-import entity.Main;
-
 public class CheckDetailsController {
 
 	private ObjectId record_id;
 	private DBObject obj, tObj;
 
-	public CheckDetailsController(String record_id) {
-		//Main.checkDetailsUI.setVisible(true);
-		this.record_id = new ObjectId(record_id);
+	public CheckDetailsController(ObjectId record_id) {
+		this.record_id = record_id;
 		QueryBuilder qb = new QueryBuilder();
 		qb.put("_id").is(record_id);
 		DBCursor cursor = Main.mongoHQ.record.find(qb.get());
