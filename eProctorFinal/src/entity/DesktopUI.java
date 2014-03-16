@@ -10,6 +10,8 @@ import java.awt.Toolkit;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+import javax.swing.plaf.basic.BasicInternalFrameTitlePane;
+import javax.swing.plaf.basic.BasicInternalFrameUI;
 import javax.swing.JMenuBar;
 import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
@@ -19,8 +21,10 @@ import java.awt.Color;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JSeparator;
+
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 public class DesktopUI extends JFrame {
 
@@ -89,6 +93,12 @@ public class DesktopUI extends JFrame {
 		
 		Main.loginController = new entity.LoginController();
 		Main.loginUI = new entity.LoginUI(Main.loginController);
+
+        BasicInternalFrameUI basicInternalFrameUI = ((javax.swing.plaf.basic.BasicInternalFrameUI) Main.loginUI.getUI());
+        for (MouseListener listener : basicInternalFrameUI.getNorthPane().getMouseListeners())
+        	basicInternalFrameUI.getNorthPane().removeMouseListener(listener);
+        Main.loginUI.remove(basicInternalFrameUI.getNorthPane());
+        
 		desktopPane.add(Main.loginUI);
 		Main.loginUI.setVisible(true);
 	}

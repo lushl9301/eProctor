@@ -1,20 +1,16 @@
 package entity;
 
-import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.JPasswordField;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.plaf.basic.BasicInternalFrameTitlePane;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.Color;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 
 public class LoginUI extends JInternalFrame {
 
@@ -33,10 +29,12 @@ public class LoginUI extends JInternalFrame {
 	private void initialize() {
 		setResizable(false);
 		setBounds(500, 100, 350, 300);
+		setBorder(null);
+		
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setTitle("Welcome to eProctor");
 		getContentPane().setLayout(null);
-
+		
 		JLabel lblUsername = new JLabel("Username:");
 		lblUsername.setBounds(100, 50, 150, 14);
 		getContentPane().add(lblUsername);

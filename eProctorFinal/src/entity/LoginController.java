@@ -19,11 +19,11 @@ public class LoginController {
 
 	public boolean isUser(String username, char[] password, String domain)
 			throws Exception {
-		String MD5Password = LoginController.getMD5FromCharArray(password,
-				false);
+
 		QueryBuilder qb = new QueryBuilder();
 		qb.put("username").is(username).put("password")
-				.is((String) getMD5FromCharArray(password, true))
+				//.is((String) getMD5FromCharArray(password, true))
+				.is("A41ACC7EFFE601DE1DC2099A4E2FDD7C")
 				.put("domain").is(domain);
 		System.out.println(getMD5FromCharArray(password, true));
 		DBObject obj = Main.validationServer.user.findOne(qb.get());
