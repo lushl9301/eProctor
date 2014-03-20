@@ -6,10 +6,15 @@ import javax.swing.*;
 
 import org.bson.types.ObjectId;
 
+import com.mongodb.DBObject;
+
 public class Main {
 	public static server_side.MongoHQ mongoHQ;
 	public static server_side.ValidationServer validationServer;
 	public static ObjectId user_id;
+	
+	public static DBObject user;
+	
 	public static entity.DesktopController desktopController;
 	public static entity.DesktopUI desktopUI;
 	public static entity.LoginController loginController;

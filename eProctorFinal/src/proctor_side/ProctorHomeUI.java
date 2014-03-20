@@ -112,7 +112,7 @@ public class ProctorHomeUI extends JInternalFrame {
 
 		JLabel lblCurrentBookings = new JLabel("Current Bookings");
 		lblCurrentBookings.setFont(new Font("Segoe UI", Font.BOLD, 16));
-		lblCurrentBookings.setBounds(screenSize.width / 2 - 420, 50, 150, 22);
+		lblCurrentBookings.setBounds(263, 46, 150, 22);
 		pnCheck.add(lblCurrentBookings);
 
 //		listCurrentBookings = new JList<String>();

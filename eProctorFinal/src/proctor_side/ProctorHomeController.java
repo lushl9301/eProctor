@@ -88,8 +88,10 @@ public class ProctorHomeController {
 	public ArrayList<String> getListAvailableCourses() {
 		BasicDBObject query = new BasicDBObject();
 		query.put("_id", Main.user_id);
-		DBObject obj = Main.mongoHQ.student.findOne(query);
-		BasicDBList e = (BasicDBList) obj.get("enrolledNotTested");
+		DBObject obj = Main.mongoHQ.proctor.findOne(query);
+//		DBObject obj;
+		BasicDBList e = (BasicDBList) Main.user.get("enrolledNotTested");
+//		BasicDBList e1 = (BasicDBList) Main.user.get("enrolledCourses");
 		ArrayList<String> coursesRecord = new ArrayList<String>();
 		for (int i = 0; i < e.size(); i++) {
 			ObjectId t = new ObjectId(e.get(i).toString());

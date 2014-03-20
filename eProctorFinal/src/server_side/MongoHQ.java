@@ -9,6 +9,7 @@ public class MongoHQ {
 	public DBCollection course;
 	public DBCollection session;
 	public DBCollection student;
+	public DBCollection proctor;
 
 	private boolean connected = false;
 
@@ -21,6 +22,7 @@ public class MongoHQ {
 		course = db.getCollection("Course");
 		session = db.getCollection("Session");
 		student = db.getCollection("Student");
+		proctor = db.getCollection("Proctor");
 		connected = true;
 		System.out.println("connected");
 	}

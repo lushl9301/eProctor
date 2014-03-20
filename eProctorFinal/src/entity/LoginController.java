@@ -27,15 +27,18 @@ public class LoginController {
 		qb.put("username").is(username).put("password")
 				.is((String) getMD5FromCharArray(password, true))
 				.put("domain").is(domain);
-		System.out.println(getMD5FromCharArray(password, true));
+//		System.out.println(getMD5FromCharArray(password, true));
+//		System.out.println(qb);
 		DBObject obj = Main.validationServer.user.findOne(qb.get());
+//		System.out.println(obj);
 		if (obj == null)
 			return false;
 		else {
 			qb = new QueryBuilder();
-			qb.put("username").is(username);
-			obj = Main.mongoHQ.student.findOne(qb.get());
-			Main.user_id = (ObjectId) obj.get("_id");
+			qb.put("username").is(obj.get("username"));
+//			obj = Main.mongoHQ.student.findOne(qb.get());
+			Main.user = obj;
+//			Main.user_id = (ObjectId) obj.get("_id");
 			return true;
 		}
 	}
