@@ -1,23 +1,43 @@
 package proctor_side;
 
+import static com.googlecode.javacv.cpp.opencv_core.cvFlip;
+
 import java.awt.*;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.plaf.basic.BasicInternalFrameUI;
 import javax.swing.table.AbstractTableModel;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.Serializable;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.ArrayList;
+import java.util.TreeMap;
+import java.awt.event.MouseListener;
 import java.awt.event.WindowFocusListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.image.BufferedImage;
 
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.ListSelectionEvent;
 
 import org.bson.types.ObjectId;
+
+import entity.RecordObject;
+
+import com.googlecode.javacv.CanvasFrame;
+import com.googlecode.javacv.FrameGrabber;
+import com.googlecode.javacv.cpp.opencv_core.IplImage;
+import javax.swing.border.LineBorder;
 
 public class ProctorHomeUI extends JInternalFrame {
 
@@ -30,12 +50,19 @@ public class ProctorHomeUI extends JInternalFrame {
 	private JList listAvailableCourses;
 	private JList listAvailableSessions;
 
+	
+	private TreeMap<String, TestVideo> imageLabelThreadList = new TreeMap<String, TestVideo>();
+	private TreeMap<String, JLabel> videoBoxList = new TreeMap<String, JLabel>();
+	private TreeMap<String, JLabel> videoIdList = new TreeMap<String, JLabel>();
+	private int numOfVideoBox = 0;
+
 	public ProctorHomeUI(ProctorHomeController controller) throws Exception {
+		getContentPane().setPreferredSize(new Dimension(1024, 768));
 		initialize();
 		this.controller = controller;
 	}
 
-	public void refreshUI() {
+	public void refreshUI() throws java.lang.NullPointerException {
 		txtpnInformation.setText(controller.getInformation());
 		txtpnRecentMessages.setText(controller.getRecentMessage());
 		tableCurrentBookings.setModel(new TableCurrentBookingsModel(controller.getTableCurrentBookings()));
@@ -101,10 +128,46 @@ public class ProctorHomeUI extends JInternalFrame {
 		txtpnRecentMessages.setBounds(screenSize.width / 2, 70, 400, 450);
 		pnStatus.add(txtpnRecentMessages);
 
-		JPanel pnInvigilate = new JPanel();
+		final JPanel pnInvigilate = new JPanel();
+		pnInvigilate.setBounds(new Rectangle(0, 0, 1024, 768));
 		tabbedPane.addTab("Invigilate", null, pnInvigilate, null);
 		pnInvigilate.setLayout(null);
+		
+//		//=//=//=//=///=//=/=/=/=/=//=//=/=/=/=/==/=/
+//		final JLabel idLabel = new JLabel("===" + numOfVideoBox);
+//		// for displaying student's name
+//		// 4 in a row, each has 10 space to other label in the same row, has 50 space to other in the same column, size = 100 x 30
+//		idLabel.setBounds(50 + (4 % 4 - 1) * (10 + 256), 150 + (numOfVideoBox / 4) * (50 + 192) - 30, 100, 30);
+//		pnInvigilate.add(idLabel);
+//		idLabel.setVisible(true);
+//		
+//		// for displaying student's image
+//		// 4 in a row, each has 10 space to other label in the same row, has 50 space to other in the same column, size = 256 x 192
+//		final JLabel videoLabelx = new JLabel("xxx", new ImageIcon("webcam_icon.gif"), JLabel.CENTER);
+//		videoLabelx.setBounds(50 + (4 % 4 - 1) * (10 + 256), 150 + (numOfVideoBox / 4) * (50 + 192), 256, 192);
+//		videoLabelx.setIcon(new ImageIcon("webcam_icon.gif"));
+//		pnInvigilate.add(videoLabelx);
+//		videoLabelx.setVisible(true);
+//		//=//=//=//=///=//=/=/=/=/=//=//=/=/=/=/==/=/
+
+		
+		JButton btnTestAddVideoBox = new JButton("add one video box");
+		btnTestAddVideoBox.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				System.out.println("btnTestAddVideoBox clicked");
+				addOneVideoBox("" + numOfVideoBox, pnInvigilate);
+			}
+		});
+		btnTestAddVideoBox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+			}
+		});
+		btnTestAddVideoBox.setBounds(10, 10, 178, 23);
+		pnInvigilate.add(btnTestAddVideoBox);
 		//TODO add canvas here
+		
+	
 
 		JPanel pnCheck = new JPanel();
 		tabbedPane.addTab("Check", null, pnCheck, null);
@@ -128,8 +191,7 @@ public class ProctorHomeUI extends JInternalFrame {
 				if (tableCurrentBookings != null) {
 					int index = tableCurrentBookings.getSelectedRow();
 					if (index != -1) {
-						controller
-								.makeRequestOfABooking(new ObjectId((String) tableCurrentBookings.getValueAt(index, 0)));
+						controller.makeRequestOfABooking(new ObjectId((String) tableCurrentBookings.getValueAt(index, 0)));
 					}
 				}
 			}
@@ -233,7 +295,68 @@ public class ProctorHomeUI extends JInternalFrame {
 		scrollPane.setViewportView(tableReview);
 		
 		JPanel pnSetting = new JPanel();
+		pnSetting.setPreferredSize(new Dimension(1024, 768));
 		tabbedPane.addTab("Setting", null, pnSetting, null);
+		
+		final JButton btnStop = new JButton("stop");
+		btnStop.setBounds((screenSize.width - 345) / 2, 50, 345, 88);
+		btnStop.setIcon(new ImageIcon("E:\\GitHub\\ce2006project\\eProctorFinal\\stop.png"));
+		btnStop.setAlignmentY(Component.TOP_ALIGNMENT);
+		btnStop.setPreferredSize(new Dimension(345, 88));
+		btnStop.setVisible(false);
+		pnSetting.setLayout(null);
+		
+		final JButton btnStart = new JButton("test Camera");
+		btnStart.setBounds((screenSize.width - 345) / 2, 50, 345, 88);
+		pnSetting.add(btnStart);
+		btnStart.setMargin(new Insets(0, 0, 0, 0));
+		btnStart.setIcon(new ImageIcon("E:\\GitHub\\ce2006project\\eProctorFinal\\start.png"));
+		btnStart.setAlignmentY(Component.TOP_ALIGNMENT);
+		btnStart.setPreferredSize(new Dimension(345, 88));
+		
+		final JLabel videoLabel = new JLabel("", new ImageIcon("webcam_icon.gif"), JLabel.CENTER);
+		videoLabel.setBorder(new LineBorder(new Color(0, 0, 0)));
+		videoLabel.setIcon(new ImageIcon("E:\\GitHub\\ce2006project\\eProctorFinal\\webcam_icon.gif"));
+		videoLabel.setPreferredSize(new Dimension(512, 384));
+		videoLabel.setBounds((screenSize.width - 512) / 2, 150, 512, 384);
+		pnSetting.add(videoLabel);
+		
+		btnStart.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				imageLabelThreadList.put("0", new TestVideo("0", videoLabel));
+				imageLabelThreadList.get("0").start();
+				btnStart.setVisible(false);
+				btnStop.setVisible(true);
+			}
+		});
+		pnSetting.add(btnStop);
+		
+		btnStop.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				synchronized (this) {
+					imageLabelThreadList.get("0").shouldEnd = true;
+				}
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					// XXX Auto-generated catch block
+					e.printStackTrace();
+				}
+				System.out.println("isAlive: " + imageLabelThreadList.get("0").isAlive()); // kill failed?!
+				btnStart.setVisible(true);
+				btnStop.setVisible(false);
+			}
+		});
+		
+		
+		// remove the border
+        BasicInternalFrameUI basicInternalFrameUI = ((javax.swing.plaf.basic.BasicInternalFrameUI) this.getUI());
+        for (MouseListener listener : basicInternalFrameUI.getNorthPane().getMouseListeners())
+        	basicInternalFrameUI.getNorthPane().removeMouseListener(listener);
+        this.remove(basicInternalFrameUI.getNorthPane());
+        this.setBorder(null);
 	}
 	public class TableCurrentBookingsModel extends AbstractTableModel {
 
@@ -329,6 +452,109 @@ public class ProctorHomeUI extends JInternalFrame {
 		public Object getValueAt(int rowIndex, int columnIndex) {
 			return records.get(rowIndex).get(columnIndex);
 		}
+	}
+
+	class TestVideo extends Thread {
+		
+		// replace by repaint() ?
+		
+		public JLabel videoLabel;
+		public volatile boolean shouldEnd;
+		public String id;
+		
+		public TestVideo(String id, JLabel videoLabel) {
+			this.id = id;
+			this.videoLabel = videoLabel;
+			this.shouldEnd = false;
+		}
+
+		@Override
+		public void run() {
+		    IplImage img = new IplImage();	
+		    FrameGrabber grabber;
+			try {
+				grabber = FrameGrabber.createDefault(0);
+				grabber.start(); 
+				
+			    while (!shouldEnd){	
+			    	img = grabber.grab();
+		            cvFlip(img, img, 1);
+		            videoLabel.setIcon(new ImageIcon(img.getBufferedImage()));
+			    }
+			    grabber.stop();
+			    videoLabel.setIcon(new ImageIcon("webcam_icon.gif"));
+			    
+			    return ;
+			} catch (com.googlecode.javacv.FrameGrabber.Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	public void addOneVideoBox (String id, JPanel panel) {
+		int horizontalSpace = 8;
+		int verticalSpace = 50;
+
+		final JLabel idLabel = new JLabel("" + numOfVideoBox);
+		// for displaying student's name
+		// 4 in a row, each has 10 space to other label in the same row, has 50 space to other in the same column, size = 100 x 30
+		idLabel.setBounds(30 + (numOfVideoBox % 4) * (horizontalSpace + 256), 150 + (numOfVideoBox / 4) * (verticalSpace + 192) - 30, 100, 30);
+		idLabel.setBorder(new LineBorder(new Color(0, 0, 0)));
+		panel.add(idLabel);
+		idLabel.setVisible(true);
+		
+		// for displaying student's image
+		// 4 in a row, each has 10 space to other label in the same row, has 50 space to other in the same column, size = 256 x 192
+		final JLabel videoLabel = new JLabel("", new ImageIcon("webcam_icon.gif"), JLabel.CENTER);
+		videoLabel.setBounds(30 + (numOfVideoBox % 4) * (horizontalSpace + 256), 150 + (numOfVideoBox / 4) * (verticalSpace + 192), 256, 192);
+		videoLabel.setIcon(new ImageIcon("webcam_icon.gif"));
+		videoLabel.setBorder(new LineBorder(new Color(0, 0, 0)));
+		panel.add(videoLabel);
+		videoLabel.setVisible(true);
+		
+		panel.repaint();
+		
+		videoIdList.put(id, idLabel);
+		videoBoxList.put(id, videoLabel);
+		
+		numOfVideoBox++;
+	}
+
+	class ReceiveShow extends Thread {
+		int port = 6002;
+		
+	    public RecordObject recordObject;
+	    public ObjectInputStream sInput;
+	    public ServerSocket serverSocket;
+	    public Socket socket;
+	    
+	    public volatile boolean shouldEnd;
+	  
+	    public ReceiveShow () throws IOException {
+	    	this.serverSocket = new ServerSocket(port);
+	    	this.shouldEnd = false;
+	    }
+	    
+	    public void run() {
+	    	try {
+		    	while (!shouldEnd) {  		
+					socket = serverSocket.accept();
+					sInput = new ObjectInputStream(socket.getInputStream());
+		    		RecordObject recordObject = (RecordObject) sInput.readObject();
+		    		socket.close();
+		    		
+		    		BufferedImage buf = ImageIO.read(new ByteArrayInputStream(recordObject.getImageBytes()));
+		            IplImage toDisplay = IplImage.createFrom(buf);
+		            
+		            videoBoxList.get(recordObject.getUserId()).setIcon(new ImageIcon(toDisplay.getBufferedImage()));
+		    	}
+		    	
+		    	return ;
+			} catch (Exception e) {
+				// XXX Auto-generated catch block
+				e.printStackTrace();
+			}
+	    }
 	}
 }
 

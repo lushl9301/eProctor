@@ -12,7 +12,7 @@ public class MongoHQ {
 	public DBCollection proctor;
 
 	private boolean connected = false;
-
+	
 	public MongoHQ(String strUrl, String strDb) throws Exception {
 		System.out.println("Starting connection");
 		MongoClientURI uri = new MongoClientURI(strUrl);

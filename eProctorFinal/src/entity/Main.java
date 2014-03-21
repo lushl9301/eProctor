@@ -44,13 +44,14 @@ public class Main {
 		UIManager.put("TextPane.font", new Font("Segoe UI", Font.PLAIN, 14));
 
 //		user_id = new ObjectId("531ec0d07a0016ee1c000508");
-		mongoHQ = new server_side.MongoHQ(
-				"mongodb://admin:admin@emma.mongohq.com:10051/real_like_doc",
-				"real_like_doc");
-		validationServer = new server_side.ValidationServer(
-				"mongodb://admin:admin@emma.mongohq.com:10063/NTU_Server",
-				"NTU_Server");
-		desktopController = new DesktopController();
-		desktopUI = new DesktopUI(desktopController);
+//		mongoHQ = new server_side.MongoHQ("mongodb://admin:admin@emma.mongohq.com:10051/real_like_doc","real_like_doc");
+//		validationServer = new server_side.ValidationServer("mongodb://admin:admin@emma.mongohq.com:10063/NTU_Server","NTU_Server");
+		try {
+			desktopController = new DesktopController();
+			desktopUI = new DesktopUI(desktopController);
+		} catch (Exception e) {
+			new Popup(e.getClass().getCanonicalName());
+		}
+		
 	}
 }
