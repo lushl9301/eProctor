@@ -23,6 +23,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowFocusListener;
@@ -44,6 +45,7 @@ import com.googlecode.javacv.FrameGrabber;
 import com.googlecode.javacv.cpp.opencv_core.IplImage;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCursor;
+import com.mongodb.DBObject;
 
 import javax.swing.border.LineBorder;
 
@@ -57,9 +59,12 @@ public class ProctorHomeUI extends JInternalFrame {
 	private JTable tableCurrentBookings;
 	private JList listAvailableCourses;
 	private JList listAvailableSessions;
+	
+	JPanel pnInvigilate;
 
 	// for invigilate
-//	private 
+	Timer timer;
+	private TreeMap<ObjectId, DBObject> sessionStudentList = new TreeMap<ObjectId, DBObject>();
 	private TreeMap<String, TestVideo> imageLabelThreadList = new TreeMap<String, TestVideo>();
 	private TreeMap<String, JLabel> videoBoxList = new TreeMap<String, JLabel>();
 	private TreeMap<String, JLabel> videoIdList = new TreeMap<String, JLabel>();
@@ -137,7 +142,10 @@ public class ProctorHomeUI extends JInternalFrame {
 		txtpnRecentMessages.setBounds(screenSize.width / 2, 70, 400, 450);
 		pnStatus.add(txtpnRecentMessages);
 
-		final JPanel pnInvigilate = new JPanel();
+		// change to global 
+	    // final JPanel pnInvigilate = new JPanel();
+		pnInvigilate = new JPanel();
+		
 		pnInvigilate.setBounds(new Rectangle(0, 0, 1024, 768));
 		tabbedPane.addTab("Invigilate", null, pnInvigilate, null);
 		pnInvigilate.setLayout(null);
@@ -175,9 +183,10 @@ public class ProctorHomeUI extends JInternalFrame {
 		btnTestAddVideoBox.setBounds(10, 10, 178, 23);
 		pnInvigilate.add(btnTestAddVideoBox);
 		
-		JLabel lblTimeToGo = new JLabel("New label");
-		lblTimeToGo.setBounds(219, 14, 54, 15);
-		startTimer(lblTimeToGo);
+		JLabel lblTimeToGo = new JLabel("lblTimeToGo");
+		lblTimeToGo.setBounds(219, 14, 324, 15);
+		startTimer(5, lblTimeToGo);
+//		startTimer(getTimeToMostRecentSession(), lblTimeToGo);
 		pnInvigilate.add(lblTimeToGo);
 		
 		
@@ -575,11 +584,11 @@ public class ProctorHomeUI extends JInternalFrame {
 	}
 
 	// should be moved to controller later
-	class UpdateTimeToGo implements ActionListener {
+	class UpdateTimeToGoBeforeExam implements ActionListener {
 		public int timeToGo;
 		
 		public JLabel lblTimeToGo;
-		public UpdateTimeToGo(JLabel lblTimeToGo, int timeToGo) {
+		public UpdateTimeToGoBeforeExam(JLabel lblTimeToGo, int timeToGo) {
 			this.timeToGo = timeToGo;
 			this.lblTimeToGo = lblTimeToGo;
 		}
@@ -587,51 +596,164 @@ public class ProctorHomeUI extends JInternalFrame {
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			// XXX Auto-generated method stub
-			if (timeToGo != 0) {
+			if (timeToGo > 0) {
 				timeToGo--;
-				lblTimeToGo.setText("" + timeToGo);
+				lblTimeToGo.setText(secondToString(timeToGo));
+			} else if (timeToGo == 0) {
+				timer.stop();
+								
+				sessionStudentList = getStudentList();
+				if (sessionStudentList == null) {
+					System.out.println("sessionStudentList == null, getStudentList failed");
+				} else if (sessionStudentList.size() == 0) {
+					System.out.println("sessionStudentList.size() == 0");
+					lblTimeToGo.setText("this sesion has no student...");
+				} else {
+					System.out.println("sessionStudentList != null");
+					lblTimeToGo.setText("here you go...");
+									
+					Iterator<Entry<ObjectId, DBObject>> iter = sessionStudentList.entrySet().iterator();
+					Entry<ObjectId, DBObject> temp = null;
+					while (iter.hasNext()) {
+						System.out.println("add one");
+						temp = iter.next();
+						addOneVideoBox((String)temp.getValue().get("username"), pnInvigilate);
+					}
+				}
 			} else {
-				
+				lblTimeToGo.setText("here is UpdateTimeToGoBeforeExam. something goes wrong");
 			}
 		}
 	}
+	class UpdateTimeToGoDuringExam implements ActionListener {
+		public int timeToGo;
+		public JLabel lblTimeToGo;
+		
+		public UpdateTimeToGoDuringExam(JLabel lblTimeToGo, int timeToGo) {
+			this.timeToGo = timeToGo;
+			this.lblTimeToGo = lblTimeToGo;
+		}
+		
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			// XXX Auto-generated method stub
+			if (timeToGo > 0) {
+				timeToGo--;
+				lblTimeToGo.setText(secondToString(timeToGo));
+			} else if (timeToGo == 0) {
+				timer.stop();
+				lblTimeToGo.setText("exam ended. refresh to exit");
+			} else {
+				lblTimeToGo.setText("here is UpdateTimeToGoDuringExam. something goes wrong");
+			}
+		}
+	}
+	public String secondToString (int second) {
+		int minute = second / 60;
+		second = second % 60;
+		
+		int hour = minute / 60;
+		minute = minute % 60;
+		
+		int day = hour / 24;
+		hour = hour % 24;
+		
+		return day + " days " + hour + " hours " + minute + " minutes " + second + " seconds ";
+	}
 
-	public void startTimer(JLabel lblTimeToGo) throws ParseException {
-//		DBCursor sessionsCursor = Main.mongoHQ.course.find(new BasicDBObject("user_id", Main.user_id));
-//		ArrayList<ObjectId> sessions = new ArrayList<ObjectId>();
-//		
-//		if (sessionsCursor.itcount() == 0) {
-//			lblTimeToGo.setText("You don't have upcoming exam:)");
-//			return ;
-//		}
-//		
-//		while (sessionsCursor.hasNext()) {
-//			sessions.add((ObjectId)sessionsCursor.next());
-//		}
-//		
-//		ObjectId mostRecentSession = null;
-//		Date mostRecentStartTime = new SimpleDateFormat().parse("01-01-2020 00:00:00");
-//		ObjectId tempSession = null;
-//		Date tempStartTime = null;
-//		Iterator<ObjectId> iter = sessions.iterator();
-//		while (iter.hasNext()) {
-//			tempSession = iter.next();
-//			tempStartTime = (Date) Main.mongoHQ.session.findOne(new BasicDBObject("_id", tempSession)).get("start");
-//			if ((tempStartTime.before(mostRecentStartTime))) {
-//				mostRecentSession = tempSession;
-//				mostRecentStartTime = tempStartTime;
-//			}
-//		}
-//		
-//		int timeToGo = (int)((mostRecentStartTime.getTime() - new Date().getTime()) / 1000);
+	public void startTimer(int timeToGo, JLabel lblTimeToGo) throws ParseException {
+		if (timeToGo == -1) {
+			lblTimeToGo.setText("You don't have upcoming exam:)");
+			return ;
+		}
+			
+		UpdateTimeToGoBeforeExam utt = new UpdateTimeToGoBeforeExam(lblTimeToGo, timeToGo);
 		
-		final int timeToGo = 20;
-		
-		UpdateTimeToGo utt = new UpdateTimeToGo(lblTimeToGo, timeToGo);
-		Timer timer = new Timer(timeToGo, utt);
+		timer = new Timer(timeToGo, utt);
 		timer.setInitialDelay(0);
 		timer.setDelay(1000);
 		timer.start();
+	}
+	
+	public int getTimeToMostRecentSession() throws ParseException {
+		ObjectId mostRecentSession = getMostRecentSession();
+		if (mostRecentSession == null)
+			return -1;
+		
+		Date mostRecentStartTime = (Date) Main.mongoHQ.session.findOne(new BasicDBObject("_id", mostRecentSession), new BasicDBObject("start", 1)).get("start");
+		
+		int timeToGo = (int)((mostRecentStartTime.getTime() - new Date().getTime()) / 1000);
+		System.out.println("\nstart: " + mostRecentStartTime.toString());
+		System.out.println("now: " + new Date().toString());
+		System.out.println("time to go: " + timeToGo);
+		return timeToGo;
+	}
+
+	public ObjectId getMostRecentSession() throws ParseException {
+//		DBCursor sessionsCursor = Main.mongoHQ.record.find(new BasicDBObject("user_id", Main.user_id), new BasicDBObject("session_id", 1));
+		DBCursor sessionsCursor = Main.mongoHQ.record.find(new BasicDBObject("user_id", new ObjectId("532541929862bcab1a0000fd")), new BasicDBObject("session_id", 1));
+				
+		ArrayList<ObjectId> sessions = new ArrayList<ObjectId>();
+		
+		if (sessionsCursor == null) {
+			System.out.println("sessionsCursor == null");
+			return null;
+		}
+		
+		while (sessionsCursor.hasNext()) {
+			sessions.add((ObjectId)sessionsCursor.next().get("session_id"));
+		}
+				
+		ObjectId mostRecentSession = null;
+		Date mostRecentStartTime = new SimpleDateFormat("dd-M-yyyy hh:mm:ss").parse("01-01-2015 00:00:00");
+		ObjectId tempSession = null;
+		Date tempStartTime = null;
+		Iterator<ObjectId> iter = sessions.iterator();
+		while (iter.hasNext()) {
+			tempSession = iter.next();
+			
+			DBObject tempResult = Main.mongoHQ.session.findOne(new BasicDBObject("_id", tempSession));
+			tempStartTime = (Date) tempResult.get("start");
+			if ((tempStartTime.before(mostRecentStartTime))) {
+				mostRecentSession = tempSession;
+				mostRecentStartTime = tempStartTime;
+			}
+		}
+		
+		System.out.println("mostRecentSession: " + mostRecentSession);
+		
+		return mostRecentSession;
+	}
+	
+	public TreeMap<ObjectId, DBObject> getStudentList() {
+		TreeMap<ObjectId, DBObject> sessionStudentList = new TreeMap<ObjectId, DBObject>();
+		DBCursor studentCursor = null;
+		
+		try {
+			ObjectId mostRecentSession = getMostRecentSession();
+			if (mostRecentSession != null) {
+				BasicDBObject query = new BasicDBObject("session_id", getMostRecentSession()).append("domain", "Student");
+				studentCursor = Main.mongoHQ.record.find(query);
+			}
+		} catch (ParseException e) {
+			// XXX Auto-generated catch block
+			e.printStackTrace();
+			System.out.println("failed to get student list");
+		}
+		
+		if (studentCursor == null) {
+			System.out.println("studentCursor == null");
+			return null;
+		}
+			
+		ObjectId studentTemp = null;
+		while (studentCursor.hasNext()) {
+			studentTemp = (ObjectId) studentCursor.next().get("student_id");			
+			sessionStudentList.put(studentTemp, Main.mongoHQ.student.findOne(new BasicDBObject("_id", studentTemp)));
+		}
+		
+		System.out.println("sessionStudentList: " + sessionStudentList.toString());
+		return sessionStudentList;
 	}
 }
 

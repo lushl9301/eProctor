@@ -37,7 +37,7 @@ public class LoginController {
 //		System.out.println(qb);
 		DBObject obj = null;
 		obj = Main.validationServer.user.findOne(qb.get());
-//		System.out.println(obj);
+		System.out.println("logged in as " + obj);
 		if (obj == null)
 			return false;
 		else {

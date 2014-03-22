@@ -14,7 +14,7 @@ public class MongoHQ {
 	private boolean connected = false;
 	
 	public MongoHQ(String strUrl, String strDb) throws Exception {
-		System.out.println("Starting connection");
+		System.out.println("MongoHQ connecting");
 		MongoClientURI uri = new MongoClientURI(strUrl);
 		MongoClient mongoClient = new MongoClient(uri);
 		DB db = mongoClient.getDB(strDb);
@@ -24,7 +24,7 @@ public class MongoHQ {
 		student = db.getCollection("Student");
 		proctor = db.getCollection("Proctor");
 		connected = true;
-		System.out.println("connected");
+		System.out.println("MongoHQ connected");
 	}
 
 	public void disconnect() {
