@@ -60,9 +60,7 @@ public class LoginUI extends JInternalFrame {
 		btnLogin.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try {
-					if (controller.isUser(textFieldUsername.getText(),
-							passwordField.getPassword(),
-							(String) cbxDomain.getSelectedItem())) {
+					if (controller.isUser(textFieldUsername.getText(), passwordField.getPassword(), (String) cbxDomain.getSelectedItem())) {
 						controller.showHomeUI((String) cbxDomain.getSelectedItem());
 					} else {
 						lblErrorMessage.setText(controller.getErrorMessage());
