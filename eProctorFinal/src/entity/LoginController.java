@@ -44,8 +44,8 @@ public class LoginController {
 			qb = new QueryBuilder();
 			qb.put("username").is(obj.get("username"));
 //			obj = Main.mongoHQ.student.findOne(qb.get());
-			Main.user = obj;
-//			Main.user_id = (ObjectId) obj.get("_id");
+//			Main.user = obj;
+			Main.user_id = (ObjectId) obj.get("_id");
 			return true;
 		}
 
