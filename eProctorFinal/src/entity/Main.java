@@ -13,7 +13,7 @@ public class Main {
 	public static server_side.ValidationServer validationServer;
 	public static ObjectId user_id;
 	
-	public static DBObject user;
+//	public static DBObject user;
 	
 	public static entity.DesktopController desktopController;
 	public static entity.DesktopUI desktopUI;
