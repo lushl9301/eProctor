@@ -18,7 +18,11 @@ import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
 import java.util.TreeMap;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowFocusListener;
@@ -32,11 +36,15 @@ import javax.swing.event.ListSelectionEvent;
 
 import org.bson.types.ObjectId;
 
+import entity.Main;
 import entity.RecordObject;
 
 import com.googlecode.javacv.CanvasFrame;
 import com.googlecode.javacv.FrameGrabber;
 import com.googlecode.javacv.cpp.opencv_core.IplImage;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBCursor;
+
 import javax.swing.border.LineBorder;
 
 public class ProctorHomeUI extends JInternalFrame {
@@ -50,7 +58,8 @@ public class ProctorHomeUI extends JInternalFrame {
 	private JList listAvailableCourses;
 	private JList listAvailableSessions;
 
-	
+	// for invigilate
+//	private 
 	private TreeMap<String, TestVideo> imageLabelThreadList = new TreeMap<String, TestVideo>();
 	private TreeMap<String, JLabel> videoBoxList = new TreeMap<String, JLabel>();
 	private TreeMap<String, JLabel> videoIdList = new TreeMap<String, JLabel>();
@@ -165,9 +174,13 @@ public class ProctorHomeUI extends JInternalFrame {
 		});
 		btnTestAddVideoBox.setBounds(10, 10, 178, 23);
 		pnInvigilate.add(btnTestAddVideoBox);
-		//TODO add canvas here
 		
-	
+		JLabel lblTimeToGo = new JLabel("New label");
+		lblTimeToGo.setBounds(219, 14, 54, 15);
+		startTimer(lblTimeToGo);
+		pnInvigilate.add(lblTimeToGo);
+		
+		
 
 		JPanel pnCheck = new JPanel();
 		tabbedPane.addTab("Check", null, pnCheck, null);
@@ -321,6 +334,7 @@ public class ProctorHomeUI extends JInternalFrame {
 		videoLabel.setBounds((screenSize.width - 512) / 2, 150, 512, 384);
 		pnSetting.add(videoLabel);
 		
+		// start testing camera
 		btnStart.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
@@ -332,6 +346,7 @@ public class ProctorHomeUI extends JInternalFrame {
 		});
 		pnSetting.add(btnStop);
 		
+		// stop testing camera
 		btnStop.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
@@ -349,7 +364,7 @@ public class ProctorHomeUI extends JInternalFrame {
 				btnStop.setVisible(false);
 			}
 		});
-		
+
 		
 		// remove the border
         BasicInternalFrameUI basicInternalFrameUI = ((javax.swing.plaf.basic.BasicInternalFrameUI) this.getUI());
@@ -358,6 +373,7 @@ public class ProctorHomeUI extends JInternalFrame {
         this.remove(basicInternalFrameUI.getNorthPane());
         this.setBorder(null);
 	}
+	
 	public class TableCurrentBookingsModel extends AbstractTableModel {
 
 		private ArrayList<ArrayList<String>> records;
@@ -520,6 +536,7 @@ public class ProctorHomeUI extends JInternalFrame {
 		numOfVideoBox++;
 	}
 
+	// should be moved to controller later
 	class ReceiveShow extends Thread {
 		int port = 6002;
 		
@@ -555,6 +572,66 @@ public class ProctorHomeUI extends JInternalFrame {
 				e.printStackTrace();
 			}
 	    }
+	}
+
+	// should be moved to controller later
+	class UpdateTimeToGo implements ActionListener {
+		public int timeToGo;
+		
+		public JLabel lblTimeToGo;
+		public UpdateTimeToGo(JLabel lblTimeToGo, int timeToGo) {
+			this.timeToGo = timeToGo;
+			this.lblTimeToGo = lblTimeToGo;
+		}
+		
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			// XXX Auto-generated method stub
+			if (timeToGo != 0) {
+				timeToGo--;
+				lblTimeToGo.setText("" + timeToGo);
+			} else {
+				
+			}
+		}
+	}
+
+	public void startTimer(JLabel lblTimeToGo) throws ParseException {
+//		DBCursor sessionsCursor = Main.mongoHQ.course.find(new BasicDBObject("user_id", Main.user_id));
+//		ArrayList<ObjectId> sessions = new ArrayList<ObjectId>();
+//		
+//		if (sessionsCursor.itcount() == 0) {
+//			lblTimeToGo.setText("You don't have upcoming exam:)");
+//			return ;
+//		}
+//		
+//		while (sessionsCursor.hasNext()) {
+//			sessions.add((ObjectId)sessionsCursor.next());
+//		}
+//		
+//		ObjectId mostRecentSession = null;
+//		Date mostRecentStartTime = new SimpleDateFormat().parse("01-01-2020 00:00:00");
+//		ObjectId tempSession = null;
+//		Date tempStartTime = null;
+//		Iterator<ObjectId> iter = sessions.iterator();
+//		while (iter.hasNext()) {
+//			tempSession = iter.next();
+//			tempStartTime = (Date) Main.mongoHQ.session.findOne(new BasicDBObject("_id", tempSession)).get("start");
+//			if ((tempStartTime.before(mostRecentStartTime))) {
+//				mostRecentSession = tempSession;
+//				mostRecentStartTime = tempStartTime;
+//			}
+//		}
+//		
+//		int timeToGo = (int)((mostRecentStartTime.getTime() - new Date().getTime()) / 1000);
+		
+		final int timeToGo = 20;
+		
+		UpdateTimeToGo utt = new UpdateTimeToGo(lblTimeToGo, timeToGo);
+		Timer timer = new Timer(timeToGo, utt);
+		timer.setInitialDelay(0);
+		timer.setDelay(1000);
+		timer.start();
 	}
 }
 
