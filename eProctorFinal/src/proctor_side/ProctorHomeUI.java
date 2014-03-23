@@ -48,6 +48,7 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 
 import javax.swing.border.LineBorder;
+import javax.swing.border.EmptyBorder;
 
 public class ProctorHomeUI extends JInternalFrame {
 
@@ -144,6 +145,7 @@ public class ProctorHomeUI extends JInternalFrame {
 		// change to global 
 	    // final JPanel pnInvigilate = new JPanel();
 		pnInvigilate = new JPanel();
+		pnInvigilate.setBackground(Color.WHITE);
 		
 		pnInvigilate.setBounds(new Rectangle(0, 0, 1024, 768));
 		tabbedPane.addTab("Invigilate", null, pnInvigilate, null);
@@ -189,14 +191,23 @@ public class ProctorHomeUI extends JInternalFrame {
 			
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				String type = InvigilateTab.lblType.getText().split(" ")[1];
 				String id = InvigilateTab.lblStudentId.getText().split(" ")[1];
+				String type = InvigilateTab.lblType.getText().split(" ")[1];
 				String content = InvigilateTab.textField.getText();
 				System.out.println("cofirmed to #" + type + "# id #" + id + "# content #" + content + "#");
 
 				//
 				// send to server
 				//
+				if ("send" != "failed") {
+					InvigilateTab.lblStudentId.setText("Sent_to " + id);
+					InvigilateTab.lblType.setText("");
+					InvigilateTab.textField.setText("");
+					InvigilateTab.btnSend.setText("Send");
+				} else {
+					InvigilateTab.lblStudentId.setText("Failed_sending_to " + id);
+					InvigilateTab.btnSend.setText("Re-send");
+				}
 			}
 		});
 		btnSend.setVisible(false);
@@ -382,31 +393,40 @@ public class ProctorHomeUI extends JInternalFrame {
 		
 		// panel for setting
 		JPanel pnSetting = new JPanel();
+		pnSetting.setBackground(Color.WHITE);
+		pnSetting.setBorder(null);
 		pnSetting.setPreferredSize(new Dimension(1024, 768));
 		tabbedPane.addTab("Setting", null, pnSetting, null);
 		
-		
-		// button to start camera test in setting panel
-		final JButton btnStop = new JButton("stop");
-		btnStop.setBounds((screenSize.width - 345) / 2, 50, 345, 88);
-		btnStop.setIcon(new ImageIcon("E:\\GitHub\\ce2006project\\eProctorFinal\\stop.png"));
-		btnStop.setAlignmentY(Component.TOP_ALIGNMENT);
+		// button to end camera test in setting panel
+		final JButton btnStop = new JButton("");
+		btnStop.setHorizontalTextPosition(SwingConstants.CENTER);
+		btnStop.setForeground(Color.BLACK);
+		btnStop.setBackground(Color.WHITE);
+		btnStop.setBorder(null);
+		btnStop.setBounds(510, 52, 345, 88);
+		btnStop.setIcon(new ImageIcon("icon\\stop.png"));
+		btnStop.setAlignmentY(Component.CENTER_ALIGNMENT);
 		btnStop.setPreferredSize(new Dimension(345, 88));
 		btnStop.setVisible(false);
 		pnSetting.setLayout(null);
 		
-		// button to end camera test in setting panel
-		final JButton btnStart = new JButton("test Camera");
-		btnStart.setBounds((screenSize.width - 345) / 2, 50, 345, 88);
+		// button to start camera test in setting panel
+		final JButton btnStart = new JButton("");
+		btnStart.setHorizontalTextPosition(SwingConstants.CENTER);
+		btnStart.setBorder(null);
+		btnStart.setBackground(new Color(255, 255, 255));
+		btnStart.setForeground(Color.BLACK);
+		btnStart.setBounds(510, 52, 345, 88);
 		pnSetting.add(btnStart);
 		btnStart.setMargin(new Insets(0, 0, 0, 0));
-		btnStart.setIcon(new ImageIcon("E:\\GitHub\\ce2006project\\eProctorFinal\\start.png"));
-		btnStart.setAlignmentY(Component.TOP_ALIGNMENT);
+		btnStart.setIcon(new ImageIcon("E:\\GitHub\\ce2006project\\eProctorFinal\\icon\\start.png"));
+		btnStart.setAlignmentY(Component.CENTER_ALIGNMENT);
 		btnStart.setPreferredSize(new Dimension(345, 88));
 		
-		final JLabel videoLabel = new JLabel("", new ImageIcon("webcam_icon.gif"), JLabel.CENTER);
+		final JLabel videoLabel = new JLabel("", new ImageIcon("icon\\webcam_icon.gif"), JLabel.CENTER);
 		videoLabel.setBorder(new LineBorder(new Color(0, 0, 0)));
-		videoLabel.setIcon(new ImageIcon("E:\\GitHub\\ce2006project\\eProctorFinal\\webcam_icon.gif"));
+		videoLabel.setIcon(new ImageIcon("icon\\webcam_icon.gif"));
 		videoLabel.setPreferredSize(new Dimension(512, 384));
 		videoLabel.setBounds((screenSize.width - 512) / 2, 150, 512, 384);
 		pnSetting.add(videoLabel);
@@ -574,7 +594,7 @@ public class ProctorHomeUI extends JInternalFrame {
 		            videoLabel.setIcon(new ImageIcon(img.getBufferedImage()));
 			    }
 			    grabber.stop();
-			    videoLabel.setIcon(new ImageIcon("webcam_icon.gif"));
+			    videoLabel.setIcon(new ImageIcon("icon\\webcam_icon.gif"));
 			    
 			    return ;
 			} catch (com.googlecode.javacv.FrameGrabber.Exception e) {
@@ -587,8 +607,12 @@ public class ProctorHomeUI extends JInternalFrame {
 		int horizontalSpace = 8;
 		int verticalSpace = 50;
 		
+		int btnSpace = 5;
+		
 		int upperLeftX = 30 + (InvigilateTab.numOfVideoBox % 4) * (horizontalSpace + 256);
 		int upperLeftY = 120 + (InvigilateTab.numOfVideoBox / 4) * (verticalSpace + 192);
+		
+		int btnSize = 30;
 
 		final JLabel idLabel = new JLabel("" + InvigilateTab.numOfVideoBox);
 		// for displaying student's name
@@ -599,8 +623,11 @@ public class ProctorHomeUI extends JInternalFrame {
 		idLabel.setVisible(true);
 		
 		JButton btnWarn = new JButton("Warn");
-		btnWarn.setBounds(upperLeftX + 76, upperLeftY, 60, 25);
-		btnWarn.setIcon(new ImageIcon("icon\\appbar.warning.png"));
+		btnWarn.setBounds(upperLeftX + 256 - (btnSize + btnSpace) * 3, upperLeftY, btnSize, btnSize);
+		idLabel.setBorder(new LineBorder(new Color(0, 0, 0)));
+		btnWarn.setIcon(new ImageIcon("icon\\appbar.warning.small.jpg"));
+		btnWarn.setBorder(BorderFactory.createEmptyBorder());
+		btnWarn.setContentAreaFilled(false);
 		btnWarn.setName(id + "#btnWarn#");
 		btnWarn.addMouseListener(new MouseAdapter() {
 			
@@ -614,8 +641,10 @@ public class ProctorHomeUI extends JInternalFrame {
 		pnInvigilate.add(btnWarn);
 		
 		JButton btnEnd = new JButton("End");
-		btnEnd.setBounds(upperLeftX + 136, upperLeftY, 60, 25);
-		btnEnd.setIcon(new ImageIcon("icon\\appbar.close.png"));
+		btnEnd.setBounds(upperLeftX + 256 - (btnSize + btnSpace) * 2, upperLeftY, btnSize, btnSize);
+		btnEnd.setIcon(new ImageIcon("icon\\appbar.close.small.jpg"));
+		btnEnd.setBorder(BorderFactory.createEmptyBorder());
+		btnEnd.setContentAreaFilled(false);
 		btnEnd.setName(id + "#btnEnd#");
 		btnEnd.addMouseListener(new MouseAdapter() {
 			
@@ -629,8 +658,10 @@ public class ProctorHomeUI extends JInternalFrame {
 		pnInvigilate.add(btnEnd);
 		
 		JButton btnMsg = new JButton("Msg");
-		btnMsg.setBounds(upperLeftX + 196, upperLeftY, 60, 25);
-		btnMsg.setIcon(new ImageIcon("icon\\appbar.message.png"));
+		btnMsg.setBounds(upperLeftX + 256 - (btnSize + btnSpace), upperLeftY, btnSize, btnSize);
+		btnMsg.setIcon(new ImageIcon("icon\\appbar.message.small.jpg"));
+		btnMsg.setBorder(BorderFactory.createEmptyBorder());
+		btnMsg.setContentAreaFilled(false);
 		btnMsg.setName(id + "#btnMsg#");
 		btnMsg.addMouseListener(new MouseAdapter() {
 			
@@ -645,9 +676,9 @@ public class ProctorHomeUI extends JInternalFrame {
 		
 		// for displaying student's image
 		// 4 in a row, each has 10 space to other label in the same row, has 50 space to other in the same column, size = 256 x 192
-		final JLabel videoLabel = new JLabel("", new ImageIcon("webcam_icon.gif"), JLabel.CENTER);
+		final JLabel videoLabel = new JLabel("", new ImageIcon("icon\\webcam_icon.gif"), JLabel.CENTER);
 		videoLabel.setBounds(upperLeftX, upperLeftY + 30, 256, 192);
-		videoLabel.setIcon(new ImageIcon("webcam_icon.gif"));
+		videoLabel.setIcon(new ImageIcon("icon\\webcam_icon.gif"));
 		videoLabel.setBorder(new LineBorder(new Color(0, 0, 0)));
 		panel.add(videoLabel);
 		videoLabel.setVisible(true);
@@ -860,6 +891,10 @@ public class ProctorHomeUI extends JInternalFrame {
 	}
 	public void getMostRecentSession() {
 //		DBCursor sessionsCursor = Main.mongoHQ.record.find(new BasicDBObject("user_id", Main.user_id), new BasicDBObject("session_id", 1));
+		if (Main.mongoHQ == null) {
+			System.out.println("server not found");
+			return ;
+		}
 		DBCursor sessionsCursor = Main.mongoHQ.record.find(new BasicDBObject("user_id", new ObjectId("532541929862bcab1a0000fd")), new BasicDBObject("session_id", 1));
 				
 		ArrayList<ObjectId> sessions = new ArrayList<ObjectId>();

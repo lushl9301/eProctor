@@ -26,8 +26,8 @@ public class LoginController {
 //		if (username.equals("cly753") && domain.equals("Proctor"))
 //			return true;
 		
-		if (username.equals("gong0025") && domain.equals("Student"))
-			return true;
+//		if (username.equals("gong0025") && domain.equals("Student"))
+//			return true;
 		
 		QueryBuilder qb = new QueryBuilder();
 		qb.put("username").is(username).put("password")
