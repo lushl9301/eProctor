@@ -60,15 +60,14 @@ public class ProctorHomeUI extends JInternalFrame {
 	private JList listAvailableCourses;
 	private JList listAvailableSessions;
 	
-	JPanel pnInvigilate;
+	private JPanel pnInvigilate;
 
-	// for invigilate
-	Timer timer;
-	private TreeMap<ObjectId, DBObject> sessionStudentList = new TreeMap<ObjectId, DBObject>();
-	private TreeMap<String, TestVideo> imageLabelThreadList = new TreeMap<String, TestVideo>();
-	private TreeMap<String, JLabel> videoBoxList = new TreeMap<String, JLabel>();
-	private TreeMap<String, JLabel> videoIdList = new TreeMap<String, JLabel>();
-	private int numOfVideoBox = 0;
+	// for invigilation
+	private Timer timer;
+	private ReceiveShow videoReceiveShowThread;
+	// for testing camera in setting tab
+	private TestVideo testVideoThread;
+
 
 	public ProctorHomeUI(ProctorHomeController controller) throws Exception {
 		getContentPane().setPreferredSize(new Dimension(1024, 768));
@@ -76,7 +75,7 @@ public class ProctorHomeUI extends JInternalFrame {
 		this.controller = controller;
 	}
 
-	public void refreshUI() throws java.lang.NullPointerException {
+	public void XrefreshUI() throws java.lang.NullPointerException {
 		txtpnInformation.setText(controller.getInformation());
 		txtpnRecentMessages.setText(controller.getRecentMessage());
 		tableCurrentBookings.setModel(new TableCurrentBookingsModel(controller.getTableCurrentBookings()));
@@ -149,31 +148,15 @@ public class ProctorHomeUI extends JInternalFrame {
 		pnInvigilate.setBounds(new Rectangle(0, 0, 1024, 768));
 		tabbedPane.addTab("Invigilate", null, pnInvigilate, null);
 		pnInvigilate.setLayout(null);
-		
-//		//=//=//=//=///=//=/=/=/=/=//=//=/=/=/=/==/=/
-//		final JLabel idLabel = new JLabel("===" + numOfVideoBox);
-//		// for displaying student's name
-//		// 4 in a row, each has 10 space to other label in the same row, has 50 space to other in the same column, size = 100 x 30
-//		idLabel.setBounds(50 + (4 % 4 - 1) * (10 + 256), 150 + (numOfVideoBox / 4) * (50 + 192) - 30, 100, 30);
-//		pnInvigilate.add(idLabel);
-//		idLabel.setVisible(true);
-//		
-//		// for displaying student's image
-//		// 4 in a row, each has 10 space to other label in the same row, has 50 space to other in the same column, size = 256 x 192
-//		final JLabel videoLabelx = new JLabel("xxx", new ImageIcon("webcam_icon.gif"), JLabel.CENTER);
-//		videoLabelx.setBounds(50 + (4 % 4 - 1) * (10 + 256), 150 + (numOfVideoBox / 4) * (50 + 192), 256, 192);
-//		videoLabelx.setIcon(new ImageIcon("webcam_icon.gif"));
-//		pnInvigilate.add(videoLabelx);
-//		videoLabelx.setVisible(true);
-//		//=//=//=//=///=//=/=/=/=/=//=//=/=/=/=/==/=/
 
 		
+		// button in invigilation tab for testing function
 		JButton btnTestAddVideoBox = new JButton("add one video box");
 		btnTestAddVideoBox.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
 				System.out.println("btnTestAddVideoBox clicked");
-				addOneVideoBox("" + numOfVideoBox, pnInvigilate);
+				addOneVideoBox("" + InvigilateTab.numOfVideoBox, pnInvigilate);
 			}
 		});
 		btnTestAddVideoBox.addActionListener(new ActionListener() {
@@ -183,21 +166,105 @@ public class ProctorHomeUI extends JInternalFrame {
 		btnTestAddVideoBox.setBounds(10, 10, 178, 23);
 		pnInvigilate.add(btnTestAddVideoBox);
 		
-		JLabel lblTimeToGo = new JLabel("lblTimeToGo");
-		lblTimeToGo.setBounds(219, 14, 324, 15);
-		startTimer(5, lblTimeToGo);
+		// label in invigilation tab
+		final JLabel lblTimeToGo = new JLabel("lblTimeToGo");
+		lblTimeToGo.setBounds(198, 14, 324, 15);
+		lblTimeToGo.setVisible(false);
+		startTimer(3, lblTimeToGo);
 //		startTimer(getTimeToMostRecentSession(), lblTimeToGo);
 		pnInvigilate.add(lblTimeToGo);
 		
+		// textField in invigilation tab
+		JTextField textField = new JTextField();
+		textField.setBounds(1112, 348, 197, 233);
+		textField.setVisible(false);
+		pnInvigilate.add(textField);
+		textField.setColumns(10);
+		InvigilateTab.textField = textField;
+		
+		// button in invigilation tab
+		JButton btnSend = new JButton("Send");
+		btnSend.setBounds(1216, 591, 93, 23);
+		btnSend.addMouseListener(new MouseAdapter() {
+			
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				String type = InvigilateTab.lblType.getText().split(" ")[1];
+				String id = InvigilateTab.lblStudentId.getText().split(" ")[1];
+				String content = InvigilateTab.textField.getText();
+				System.out.println("cofirmed to #" + type + "# id #" + id + "# content #" + content + "#");
+
+				//
+				// send to server
+				//
+			}
+		});
+		btnSend.setVisible(false);
+		pnInvigilate.add(btnSend);
+		InvigilateTab.btnSend = btnSend;
+		
+		// label in invigilation tab
+		JLabel lblStudentId = new JLabel("Student: ");
+		lblStudentId.setBounds(1112, 298, 197, 15);
+		lblStudentId.setVisible(false);
+		pnInvigilate.add(lblStudentId);
+		InvigilateTab.lblStudentId = lblStudentId;
+		
+		// label in invigilation tab
+		JLabel lblType = new JLabel("Type: ");
+		lblType.setBounds(1112, 323, 197, 15);
+		lblType.setVisible(false);
+		pnInvigilate.add(lblType);
+		InvigilateTab.lblType = lblType;
+		
+		// button in invigilate tab
+		JButton btnSign = new JButton("Sign");
+		btnSign.setBounds(532, 10, 93, 23);
+		btnSign.setVisible(false);
+		btnSign.addMouseListener(new MouseAdapter() {
+			
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				if (videoReceiveShowThread != null && videoReceiveShowThread.isAlive()) {
+					videoReceiveShowThread.shouldEnd = true;
+					videoReceiveShowThread = null;
+				}
+				
+				InvigilateTab.hideWhenEnd();
+				InvigilateTab.btnSign.setVisible(false);
+				
+				getMostRecentSession();
+				startTimer(getTimeToMostRecentSession(), lblTimeToGo);
+				
+				//
+				// send the sign to server
+				// terminate connection to video server
+				//
+				
+				System.out.println("An exam ended with sign by proctor.");
+			}
+		});
+		pnInvigilate.add(btnSign);
+		InvigilateTab.btnSign = btnSign;
+		
+		// label in invigilate tab
+		JLabel lblIncomingMsg = new JLabel("Received message");
+		lblIncomingMsg.setBounds(1112, 50, 197, 238);
+		lblIncomingMsg.setVisible(false);
+		pnInvigilate.add(lblIncomingMsg);
+		InvigilateTab.lblIncomingMsg = lblIncomingMsg;
 		
 
+		//
+		// check tab
+		//
 		JPanel pnCheck = new JPanel();
 		tabbedPane.addTab("Check", null, pnCheck, null);
 		pnCheck.setLayout(null);
 
-		JLabel lblCurrentBookings = new JLabel("Current Bookings");
+		JLabel lblCurrentBookings = new JLabel("Exams assigned to");
 		lblCurrentBookings.setFont(new Font("Segoe UI", Font.BOLD, 16));
-		lblCurrentBookings.setBounds(263, 46, 150, 22);
+		lblCurrentBookings.setBounds(263, 46, 140, 22);
 		pnCheck.add(lblCurrentBookings);
 
 //		listCurrentBookings = new JList<String>();
@@ -218,7 +285,7 @@ public class ProctorHomeUI extends JInternalFrame {
 				}
 			}
 		});
-		btnMakeARequest.setBounds(screenSize.width / 2 + 200, 150, 150, 30);
+		btnMakeARequest.setBounds(873, 262, 150, 30);
 		pnCheck.add(btnMakeARequest);
 
 		JLabel lblNewBooking = new JLabel("New booking");
@@ -236,10 +303,8 @@ public class ProctorHomeUI extends JInternalFrame {
 				listAvailableSessions.setModel(new ListArrayListModel(controller.getListAvailableSessions(listAvailableCourses.getSelectedIndex())));
 			}
 		});
-		listAvailableCourses
-				.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		listAvailableCourses.setBounds(screenSize.width / 2 - 420, 381, 405,
-				174);
+		listAvailableCourses.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		listAvailableCourses.setBounds(screenSize.width / 2 - 420, 381, 405, 174);
 		pnCheck.add(listAvailableCourses);
 
 		JLabel lblAvailableSessions = new JLabel("Available Sessions");
@@ -247,10 +312,8 @@ public class ProctorHomeUI extends JInternalFrame {
 		pnCheck.add(lblAvailableSessions);
 
 		listAvailableSessions = new JList();
-		listAvailableSessions
-				.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		listAvailableSessions
-				.setBounds(screenSize.width / 2 - 5, 381, 240, 174);
+		listAvailableSessions.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		listAvailableSessions.setBounds(screenSize.width / 2 - 5, 381, 240, 174);
 		pnCheck.add(listAvailableSessions);
 
 		JButton btnOk = new JButton("OK");
@@ -271,7 +334,7 @@ public class ProctorHomeUI extends JInternalFrame {
 		btnRefresh.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				refreshUI();
+//				refreshUI();
 			}
 		});
 		btnRefresh.setBounds(screenSize.width / 2 + 261, 497, 89, 30);
@@ -289,6 +352,7 @@ public class ProctorHomeUI extends JInternalFrame {
 		scpCurrentBookings.setViewportView(tableCurrentBookings);
 		
 
+		// panel for result review
 		JPanel pnReview = new JPanel();
 		tabbedPane.addTab("Review", null, pnReview, null);
 		pnReview.setLayout(null);
@@ -316,10 +380,13 @@ public class ProctorHomeUI extends JInternalFrame {
 		tableReview = new JTable();
 		scrollPane.setViewportView(tableReview);
 		
+		// panel for setting
 		JPanel pnSetting = new JPanel();
 		pnSetting.setPreferredSize(new Dimension(1024, 768));
 		tabbedPane.addTab("Setting", null, pnSetting, null);
 		
+		
+		// button to start camera test in setting panel
 		final JButton btnStop = new JButton("stop");
 		btnStop.setBounds((screenSize.width - 345) / 2, 50, 345, 88);
 		btnStop.setIcon(new ImageIcon("E:\\GitHub\\ce2006project\\eProctorFinal\\stop.png"));
@@ -328,6 +395,7 @@ public class ProctorHomeUI extends JInternalFrame {
 		btnStop.setVisible(false);
 		pnSetting.setLayout(null);
 		
+		// button to end camera test in setting panel
 		final JButton btnStart = new JButton("test Camera");
 		btnStart.setBounds((screenSize.width - 345) / 2, 50, 345, 88);
 		pnSetting.add(btnStart);
@@ -347,8 +415,8 @@ public class ProctorHomeUI extends JInternalFrame {
 		btnStart.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				imageLabelThreadList.put("0", new TestVideo("0", videoLabel));
-				imageLabelThreadList.get("0").start();
+				testVideoThread = new TestVideo(videoLabel);
+				testVideoThread.start();
 				btnStart.setVisible(false);
 				btnStop.setVisible(true);
 			}
@@ -360,7 +428,7 @@ public class ProctorHomeUI extends JInternalFrame {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
 				synchronized (this) {
-					imageLabelThreadList.get("0").shouldEnd = true;
+					testVideoThread.shouldEnd = true;
 				}
 				try {
 					Thread.sleep(1000);
@@ -368,13 +436,12 @@ public class ProctorHomeUI extends JInternalFrame {
 					// XXX Auto-generated catch block
 					e.printStackTrace();
 				}
-				System.out.println("isAlive: " + imageLabelThreadList.get("0").isAlive()); // kill failed?!
+				System.out.println("isAlive: " + testVideoThread.isAlive()); // kill failed?!
 				btnStart.setVisible(true);
 				btnStop.setVisible(false);
 			}
 		});
 
-		
 		// remove the border
         BasicInternalFrameUI basicInternalFrameUI = ((javax.swing.plaf.basic.BasicInternalFrameUI) this.getUI());
         for (MouseListener listener : basicInternalFrameUI.getNorthPane().getMouseListeners())
@@ -382,6 +449,8 @@ public class ProctorHomeUI extends JInternalFrame {
         this.remove(basicInternalFrameUI.getNorthPane());
         this.setBorder(null);
 	}
+	
+	// thread for testing camera, in setting tab
 	
 	public class TableCurrentBookingsModel extends AbstractTableModel {
 
@@ -485,10 +554,8 @@ public class ProctorHomeUI extends JInternalFrame {
 		
 		public JLabel videoLabel;
 		public volatile boolean shouldEnd;
-		public String id;
 		
-		public TestVideo(String id, JLabel videoLabel) {
-			this.id = id;
+		public TestVideo(JLabel videoLabel) {
 			this.videoLabel = videoLabel;
 			this.shouldEnd = false;
 		}
@@ -519,19 +586,67 @@ public class ProctorHomeUI extends JInternalFrame {
 	public void addOneVideoBox (String id, JPanel panel) {
 		int horizontalSpace = 8;
 		int verticalSpace = 50;
+		
+		int upperLeftX = 30 + (InvigilateTab.numOfVideoBox % 4) * (horizontalSpace + 256);
+		int upperLeftY = 120 + (InvigilateTab.numOfVideoBox / 4) * (verticalSpace + 192);
 
-		final JLabel idLabel = new JLabel("" + numOfVideoBox);
+		final JLabel idLabel = new JLabel("" + InvigilateTab.numOfVideoBox);
 		// for displaying student's name
 		// 4 in a row, each has 10 space to other label in the same row, has 50 space to other in the same column, size = 100 x 30
-		idLabel.setBounds(30 + (numOfVideoBox % 4) * (horizontalSpace + 256), 150 + (numOfVideoBox / 4) * (verticalSpace + 192) - 30, 100, 30);
+		idLabel.setBounds(upperLeftX, upperLeftY, 70, 30);
 		idLabel.setBorder(new LineBorder(new Color(0, 0, 0)));
 		panel.add(idLabel);
 		idLabel.setVisible(true);
 		
+		JButton btnWarn = new JButton("Warn");
+		btnWarn.setBounds(upperLeftX + 76, upperLeftY, 60, 25);
+		btnWarn.setIcon(new ImageIcon("icon\\appbar.warning.png"));
+		btnWarn.setName(id + "#btnWarn#");
+		btnWarn.addMouseListener(new MouseAdapter() {
+			
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				InvigilateTab.lblStudentId.setText("StudentId: " + arg0.getComponent().getName().split("#")[0]);
+				System.out.println("going to wanr: " + arg0.getComponent().getName().split("#")[0]);
+				InvigilateTab.lblType.setText("Type: Warning");
+			}
+		});
+		pnInvigilate.add(btnWarn);
+		
+		JButton btnEnd = new JButton("End");
+		btnEnd.setBounds(upperLeftX + 136, upperLeftY, 60, 25);
+		btnEnd.setIcon(new ImageIcon("icon\\appbar.close.png"));
+		btnEnd.setName(id + "#btnEnd#");
+		btnEnd.addMouseListener(new MouseAdapter() {
+			
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				InvigilateTab.lblStudentId.setText("StudentId: " + arg0.getComponent().getName().split("#")[0]);
+				System.out.println("going to end: " + arg0.getComponent().getName().split("#")[0]);
+				InvigilateTab.lblType.setText("Type: Ending");
+			}
+		});
+		pnInvigilate.add(btnEnd);
+		
+		JButton btnMsg = new JButton("Msg");
+		btnMsg.setBounds(upperLeftX + 196, upperLeftY, 60, 25);
+		btnMsg.setIcon(new ImageIcon("icon\\appbar.message.png"));
+		btnMsg.setName(id + "#btnMsg#");
+		btnMsg.addMouseListener(new MouseAdapter() {
+			
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				InvigilateTab.lblStudentId.setText("StudentId: " + arg0.getComponent().getName().split("#")[0]);
+				System.out.println("going to msg: " + arg0.getComponent().getName().split("#")[0]);
+				InvigilateTab.lblType.setText("Type: Message");
+			}
+		});
+		pnInvigilate.add(btnMsg);
+		
 		// for displaying student's image
 		// 4 in a row, each has 10 space to other label in the same row, has 50 space to other in the same column, size = 256 x 192
 		final JLabel videoLabel = new JLabel("", new ImageIcon("webcam_icon.gif"), JLabel.CENTER);
-		videoLabel.setBounds(30 + (numOfVideoBox % 4) * (horizontalSpace + 256), 150 + (numOfVideoBox / 4) * (verticalSpace + 192), 256, 192);
+		videoLabel.setBounds(upperLeftX, upperLeftY + 30, 256, 192);
 		videoLabel.setIcon(new ImageIcon("webcam_icon.gif"));
 		videoLabel.setBorder(new LineBorder(new Color(0, 0, 0)));
 		panel.add(videoLabel);
@@ -539,10 +654,13 @@ public class ProctorHomeUI extends JInternalFrame {
 		
 		panel.repaint();
 		
-		videoIdList.put(id, idLabel);
-		videoBoxList.put(id, videoLabel);
+		InvigilateTab.videoIdList.put(id, idLabel);
+		InvigilateTab.videoBoxList.put(id, videoLabel);
+		InvigilateTab.videoWarnList.put(id, btnWarn);
+		InvigilateTab.videoEndList.put(id, btnEnd);
+		InvigilateTab.videoMsgList.put(id, btnMsg);
 		
-		numOfVideoBox++;
+		InvigilateTab.numOfVideoBox++;
 	}
 
 	// should be moved to controller later
@@ -556,14 +674,21 @@ public class ProctorHomeUI extends JInternalFrame {
 	    
 	    public volatile boolean shouldEnd;
 	  
-	    public ReceiveShow () throws IOException {
-	    	this.serverSocket = new ServerSocket(port);
+	    public ReceiveShow () {
 	    	this.shouldEnd = false;
+	    	try {
+				this.serverSocket = new ServerSocket(port);
+			} catch (IOException e) {
+				// XXX Auto-generated catch block
+				e.printStackTrace();
+				System.out.println("new ServerSocket(port) failed");
+				this.shouldEnd = true;
+			}
 	    }
 	    
 	    public void run() {
 	    	try {
-		    	while (!shouldEnd) {  		
+		    	while (!shouldEnd) {  
 					socket = serverSocket.accept();
 					sInput = new ObjectInputStream(socket.getInputStream());
 		    		RecordObject recordObject = (RecordObject) sInput.readObject();
@@ -572,9 +697,10 @@ public class ProctorHomeUI extends JInternalFrame {
 		    		BufferedImage buf = ImageIO.read(new ByteArrayInputStream(recordObject.getImageBytes()));
 		            IplImage toDisplay = IplImage.createFrom(buf);
 		            
-		            videoBoxList.get(recordObject.getUserId()).setIcon(new ImageIcon(toDisplay.getBufferedImage()));
+		            InvigilateTab.videoBoxList.get(recordObject.getUserId()).setIcon(new ImageIcon(toDisplay.getBufferedImage()));
 		    	}
-		    	
+		    	socket.close();
+		    	serverSocket.close();
 		    	return ;
 			} catch (Exception e) {
 				// XXX Auto-generated catch block
@@ -583,42 +709,69 @@ public class ProctorHomeUI extends JInternalFrame {
 	    }
 	}
 
-	// should be moved to controller later
+	// here are timers
+	// including periodic messages fetch
 	class UpdateTimeToGoBeforeExam implements ActionListener {
-		public int timeToGo;
+		public int secondToGo;
 		
 		public JLabel lblTimeToGo;
-		public UpdateTimeToGoBeforeExam(JLabel lblTimeToGo, int timeToGo) {
-			this.timeToGo = timeToGo;
+		public UpdateTimeToGoBeforeExam(JLabel lblTimeToGo, int secondToGo) {
+			this.secondToGo = secondToGo;
 			this.lblTimeToGo = lblTimeToGo;
 		}
 		
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			// XXX Auto-generated method stub
-			if (timeToGo > 0) {
-				timeToGo--;
-				lblTimeToGo.setText(secondToString(timeToGo));
-			} else if (timeToGo == 0) {
+			if (secondToGo > 0) {
+				secondToGo--;
+				lblTimeToGo.setText(secondToString(secondToGo));
+			} else if (secondToGo == 0) {
 				timer.stop();
-								
-				sessionStudentList = getStudentList();
-				if (sessionStudentList == null) {
+				
+				InvigilateTab.sessionStudentList = getStudentList();
+				
+				if (InvigilateTab.mostRecentSession == null) {
+					System.out.println("session disappeared!");
+				}
+				
+				// start a countdown timer during the exam
+				long duration = ((Date)InvigilateTab.mostRecentSession.get("end")).getTime() - ((Date)InvigilateTab.mostRecentSession.get("start")).getTime();
+				System.out.println("duration: " + secondToString((int)(duration / 1000)));
+				UpdateTimeToGoDuringExam updateTimeToGoDuringExam = new UpdateTimeToGoDuringExam(lblTimeToGo, (int)duration / 1000);
+				timer = new Timer((int)duration, updateTimeToGoDuringExam);
+				timer.setInitialDelay(0);
+				timer.setDelay(1000);
+				timer.start();
+				
+				//
+				// put here for test purpose
+				//
+				InvigilateTab.showWhenStart();		
+				
+				if (InvigilateTab.sessionStudentList == null) {
 					System.out.println("sessionStudentList == null, getStudentList failed");
-				} else if (sessionStudentList.size() == 0) {
+				} else if (InvigilateTab.sessionStudentList.size() == 0) {
 					System.out.println("sessionStudentList.size() == 0");
 					lblTimeToGo.setText("this sesion has no student...");
 				} else {
 					System.out.println("sessionStudentList != null");
 					lblTimeToGo.setText("here you go...");
 									
-					Iterator<Entry<ObjectId, DBObject>> iter = sessionStudentList.entrySet().iterator();
+					Iterator<Entry<ObjectId, DBObject>> iter = InvigilateTab.sessionStudentList.entrySet().iterator();
 					Entry<ObjectId, DBObject> temp = null;
 					while (iter.hasNext()) {
 						System.out.println("add one");
 						temp = iter.next();
 						addOneVideoBox((String)temp.getValue().get("username"), pnInvigilate);
 					}
+					
+//					videoReceiveShowThread = new ReceiveShow();
+					
+//					InvigilateTab.textField.setVisible(true);
+//					InvigilateTab.btnSend.setVisible(true);
+//					InvigilateTab.lblStudentId.setVisible(true);
+//					InvigilateTab.lblType.setVisible(true);
 				}
 			} else {
 				lblTimeToGo.setText("here is UpdateTimeToGoBeforeExam. something goes wrong");
@@ -626,23 +779,39 @@ public class ProctorHomeUI extends JInternalFrame {
 		}
 	}
 	class UpdateTimeToGoDuringExam implements ActionListener {
-		public int timeToGo;
+		public int secondToGo;
 		public JLabel lblTimeToGo;
 		
-		public UpdateTimeToGoDuringExam(JLabel lblTimeToGo, int timeToGo) {
-			this.timeToGo = timeToGo;
+		public UpdateTimeToGoDuringExam(JLabel lblTimeToGo, int secondToGo) {
+			this.secondToGo = secondToGo;
 			this.lblTimeToGo = lblTimeToGo;
+			System.out.println("new UpdateTimeToGoDuringExam");
 		}
 		
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			// XXX Auto-generated method stub
-			if (timeToGo > 0) {
-				timeToGo--;
-				lblTimeToGo.setText(secondToString(timeToGo));
-			} else if (timeToGo == 0) {
+			if (secondToGo > 0) {
+				secondToGo--;
+				System.out.println("timeToGo--; left " + secondToString(secondToGo));
+				lblTimeToGo.setText(secondToString(secondToGo));
+				
+				if (secondToGo % 10 == 0) {
+					//
+					// fetch message once
+					//
+					
+					String allTogether = "all student id and message together. " + secondToGo;
+					//
+					// compress all message together
+					//
+					InvigilateTab.lblIncomingMsg.setText("<html>" + allTogether + "</html>");
+				}
+			} else if (secondToGo == 0) {
 				timer.stop();
-				lblTimeToGo.setText("exam ended. refresh to exit");
+				
+				lblTimeToGo.setText("exam ended. please sign");
+				InvigilateTab.btnSign.setVisible(true);
 			} else {
 				lblTimeToGo.setText("here is UpdateTimeToGoDuringExam. something goes wrong");
 			}
@@ -661,35 +830,35 @@ public class ProctorHomeUI extends JInternalFrame {
 		return day + " days " + hour + " hours " + minute + " minutes " + second + " seconds ";
 	}
 
-	public void startTimer(int timeToGo, JLabel lblTimeToGo) throws ParseException {
-		if (timeToGo == -1) {
+	public void startTimer(int milliToGo, JLabel lblTimeToGo) {
+		lblTimeToGo.setVisible(true);
+		
+		if (milliToGo == -1) {
 			lblTimeToGo.setText("You don't have upcoming exam:)");
 			return ;
 		}
 			
-		UpdateTimeToGoBeforeExam utt = new UpdateTimeToGoBeforeExam(lblTimeToGo, timeToGo);
+		UpdateTimeToGoBeforeExam utt = new UpdateTimeToGoBeforeExam(lblTimeToGo, milliToGo);
 		
-		timer = new Timer(timeToGo, utt);
+		timer = new Timer(milliToGo, utt);
 		timer.setInitialDelay(0);
 		timer.setDelay(1000);
 		timer.start();
 	}
 	
-	public int getTimeToMostRecentSession() throws ParseException {
-		ObjectId mostRecentSession = getMostRecentSession();
-		if (mostRecentSession == null)
+	public int getTimeToMostRecentSession() {
+		if (InvigilateTab.mostRecentSession == null)
 			return -1;
 		
-		Date mostRecentStartTime = (Date) Main.mongoHQ.session.findOne(new BasicDBObject("_id", mostRecentSession), new BasicDBObject("start", 1)).get("start");
+		Date mostRecentStartTime = (Date) InvigilateTab.mostRecentSession.get("start");
 		
-		int timeToGo = (int)((mostRecentStartTime.getTime() - new Date().getTime()) / 1000);
+		int secondToGo = (int)((mostRecentStartTime.getTime() - new Date().getTime()) / 1000);
 		System.out.println("\nstart: " + mostRecentStartTime.toString());
 		System.out.println("now: " + new Date().toString());
-		System.out.println("time to go: " + timeToGo);
-		return timeToGo;
+		System.out.println("second to go: " + secondToGo);
+		return secondToGo;
 	}
-
-	public ObjectId getMostRecentSession() throws ParseException {
+	public void getMostRecentSession() {
 //		DBCursor sessionsCursor = Main.mongoHQ.record.find(new BasicDBObject("user_id", Main.user_id), new BasicDBObject("session_id", 1));
 		DBCursor sessionsCursor = Main.mongoHQ.record.find(new BasicDBObject("user_id", new ObjectId("532541929862bcab1a0000fd")), new BasicDBObject("session_id", 1));
 				
@@ -697,7 +866,7 @@ public class ProctorHomeUI extends JInternalFrame {
 		
 		if (sessionsCursor == null) {
 			System.out.println("sessionsCursor == null");
-			return null;
+			return ;
 		}
 		
 		while (sessionsCursor.hasNext()) {
@@ -705,7 +874,16 @@ public class ProctorHomeUI extends JInternalFrame {
 		}
 				
 		ObjectId mostRecentSession = null;
-		Date mostRecentStartTime = new SimpleDateFormat("dd-M-yyyy hh:mm:ss").parse("01-01-2015 00:00:00");
+		Date mostRecentStartTime = null;
+		try {
+			mostRecentStartTime = new SimpleDateFormat("dd-M-yyyy hh:mm:ss").parse("01-01-2015 00:00:00");
+		} catch (ParseException e) {
+			// XXX Auto-generated catch block
+			e.printStackTrace();
+			System.out.println("new SimpleDateFormat failed");
+			InvigilateTab.mostRecentSession = null;
+			return ;
+		}
 		ObjectId tempSession = null;
 		Date tempStartTime = null;
 		Iterator<ObjectId> iter = sessions.iterator();
@@ -721,24 +899,18 @@ public class ProctorHomeUI extends JInternalFrame {
 		}
 		
 		System.out.println("mostRecentSession: " + mostRecentSession);
-		
-		return mostRecentSession;
+		InvigilateTab.mostRecentSession = Main.mongoHQ.session.findOne(new BasicDBObject("_id", mostRecentSession));
+		return ;
 	}
-	
 	public TreeMap<ObjectId, DBObject> getStudentList() {
 		TreeMap<ObjectId, DBObject> sessionStudentList = new TreeMap<ObjectId, DBObject>();
 		DBCursor studentCursor = null;
 		
-		try {
-			ObjectId mostRecentSession = getMostRecentSession();
-			if (mostRecentSession != null) {
-				BasicDBObject query = new BasicDBObject("session_id", getMostRecentSession()).append("domain", "Student");
-				studentCursor = Main.mongoHQ.record.find(query);
-			}
-		} catch (ParseException e) {
-			// XXX Auto-generated catch block
-			e.printStackTrace();
-			System.out.println("failed to get student list");
+		getMostRecentSession();
+		DBObject mostRecentSession = InvigilateTab.mostRecentSession;
+		if (mostRecentSession != null) {
+			BasicDBObject query = new BasicDBObject("session_id", mostRecentSession.get("_id")).append("domain", "Student");
+			studentCursor = Main.mongoHQ.record.find(query);
 		}
 		
 		if (studentCursor == null) {
@@ -754,6 +926,84 @@ public class ProctorHomeUI extends JInternalFrame {
 		
 		System.out.println("sessionStudentList: " + sessionStudentList.toString());
 		return sessionStudentList;
+	}
+
+
+	// here are components of invigilate tab
+	static class InvigilateTab {
+		public static DBObject mostRecentSession;
+		public static TreeMap<ObjectId, DBObject> sessionStudentList = new TreeMap<ObjectId, DBObject>();
+
+		public static int numOfVideoBox = 0;
+		
+		public static TreeMap<String, JLabel> videoBoxList = new TreeMap<String, JLabel>();
+		public static TreeMap<String, JLabel> videoIdList = new TreeMap<String, JLabel>();
+		public static TreeMap<String, JButton> videoWarnList = new TreeMap<String, JButton>();
+		public static TreeMap<String, JButton> videoEndList = new TreeMap<String, JButton>();
+		public static TreeMap<String, JButton> videoMsgList = new TreeMap<String, JButton>();
+		
+		public static JTextField textField;
+		public static JButton btnSend;
+		public static JLabel lblType;
+		public static JLabel lblStudentId;
+		public static JButton btnSign;
+		public static JLabel lblIncomingMsg;
+		
+		public static void hideWhenEnd() {
+			InvigilateTab.textField.setText("");
+			InvigilateTab.textField.setVisible(false);
+			InvigilateTab.btnSend.setVisible(false);
+			InvigilateTab.lblType.setText("");
+			InvigilateTab.lblType.setVisible(false);
+			InvigilateTab.lblStudentId.setText("");
+			InvigilateTab.lblStudentId.setVisible(false);
+			InvigilateTab.lblIncomingMsg.setText("");
+			InvigilateTab.lblIncomingMsg.setVisible(false);
+			
+			Iterator<String> iter = videoBoxList.keySet().iterator();
+			String temp = null;
+			while (iter.hasNext()) {
+				temp = iter.next();
+				videoBoxList.get(temp).setVisible(false);
+				videoBoxList.remove(temp);
+			}
+
+			iter = videoIdList.keySet().iterator();
+			while (iter.hasNext()) {
+				temp = iter.next();
+				videoIdList.get(temp).setVisible(false);
+				videoIdList.remove(temp);
+			}
+			
+			iter = videoWarnList.keySet().iterator();
+			while (iter.hasNext()) {
+				temp = iter.next();
+				videoWarnList.get(temp).setVisible(false);
+				videoWarnList.remove(temp);
+			}
+			
+			iter = videoEndList.keySet().iterator();
+			while (iter.hasNext()) {
+				temp = iter.next();
+				videoEndList.get(temp).setVisible(false);
+				videoEndList.remove(temp);
+			}
+			
+			iter = videoMsgList.keySet().iterator();
+			while (iter.hasNext()) {
+				temp = iter.next();
+				videoMsgList.get(temp).setVisible(false);
+				videoMsgList.remove(temp);
+			}
+		}
+		
+		public static void showWhenStart() {
+			InvigilateTab.textField.setVisible(true);
+			InvigilateTab.btnSend.setVisible(true);
+			InvigilateTab.lblType.setVisible(true);
+			InvigilateTab.lblStudentId.setVisible(true);
+			InvigilateTab.lblIncomingMsg.setVisible(true);
+		}
 	}
 }
 

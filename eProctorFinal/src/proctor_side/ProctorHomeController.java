@@ -34,7 +34,7 @@ public class ProctorHomeController {
 				.getScreenSize().height - 32);
 		Main.desktopController.addComponent(Main.proctorHomeUI);
 		Main.proctorHomeUI.setVisible(true);
-		Main.proctorHomeUI.refreshUI();
+//		Main.proctorHomeUI.refreshUI();
 	}
 	
 	public void exit() {

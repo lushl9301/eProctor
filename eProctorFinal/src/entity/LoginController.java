@@ -23,8 +23,8 @@ public class LoginController {
 
 	public boolean isUser(String username, char[] password, String domain)
 			throws Exception {
-		if (username.equals("cly753") && domain.equals("Proctor"))
-			return true;
+//		if (username.equals("cly753") && domain.equals("Proctor"))
+//			return true;
 		
 		if (username.equals("gong0025") && domain.equals("Student"))
 			return true;
@@ -37,10 +37,12 @@ public class LoginController {
 //		System.out.println(qb);
 		DBObject obj = null;
 		obj = Main.validationServer.user.findOne(qb.get());
-		System.out.println("logged in as " + obj);
+		
 		if (obj == null)
 			return false;
 		else {
+			System.out.println("logged in as " + obj);
+			
 			qb = new QueryBuilder();
 			qb.put("username").is(obj.get("username"));
 //			obj = Main.mongoHQ.student.findOne(qb.get());
