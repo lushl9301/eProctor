@@ -29,7 +29,7 @@ public class VideoServerThread implements Runnable {
         try {
             serverSocket = new ServerSocket(port);
 
-            System.out.println("start receiveImg...");
+//            System.out.println("start receiveImg...");
             while (true) {
                 socket = serverSocket.accept();
                 sInput = new ObjectInputStream(socket.getInputStream());

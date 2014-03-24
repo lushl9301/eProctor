@@ -3,12 +3,14 @@ package student_side;
 import java.awt.*;
 
 import javax.swing.*;
+import javax.swing.plaf.basic.BasicInternalFrameUI;
 import javax.swing.table.AbstractTableModel;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.awt.event.MouseListener;
 import java.awt.event.WindowFocusListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.ActionListener;
@@ -18,6 +20,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.event.ListSelectionEvent;
 
 import org.bson.types.ObjectId;
+
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 
@@ -248,6 +251,13 @@ public class StudentHomeUI extends JInternalFrame {
 		
 		JPanel pnSetting = new JPanel();
 		tabbedPane.addTab("Setting", null, pnSetting, null);
+		
+		// remove the border
+        BasicInternalFrameUI basicInternalFrameUI = ((javax.swing.plaf.basic.BasicInternalFrameUI) this.getUI());
+        for (MouseListener listener : basicInternalFrameUI.getNorthPane().getMouseListeners())
+        	basicInternalFrameUI.getNorthPane().removeMouseListener(listener);
+        this.remove(basicInternalFrameUI.getNorthPane());
+        this.setBorder(null);
 	}
 	public class TableCurrentBookingsModel extends AbstractTableModel {
 

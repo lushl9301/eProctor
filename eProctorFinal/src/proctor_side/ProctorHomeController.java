@@ -16,6 +16,7 @@ import org.bson.types.ObjectId;
 
 import entity.Main;
 import entity.MakeARequestUI;
+import entity.Popup;
 
 public class ProctorHomeController {
 
@@ -27,13 +28,13 @@ public class ProctorHomeController {
 		sessionIdRecord = new ArrayList<ObjectId>();
 	}
 
-	public void open() {
+	public void open() throws java.lang.NullPointerException {
 		Main.proctorHomeUI.setBounds(0, 0, Toolkit.getDefaultToolkit()
 				.getScreenSize().width - 10, Toolkit.getDefaultToolkit()
 				.getScreenSize().height - 32);
 		Main.desktopController.addComponent(Main.proctorHomeUI);
 		Main.proctorHomeUI.setVisible(true);
-		Main.proctorHomeUI.refreshUI();
+//		Main.proctorHomeUI.refreshUI();
 	}
 	
 	public void exit() {
@@ -49,10 +50,15 @@ public class ProctorHomeController {
 
 	}
 
-	public ArrayList<ArrayList<String>> getTableCurrentBookings() {
+	public ArrayList<ArrayList<String>> getTableCurrentBookings() throws java.lang.NullPointerException{
 		QueryBuilder qb = new QueryBuilder();
 		qb.put("student_id").is(Main.user_id).put("takenStatus").is(false);
-		DBCursor cursor = Main.mongoHQ.record.find(qb.get());
+		DBCursor cursor = null;
+		try {
+			cursor = Main.mongoHQ.record.find(qb.get());
+		} catch (java.lang.NullPointerException e) {
+			new Popup(e.getClass().getCanonicalName());
+		}
 		ArrayList<ArrayList<String>> currentBookingsRecords = new ArrayList<ArrayList<String>>();
 		while (cursor.hasNext()) {
 			ArrayList<String> temp = new ArrayList<String>();

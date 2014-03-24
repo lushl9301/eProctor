@@ -1,6 +1,7 @@
 package entity;
 
 import java.awt.event.MouseListener;
+import java.net.SocketTimeoutException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -22,25 +23,34 @@ public class LoginController {
 
 	public boolean isUser(String username, char[] password, String domain)
 			throws Exception {
-
+//		if (username.equals("cly753") && domain.equals("Proctor"))
+//			return true;
+		
+//		if (username.equals("gong0025") && domain.equals("Student"))
+//			return true;
+		
 		QueryBuilder qb = new QueryBuilder();
 		qb.put("username").is(username).put("password")
 				.is((String) getMD5FromCharArray(password, true))
 				.put("domain").is(domain);
 //		System.out.println(getMD5FromCharArray(password, true));
 //		System.out.println(qb);
-		DBObject obj = Main.validationServer.user.findOne(qb.get());
-//		System.out.println(obj);
+		DBObject obj = null;
+		obj = Main.validationServer.user.findOne(qb.get());
+		
 		if (obj == null)
 			return false;
 		else {
+			System.out.println("logged in as " + obj);
+			
 			qb = new QueryBuilder();
 			qb.put("username").is(obj.get("username"));
 //			obj = Main.mongoHQ.student.findOne(qb.get());
-			Main.user = obj;
-//			Main.user_id = (ObjectId) obj.get("_id");
+//			Main.user = obj;
+			Main.user_id = (ObjectId) obj.get("_id");
 			return true;
 		}
+
 	}
 
 	public static String getMD5FromCharArray(char[] cInput, boolean getHex)
@@ -70,7 +80,7 @@ public class LoginController {
 		return "Login error!";
 	}
 
-	public void showHomeUI(String domain) throws Exception {
+	public void showHomeUI(String domain) throws java.lang.NullPointerException, Exception {
 		Main.desktopController.removeComponent(Main.loginUI);
 		Main.loginUI = null;
 		if ("Student".equals(domain)) {
