@@ -61,13 +61,15 @@ public class Messager {
 			}
 		}
 		
-		String str = null;
+		String str = "";
 		
 		for(DBObject o : msgs){
-			str = str +"/n"+ "type: " + (String)Main.mongoHQ.message.findOne(new BasicDBObject().append("_id",o.get("_id")),new BasicDBObject().append("type",1)).get("type")
-					/*+(String)Main.mongoHQ.student.findOne(new BasicDBObject().append("_id",o.get("senderId")),new BasicDBObject().append("name", 1)).get("name")*/
-					+ "content: " + o.get("message")
-					+ "sender id: " + o.get("senderId");
+			str = str
+				+ "\n" 
+				+ "\nsender id: " + o.get("senderId")
+				+ "type: " + o.get("type")
+				/*+(String)Main.mongoHQ.student.findOne(new BasicDBObject().append("_id",o.get("senderId")),new BasicDBObject().append("name", 1)).get("name")*/
+				+ "\ncontent: " + o.get("message");
 		}
 		System.out.println("messager here: " + str);
 		return str;

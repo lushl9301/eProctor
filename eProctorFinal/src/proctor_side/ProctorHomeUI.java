@@ -1038,8 +1038,5 @@ public class ProctorHomeUI extends JInternalFrame {
 		}
 	}
 
-	class Message {
-		
-	}
 }
 
