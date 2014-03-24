@@ -38,6 +38,7 @@ import javax.swing.event.ListSelectionEvent;
 import org.bson.types.ObjectId;
 
 import entity.Main;
+import entity.Messager;
 import entity.RecordObject;
 
 import com.googlecode.javacv.CanvasFrame;
@@ -59,7 +60,6 @@ public class ProctorHomeUI extends JInternalFrame {
 	private JList<String> listCurrentBookings;
 	private JTable tableCurrentBookings;
 	private JList listAvailableCourses;
-	private JList listAvailableSessions;
 	
 	private JPanel pnInvigilate;
 
@@ -87,7 +87,7 @@ public class ProctorHomeUI extends JInternalFrame {
 		tableCurrentBookings.getColumnModel().getColumn(2)
 				.setPreferredWidth(170);
 		listAvailableCourses.setModel(new ListArrayListModel(controller.getListAvailableCourses()));
-		listAvailableSessions.setModel(new ListArrayListModel(controller.getListAvailableSessions(-1)));
+//		listAvailableSessions.setModel(new ListArrayListModel(controller.getListAvailableSessions(-1)));
 		tableReview.setModel(new TableReviewModel(controller.getTableReview()));
 		tableReview.getColumnModel().getColumn(0).setPreferredWidth(50);
 		tableReview.getColumnModel().getColumn(1).setPreferredWidth(220);
@@ -191,14 +191,22 @@ public class ProctorHomeUI extends JInternalFrame {
 			
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				String id = InvigilateTab.lblStudentId.getText().split(" ")[1];
+				String username = InvigilateTab.lblStudentId.getText().split(" ")[1];
 				String type = InvigilateTab.lblType.getText().split(" ")[1];
 				String content = InvigilateTab.textField.getText();
-				System.out.println("cofirmed to #" + type + "# id #" + id + "# content #" + content + "#");
+				System.out.println("cofirmed to #" + type + "# id #" + username + "# content #" + content + "#");
 
 				//
 				// send to server
 				//
+				ObjectId id = null;
+				Iterator<ObjectId> iter = InvigilateTab.sessionStudentList.keySet().iterator();
+				while (iter.hasNext()) {
+					id = iter.next();
+					if (InvigilateTab.sessionStudentList.get(id).get("username").equals(username))
+						break;
+				}
+				Messager.sendMsg(content, id, Main.user_id, (ObjectId)InvigilateTab.mostRecentSession.get("_id"), type, new Date());
 				if ("send" != "failed") {
 					InvigilateTab.lblStudentId.setText("Sent_to " + id);
 					InvigilateTab.lblType.setText("");
@@ -273,9 +281,9 @@ public class ProctorHomeUI extends JInternalFrame {
 		tabbedPane.addTab("Check", null, pnCheck, null);
 		pnCheck.setLayout(null);
 
-		JLabel lblCurrentBookings = new JLabel("Exams assigned to");
+		JLabel lblCurrentBookings = new JLabel("Course assigned to");
 		lblCurrentBookings.setFont(new Font("Segoe UI", Font.BOLD, 16));
-		lblCurrentBookings.setBounds(263, 46, 140, 22);
+		lblCurrentBookings.setBounds(263, 46, 150, 22);
 		pnCheck.add(lblCurrentBookings);
 
 //		listCurrentBookings = new JList<String>();
@@ -299,46 +307,33 @@ public class ProctorHomeUI extends JInternalFrame {
 		btnMakeARequest.setBounds(873, 262, 150, 30);
 		pnCheck.add(btnMakeARequest);
 
-		JLabel lblNewBooking = new JLabel("New booking");
+		JLabel lblNewBooking = new JLabel("Exams of Course");
 		lblNewBooking.setFont(new Font("Segoe UI", Font.BOLD, 16));
 		lblNewBooking.setBounds(screenSize.width / 2 - 420, 323, 150, 22);
 		pnCheck.add(lblNewBooking);
 
-		JLabel lblAvailableCourses = new JLabel("Available Courses");
-		lblAvailableCourses.setBounds(screenSize.width / 2 - 420, 352, 150, 18);
-		pnCheck.add(lblAvailableCourses);
-
 		listAvailableCourses = new JList();
-		listAvailableCourses.addListSelectionListener(new ListSelectionListener() {
-			public void valueChanged(ListSelectionEvent arg0) {
-				listAvailableSessions.setModel(new ListArrayListModel(controller.getListAvailableSessions(listAvailableCourses.getSelectedIndex())));
-			}
-		});
+//		listAvailableCourses.addListSelectionListener(new ListSelectionListener() {
+//			public void valueChanged(ListSelectionEvent arg0) {
+//				listAvailableSessions.setModel(new ListArrayListModel(controller.getListAvailableSessions(listAvailableCourses.getSelectedIndex())));
+//			}
+//		});
 		listAvailableCourses.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		listAvailableCourses.setBounds(screenSize.width / 2 - 420, 381, 405, 174);
+		listAvailableCourses.setBounds(263, 355, 600, 174);
 		pnCheck.add(listAvailableCourses);
 
-		JLabel lblAvailableSessions = new JLabel("Available Sessions");
-		lblAvailableSessions.setBounds(screenSize.width / 2 - 5, 352, 150, 18);
-		pnCheck.add(lblAvailableSessions);
-
-		listAvailableSessions = new JList();
-		listAvailableSessions.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		listAvailableSessions.setBounds(screenSize.width / 2 - 5, 381, 240, 174);
-		pnCheck.add(listAvailableSessions);
-
 		JButton btnOk = new JButton("OK");
-		btnOk.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent arg0) {
-				controller.bookNewSession(listAvailableSessions.getSelectedIndex(), listAvailableCourses.getSelectedIndex());
-			}
-		});
-		btnOk.setBounds(screenSize.width / 2 + 261, 403, 89, 30);
+//		btnOk.addMouseListener(new MouseAdapter() {
+//			@Override
+//			public void mouseClicked(MouseEvent arg0) {
+//				controller.bookNewSession(listAvailableSessions.getSelectedIndex(), listAvailableCourses.getSelectedIndex());
+//			}
+//		});
+		btnOk.setBounds(873, 419, 89, 30);
 		pnCheck.add(btnOk);
 
 		JButton btnReset = new JButton("Reset");
-		btnReset.setBounds(screenSize.width / 2 + 261, 450, 89, 30);
+		btnReset.setBounds(873, 459, 89, 30);
 		pnCheck.add(btnReset);
 
 		JButton btnRefresh = new JButton("Refresh");
@@ -348,7 +343,7 @@ public class ProctorHomeUI extends JInternalFrame {
 //				refreshUI();
 			}
 		});
-		btnRefresh.setBounds(screenSize.width / 2 + 261, 497, 89, 30);
+		btnRefresh.setBounds(873, 499, 89, 30);
 		pnCheck.add(btnRefresh);
 
 		JSeparator separator = new JSeparator();
@@ -827,12 +822,14 @@ public class ProctorHomeUI extends JInternalFrame {
 				System.out.println("timeToGo--; left " + secondToString(secondToGo));
 				lblTimeToGo.setText(secondToString(secondToGo));
 				
-				if (secondToGo % 10 == 0) {
+				if (secondToGo % 5 == 0) {
 					//
 					// fetch message once
 					//
 					
-					String allTogether = "all student id and message together. " + secondToGo;
+					// String allTogether = "all student id and message together. " + secondToGo;
+					System.out.println(Main.user_id + " fetching message");
+					String allTogether = Messager.pollMsg(new ObjectId("532541929862bcab1a0000fd"), "Proctor");
 					//
 					// compress all message together
 					//
@@ -1039,6 +1036,10 @@ public class ProctorHomeUI extends JInternalFrame {
 			InvigilateTab.lblStudentId.setVisible(true);
 			InvigilateTab.lblIncomingMsg.setVisible(true);
 		}
+	}
+
+	class Message {
+		
 	}
 }
 

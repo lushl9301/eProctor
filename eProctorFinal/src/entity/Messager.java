@@ -8,60 +8,83 @@ import org.bson.types.ObjectId;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
+import com.mongodb.WriteResult;
 
 public class Messager {
 	public String msg;
 	private ObjectId myId;
-	private Date date = new Date();
+	private Date date;
 	
 	public Messager(ObjectId myId){
 		this.myId = myId;
 	}
 
 	
-	public void sendMsg(String str,ObjectId receiverId, ObjectId senderId, ObjectId sessionId,String type){
-		Main.mongoHQ.message.insert(new BasicDBObject().append("senderId", senderId)
+	public static boolean sendMsg(String str, ObjectId receiverId, ObjectId senderId, ObjectId sessionId, String type, Date date){
+		WriteResult wr = null;
+		wr = Main.mongoHQ.message.insert(new BasicDBObject().append("senderId", senderId)
 														.append("receiverId", receiverId)
 														.append("message", str)
 														.append("sessionId", sessionId)
 														.append("time",date)
-														.append("type", type));
-		Main.mongoHQ.student.update(new BasicDBObject().append("-id",receiverId), new BasicDBObject().append("isRead",false));
+														.append("type", type)
+														.append("isRead", false));
+		if (wr.getError() != null) {
+			System.out.println(wr.getError());
+			return false;
+		}
+		// don't know where to update
+		
+		wr = Main.mongoHQ.proctor.update(new BasicDBObject().append("_id",receiverId), new BasicDBObject("$set", new BasicDBObject().append("isRead",false)), false, false);
+		if (wr.getError() == null) {
+			wr = Main.mongoHQ.student.update(new BasicDBObject().append("_id",receiverId), new BasicDBObject("$set", new BasicDBObject().append("isRead",false)), false, false);
+			if (wr.getError() == null)
+				return true;
+		}
+		return false;
 	}
-	public static String pollMsg(ObjectId myId){
+	public static String pollMsg(ObjectId myId, String domain){
 		ArrayList<DBObject> msgs = new ArrayList<DBObject>();
-		if((boolean)Main.mongoHQ.student.findOne(new BasicDBObject().append("_id",myId),new BasicDBObject().append("isRead",1)).get("isRead")==false)
+		DBObject temp = null;
+		if (domain.equals("Proctor")) {
+			temp = Main.mongoHQ.proctor.findOne(new BasicDBObject().append("_id",myId),new BasicDBObject().append("isRead",1));
+		} else {
+			temp = Main.mongoHQ.student.findOne(new BasicDBObject().append("_id",myId),new BasicDBObject().append("isRead",1));
+		}
+		
+		if(temp != null && (boolean)temp.get("isRead") == false) {
 			{
 				DBCursor cursor = Main.mongoHQ.message.find(new BasicDBObject().append("receiverId",myId).append("isRead",false));
 				while(cursor.hasNext()){
 					msgs.add(cursor.next());
 				}
 			}
+		}
 		
 		String str = null;
 		
 		for(DBObject o : msgs){
-			str = str +"/n"+ (String)Main.mongoHQ.message.findOne(new BasicDBObject().append("_id",o.get("_id")),new BasicDBObject().append("type",1)).get("type")
-					+(String)Main.mongoHQ.student.findOne(new BasicDBObject().append("_d",o.get("senderId")),new BasicDBObject().append("name", 1)).get("name")
-					+o.get("message");
+			str = str +"/n"+ "type: " + (String)Main.mongoHQ.message.findOne(new BasicDBObject().append("_id",o.get("_id")),new BasicDBObject().append("type",1)).get("type")
+					/*+(String)Main.mongoHQ.student.findOne(new BasicDBObject().append("_id",o.get("senderId")),new BasicDBObject().append("name", 1)).get("name")*/
+					+ "content: " + o.get("message")
+					+ "sender id: " + o.get("senderId");
 		}
-			
+		System.out.println("messager here: " + str);
 		return str;
 	}
 //Thread is to poll server to check if have message in database		
-	Thread pollMsg = new Thread(){
-		public void run(){
-			while(true){
-				//add method to visit database
-				msg = pollMsg(myId);
-				try {
-					Thread.sleep(3000);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}		
-		}
-	};
-
+//	Thread pollMsg = new Thread(){
+//		public void run(){
+//			while(true){
+//				//add method to visit database
+//				msg = pollMsg(myId);
+//				try {
+//					Thread.sleep(3000);
+//				} catch (InterruptedException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+//			}		
+//		}
+//	};
 }
