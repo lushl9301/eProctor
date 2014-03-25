@@ -70,7 +70,17 @@ public class Messager {
 				+ "type: " + o.get("type")
 				/*+(String)Main.mongoHQ.student.findOne(new BasicDBObject().append("_id",o.get("senderId")),new BasicDBObject().append("name", 1)).get("name")*/
 				+ "\ncontent: " + o.get("message");
+			
 		}
+		
+		
+		////////////////////////////////////
+		//this is to set the isRead true
+//		Main.mongoHQ.proctor.update(new BasicDBObject().append("_id",myId), new BasicDBObject("$set", new BasicDBObject().append("isRead",true)), false, false);
+//		Main.mongoHQ.student.update(new BasicDBObject().append("_id",myId), new BasicDBObject("$set", new BasicDBObject().append("isRead",true)), false, false);
+	////////////////////////////////////////////
+		
+		
 		System.out.println("messager here: " + str);
 		return str;
 	}
