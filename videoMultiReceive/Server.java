@@ -7,7 +7,6 @@ public class Server {
     public static HashMap<String, RecordObject> receivedList;
     public static void main(String[] args) throws IOException {
         receivedList = new HashMap<String, RecordObject>();
-        // new QueryServerThread(port1);
         new VideoServerThread(port1, receivedList);
         new DisplayServerThread(port2, receivedList);
     }

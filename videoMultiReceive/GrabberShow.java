@@ -10,9 +10,10 @@ import com.googlecode.javacv.CanvasFrame;
 import com.googlecode.javacv.FrameGrabber;
 import com.googlecode.javacv.cpp.opencv_core.IplImage;
 
-public class GrabberShow implements Runnable {
+public class GrabberShow extends Thread {
     IplImage image;
     public CanvasFrame canvas = new CanvasFrame("Web Cam");
+    public boolean shouldEnd = false;
     private ObjectOutputStream sOutput;
     private int port = MainForGrabberShow.port2;
     private String userId;
@@ -22,7 +23,8 @@ public class GrabberShow implements Runnable {
         this.port = port;
         this.userId = userId;
         canvas.setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE);
-        new Thread(this, "send image").start();
+        this.start();
+        //new Thread(this, "send image").start();
     }
 
     public GrabberShow(int port) {
@@ -47,7 +49,7 @@ public class GrabberShow implements Runnable {
             grabber.start();
             IplImage img;
             BufferedImage buf;
-            while (true) {
+            while (!shouldEnd) {
                 img = grabber.grab();
                 buf = img.getBufferedImage();
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
