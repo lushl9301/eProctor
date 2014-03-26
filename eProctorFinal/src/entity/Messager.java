@@ -64,12 +64,24 @@ public class Messager {
 		String str = "";
 		
 		for(DBObject o : msgs){
+			String name = "";
+			DBObject mingzi = Main.mongoHQ.proctor.findOne(new BasicDBObject("_id", (ObjectId)o.get("senderId")));
+			System.out.println("sender id: " + o.get("senderId"));
+			System.out.println("Messager here: mingzi: " + mingzi);
+			if (mingzi == null)
+				mingzi = Main.mongoHQ.student.findOne(new BasicDBObject("_id", (ObjectId)o.get("senderId")));
+			if (mingzi == null) {
+				System.out.println("Messager here: ???@$%U*^&%%^%$!!@!#!#$");
+				continue;
+			}
+			System.out.println("Messager here: mingzi: " + mingzi);
+			name = (String) mingzi.get("name");
 			str = str
-				+ "\n" 
-				+ "\nsender id: " + o.get("senderId")
-				+ "type: " + o.get("type")
+				+ "\nsender name: " + name
+				+ "\ntype: " + o.get("type")
 				/*+(String)Main.mongoHQ.student.findOne(new BasicDBObject().append("_id",o.get("senderId")),new BasicDBObject().append("name", 1)).get("name")*/
-				+ "\ncontent: " + o.get("message");
+				+ "\ncontent: " + o.get("message")
+				+ "\n";
 			
 		}
 		

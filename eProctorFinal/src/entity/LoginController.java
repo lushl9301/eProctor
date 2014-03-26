@@ -45,9 +45,13 @@ public class LoginController {
 			
 			qb = new QueryBuilder();
 			qb.put("username").is(obj.get("username"));
-//			obj = Main.mongoHQ.student.findOne(qb.get());
+			if (domain.equals("Proctor"))
+				obj = Main.mongoHQ.proctor.findOne(qb.get());
+			else
+				obj = Main.mongoHQ.student.findOne(qb.get());
 //			Main.user = obj;
 			Main.user_id = (ObjectId) obj.get("_id");
+			Main.domain = domain;
 			return true;
 		}
 

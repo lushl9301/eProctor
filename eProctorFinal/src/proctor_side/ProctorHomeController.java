@@ -8,14 +8,17 @@ import java.util.Date;
 
 import javax.swing.AbstractListModel;
 import javax.swing.DefaultListModel;
+import javax.swing.JTextPane;
 import javax.swing.table.AbstractTableModel;
 
 import com.mongodb.*;
 
 import org.bson.types.ObjectId;
 
+import student_side.StudentHomeUI;
 import entity.Main;
 import entity.MakeARequestUI;
+import entity.Messager;
 import entity.Popup;
 
 public class ProctorHomeController {
@@ -95,8 +98,7 @@ public class ProctorHomeController {
 		BasicDBObject query = new BasicDBObject();
 		query.put("_id", Main.user_id);
 		DBObject obj = Main.mongoHQ.proctor.findOne(query);
-//		DBObject obj;
-		BasicDBList e = (BasicDBList) Main.user.get("enrolledNotTested");
+		BasicDBList e = (BasicDBList) obj.get("enrolledNotTested");
 //		BasicDBList e1 = (BasicDBList) Main.user.get("enrolledCourses");
 		ArrayList<String> coursesRecord = new ArrayList<String>();
 		for (int i = 0; i < e.size(); i++) {
@@ -290,5 +292,42 @@ public class ProctorHomeController {
 		Main.desktopController.addComponent(Main.checkDetailsUI);
 		Main.checkDetailsUI.setVisible(true);
 	}
+	
+	public void updateInfoTextPand(JTextPane txtpnInformation) {
+		
+		String newInfo = "";
+		ProctorHomeUI.getMostRecentSession();
+		DBObject user = Main.mongoHQ.proctor.findOne(new BasicDBObject("_id", (ObjectId)Main.user_id));
+		System.out.println("user_id: " + Main.user_id);
+		System.out.println(user);
+		newInfo += "Hello " + user.get("username") + "\n";
+		
+		DBCursor recordCur = Main.mongoHQ.record.find(new BasicDBObject("user_id", Main.user_id));
+		
+		DBObject record;
+		DBObject course;
+		String temp = "";
+		int noExam = 0;
+		while (recordCur.hasNext()) {
+			record = recordCur.next();
+			System.out.println("record: " + record);
+			course = Main.mongoHQ.course.findOne(new BasicDBObject("sessions", record.get("session_id")));
+			System.out.println("course: " + course);
+			Date start = (Date) Main.mongoHQ.session.findOne(new BasicDBObject("_id", record.get("session_id"))).get("start");
+			if (start.before(new Date()))
+				continue;
+			noExam++;
+			temp = course.get("code") + " " + course.get("name") + ": " + start + "\n";
+		}
+		
+		newInfo += "You have " + noExam + " exams left.\n\n" + temp;
+		
+		txtpnInformation.setText(newInfo);
+	}
 
+	public void updateMsgTextPand(JTextPane txtpnRecentMessages){
+		String newMsg ="";
+		newMsg = Messager.pollMsg(Main.user_id, "Proctor");
+		txtpnRecentMessages.setText(newMsg);
+	}
 }

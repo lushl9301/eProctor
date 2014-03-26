@@ -3,12 +3,12 @@ package student_side;
 import java.awt.Toolkit;
 import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
+import java.util.*;
 
 import javax.swing.AbstractListModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JDialog;
+import javax.swing.JTextPane;
 import javax.swing.table.AbstractTableModel;
 
 import com.mongodb.*;
@@ -17,6 +17,7 @@ import org.bson.types.ObjectId;
 
 import entity.Main;
 import entity.MakeARequestUI;
+import entity.Messager;
 
 public class StudentHomeController {
 
@@ -170,65 +171,65 @@ public class StudentHomeController {
 
 	}
 
-	public String getInformation() {
-		// ArrayList<String> neededInfoList = new
-		// ArrayList<String>(Arrays.asList("realname", "coursecode", "examid"));
-		// ArrayList<ArrayList<String>> information =
-		// Main.client.fetchData("username", Main.currentUser.getUserId(),
-		// neededInfoList);
+//	public String getInformation() {
+//		// ArrayList<String> neededInfoList = new
+//		// ArrayList<String>(Arrays.asList("realname", "coursecode", "examid"));
+//		// ArrayList<ArrayList<String>> information =
+//		// Main.client.fetchData("username", Main.currentUser.getUserId(),
+//		// neededInfoList);
+//
+//		ArrayList<ArrayList<String>> information = new ArrayList<ArrayList<String>>();
+//		{
+//			ArrayList<String> a = new ArrayList<String>();
+//			String b = "Welcome, Gong Yue from CE2006 BCE2";
+//			String c = "You have:   2 exams in the next week.";
+//			String d = "5 exams in the next few months.";
+//			a.add(b);
+//			a.add(c);
+//			ArrayList<String> aa = new ArrayList<String>();
+//			aa.add(d);
+//			information.add(a);
+//			information.add(aa);
+//		}
+//		String result = "";
+//		for (ArrayList<String> s : information) {
+//			for (String e : s) {
+//				result += "      " + e;
+//			}
+//			result += "\n";
+//		}
+//		return result.substring(6);
+//	}
 
-		ArrayList<ArrayList<String>> information = new ArrayList<ArrayList<String>>();
-		{
-			ArrayList<String> a = new ArrayList<String>();
-			String b = "Welcome, Gong Yue from CE2006 BCE2";
-			String c = "You have:   2 exams in the next week.";
-			String d = "5 exams in the next few months.";
-			a.add(b);
-			a.add(c);
-			ArrayList<String> aa = new ArrayList<String>();
-			aa.add(d);
-			information.add(a);
-			information.add(aa);
-		}
-		String result = "";
-		for (ArrayList<String> s : information) {
-			for (String e : s) {
-				result += "      " + e;
-			}
-			result += "\n";
-		}
-		return result.substring(6);
-	}
-
-	public String getRecentMessage() {
-		// implement way: polling request
-		// ArrayList<ArrayList<String>> recentMessage = Main.client.fetchData();
-		ArrayList<ArrayList<String>> recentMessage = new ArrayList<ArrayList<String>>();
-		{
-			ArrayList<String> a = new ArrayList<String>();
-			String b = "Laoshi";
-			String c = "03/03/2014 13:20";
-			a.add(b);
-			a.add(c);
-			ArrayList<String> aa = new ArrayList<String>();
-			String d = "ni jin tian biao xian hen hao";
-			String e = "geilaozi qu si";
-			String f = "haoba";
-			aa.add(d);
-			aa.add(e);
-			aa.add(f);
-			recentMessage.add(a);
-			recentMessage.add(aa);
-		}
-
-		String result = "";
-		result += "Send From: " + recentMessage.get(0).get(0) + "\n";
-		result += "Time: " + recentMessage.get(0).get(1) + "\n";
-		for (String e : recentMessage.get(1)) {
-			result += "      " + e;
-		}
-		return result;
-	}
+//	public String getRecentMessage() {
+//		// implement way: polling request
+//		// ArrayList<ArrayList<String>> recentMessage = Main.client.fetchData();
+//		ArrayList<ArrayList<String>> recentMessage = new ArrayList<ArrayList<String>>();
+//		{
+//			ArrayList<String> a = new ArrayList<String>();
+//			String b = "Laoshi";
+//			String c = "03/03/2014 13:20";
+//			a.add(b);
+//			a.add(c);
+//			ArrayList<String> aa = new ArrayList<String>();
+//			String d = "ni jin tian biao xian hen hao";
+//			String e = "geilaozi qu si";
+//			String f = "haoba";
+//			aa.add(d);
+//			aa.add(e);
+//			aa.add(f);
+//			recentMessage.add(a);
+//			recentMessage.add(aa);
+//		}
+//
+//		String result = "";
+//		result += "Send From: " + recentMessage.get(0).get(0) + "\n";
+//		result += "Time: " + recentMessage.get(0).get(1) + "\n";
+//		for (String e : recentMessage.get(1)) {
+//			result += "      " + e;
+//		}
+//		return result;
+//	}
 
 	public void bookNewSession(int selectedCourseIndex, int selectedSessionIndex) {
 		if (selectedSessionIndex == -1)
@@ -290,4 +291,57 @@ public class StudentHomeController {
 		Main.checkDetailsUI.setVisible(true);
 	}
 
+	public void updateInfoTextPand(JTextPane txtpnInformation) {
+		String newInfo = "";
+		StudentHomeUI.getMostRecentSession();
+		DBObject user = Main.mongoHQ.student.findOne(new BasicDBObject("_id", (ObjectId)Main.user_id));
+		System.out.println("user_id: " + Main.user_id);
+		System.out.println(user);
+		newInfo += "Hello " + user.get("username") + "\n";
+		
+		DBCursor recordCur = Main.mongoHQ.record.find(new BasicDBObject("student_id", Main.user_id));
+		
+		DBObject record;
+		DBObject course;
+		String temp = "";
+		int noExam = 0;
+		while (recordCur.hasNext()) {
+			record = recordCur.next();
+			System.out.println("record: " + record);
+			course = Main.mongoHQ.course.findOne(new BasicDBObject("sessions", record.get("session_id")));
+			System.out.println("course: " + course);
+			Date start = (Date) Main.mongoHQ.session.findOne(new BasicDBObject("_id", record.get("session_id"))).get("start");
+			System.out.println("start: " + start);
+			System.out.println("new Date: " + new Date());
+			if (start.before(new Date())) {
+				continue;
+			}
+			noExam++;
+			System.out.println("noExam: " + noExam);
+			temp = course.get("code") + " " + course.get("name") + ": " + start + "\n";
+		}
+		
+		newInfo += "You have " + noExam + " exams left.\n\n" + temp;
+		
+		txtpnInformation.setText(newInfo);
+	}
+	
+	public void updateMsgTextPand(JTextPane txtpnRecentMessages){
+		String newMsg ="";
+		newMsg = Messager.pollMsg(Main.user_id, "Student");
+		txtpnRecentMessages.setText(newMsg);
+	}
+
+	public ObjectId getOneProctor(ObjectId sessionId) {
+		// XXX Auto-generated method stub
+		DBCursor cursor = Main.mongoHQ.record.find(new BasicDBObject("session_id", sessionId).append("user_id", new BasicDBObject("$exists", true)));
+		ArrayList<ObjectId> pList = new ArrayList<ObjectId>();
+		while (cursor.hasNext()) {
+			pList.add((ObjectId) cursor.next().get("user_id"));
+		}
+		
+		Random rd = new Random();
+		
+		return pList.get(rd.nextInt(pList.size()));
+	}
 }

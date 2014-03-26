@@ -28,6 +28,7 @@ import org.bson.types.ObjectId;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
+import com.mongodb.WriteResult;
 
 import entity.Main;
 import entity.Messager;
@@ -46,16 +47,18 @@ public class StudentHomeUI extends JInternalFrame {
 	private JList listAvailableSessions;
 	
 	private Timer timer;
+	private JTextField textField;
 
 	public StudentHomeUI(StudentHomeController controller) throws Exception {
-		initialize();
+		
 		this.controller = controller;
+		initialize();
 		this.setSize(1427, 742);
 	}
 
 	public void refreshUI() {
-		txtpnInformation.setText(controller.getInformation());
-		txtpnRecentMessages.setText(controller.getRecentMessage());
+//		txtpnInformation.setText(controller.getInformation());
+//		txtpnRecentMessages.setText(controller.getRecentMessage());
 		tableCurrentBookings.setModel(new TableCurrentBookingsModel(controller.getTableCurrentBookings()));
 		tableCurrentBookings.getColumnModel().getColumn(0).setPreferredWidth(100);
 		tableCurrentBookings.getColumnModel().getColumn(1).setPreferredWidth(200);
@@ -103,6 +106,7 @@ public class StudentHomeUI extends JInternalFrame {
 
 		txtpnInformation = new JTextPane();
 		txtpnInformation.setBounds(screenSize.width / 2 - 420, 70, 400, 450);
+		controller.updateInfoTextPand(txtpnInformation);
 		pnStatus.add(txtpnInformation);
 
 		JLabel lblInformation = new JLabel("Information");
@@ -116,6 +120,7 @@ public class StudentHomeUI extends JInternalFrame {
 
 		txtpnRecentMessages = new JTextPane();
 		txtpnRecentMessages.setBounds(screenSize.width / 2, 70, 400, 450);
+		controller.updateMsgTextPand(txtpnRecentMessages);
 		pnStatus.add(txtpnRecentMessages);
 
 		JPanel pnExam = new JPanel();
@@ -151,15 +156,32 @@ public class StudentHomeUI extends JInternalFrame {
 		pnExam.add(lblMsgReceived);
 		ExamTab.lblMsgReceived = lblMsgReceived;
 		
-		JLabel lblMsgBox = new JLabel("New label");
-		lblMsgBox.setBounds(969, 425, 256, 89);
-		lblMsgBox.setVisible(false);
-		pnExam.add(lblMsgBox);
-		ExamTab.lblMsgBox = lblMsgBox;
-		
-		JButton btnMsgSend = new JButton("New button");
-		btnMsgSend.setBounds(1132, 524, 93, 23);
+		JButton btnMsgSend = new JButton("Send");
+		btnMsgSend.setBounds(1132, 592, 93, 23);
 		btnMsgSend.setVisible(false);
+		btnMsgSend.addMouseListener(new MouseAdapter() {
+			
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				ObjectId receiverId = controller.getOneProctor((ObjectId) ExamTab.mostRecentSession.get("_id"));
+				String type = "Message";
+				String content = ExamTab.textField.getText();
+				System.out.println("cofirmed to #" + type + "# id #" + receiverId + "# content #" + content + "#");
+
+				//
+				// send to server
+				//
+				boolean wr = Messager.sendMsg(content, receiverId, Main.user_id, (ObjectId)ExamTab.mostRecentSession.get("_id"), type, new Date());
+				System.out.println("sending message........... " + wr);
+				if (wr) {
+					ExamTab.textField.setText("");
+					ExamTab.lblMsgStatus.setText("Sent.");
+				} else {
+					ExamTab.textField.setText(content);
+					ExamTab.lblMsgStatus.setText("Failed to send.");
+				}
+			}
+		});
 		pnExam.add(btnMsgSend);
 		ExamTab.btnMsgSend = btnMsgSend;
 		
@@ -168,6 +190,19 @@ public class StudentHomeUI extends JInternalFrame {
 		lblTimeToGo.setVisible(false);
 		pnExam.add(lblTimeToGo);
 		startTimer(5, lblTimeToGo);
+		
+		textField = new JTextField();
+		textField.setBounds(969, 425, 256, 157);
+		textField.setVisible(false);
+		pnExam.add(textField);
+		ExamTab.textField = textField;
+		textField.setColumns(10);
+		
+		JLabel lblMsgStatus = new JLabel("");
+		lblMsgStatus.setBounds(969, 596, 54, 15);
+		lblMsgStatus.setVisible(false);
+		ExamTab.lblMsgStatus = lblMsgStatus;
+		pnExam.add(lblMsgStatus);
 
 		JPanel pnBooking = new JPanel();
 		tabbedPane.addTab("Booking", null, pnBooking, null);
@@ -392,6 +427,10 @@ public class StudentHomeUI extends JInternalFrame {
 	}
 	
 	static class ExamTab {
+		public static JLabel lblMsgStatus;
+
+		public static JTextField textField;
+
 		static DBObject mostRecentSession;
 		
 		static JEditorPane dtrpnExampaper;
@@ -399,8 +438,6 @@ public class StudentHomeUI extends JInternalFrame {
 		static JLabel lblVideoBox;
 		
 		static JLabel lblMsgReceived;
-		static JLabel lblMsgTitle;
-		static JLabel lblMsgBox;
 		static JButton btnMsgSend;
 		
 		public static void showWhenStart() {
@@ -412,12 +449,13 @@ public class StudentHomeUI extends JInternalFrame {
 				System.out.println("dtrpnExampaper.setPage(); failed");
 			}
 			
+			dtrpnExampaper.setVisible(true);
 			lblVideoTitle.setVisible(true);
 			lblVideoBox.setVisible(true);
 			lblMsgReceived.setVisible(true);
-			lblMsgTitle.setVisible(true);
-			lblMsgBox.setVisible(true);
 			btnMsgSend.setVisible(true);
+			textField.setVisible(true);
+			lblMsgStatus.setVisible(true);
 		}
 		
 		public static void hideWhenEnd() {
@@ -425,9 +463,9 @@ public class StudentHomeUI extends JInternalFrame {
 			lblVideoTitle.setVisible(false);
 			lblVideoBox.setVisible(false);
 			lblMsgReceived.setVisible(false);
-			lblMsgTitle.setVisible(false);
-			lblMsgBox.setVisible(false);
 			btnMsgSend.setVisible(false);
+			textField.setVisible(false);
+			lblMsgStatus.setVisible(false);
 		}
 	}
 
@@ -504,6 +542,8 @@ public class StudentHomeUI extends JInternalFrame {
 				timer.stop();
 				lblTimeToGo.setText("exam ended.");
 				ExamTab.hideWhenEnd();
+				
+				controller.updateInfoTextPand(txtpnInformation);
 			} else {
 				lblTimeToGo.setText("here is UpdateTimeToGoDuringExam. something goes wrong");
 			}
@@ -550,7 +590,7 @@ public class StudentHomeUI extends JInternalFrame {
 		System.out.println("second to go: " + secondToGo);
 		return secondToGo;
 	}
-	public void getMostRecentSession() {
+	public static void getMostRecentSession() {
 //		DBCursor sessionsCursor = Main.mongoHQ.record.find(new BasicDBObject("user_id", Main.user_id), new BasicDBObject("session_id", 1));
 		if (Main.mongoHQ == null) {
 			System.out.println("server not found");

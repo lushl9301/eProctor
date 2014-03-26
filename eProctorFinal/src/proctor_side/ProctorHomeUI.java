@@ -37,6 +37,7 @@ import javax.swing.event.ListSelectionEvent;
 
 import org.bson.types.ObjectId;
 
+import entity.Displayer;
 import entity.Main;
 import entity.Messager;
 import entity.RecordObject;
@@ -65,15 +66,15 @@ public class ProctorHomeUI extends JInternalFrame {
 
 	// for invigilation
 	private Timer timer;
-	private ReceiveShow videoReceiveShowThread;
+	private Displayer videoReceiveShowThread;
 	// for testing camera in setting tab
 	private TestVideo testVideoThread;
 
 
 	public ProctorHomeUI(ProctorHomeController controller) throws Exception {
 		getContentPane().setPreferredSize(new Dimension(1024, 768));
-		initialize();
 		this.controller = controller;
+		initialize();
 	}
 
 	public void XrefreshUI() throws java.lang.NullPointerException {
@@ -128,6 +129,7 @@ public class ProctorHomeUI extends JInternalFrame {
 
 		txtpnInformation = new JTextPane();
 		txtpnInformation.setBounds(screenSize.width / 2 - 420, 70, 400, 450);
+		controller.updateInfoTextPand(txtpnInformation);
 		pnStatus.add(txtpnInformation);
 
 		JLabel lblInformation = new JLabel("Information");
@@ -140,6 +142,7 @@ public class ProctorHomeUI extends JInternalFrame {
 
 		txtpnRecentMessages = new JTextPane();
 		txtpnRecentMessages.setBounds(screenSize.width / 2, 70, 400, 450);
+		controller.updateMsgTextPand(txtpnRecentMessages);
 		pnStatus.add(txtpnRecentMessages);
 
 		// change to global 
@@ -248,7 +251,7 @@ public class ProctorHomeUI extends JInternalFrame {
 					videoReceiveShowThread.shouldEnd = true;
 					videoReceiveShowThread = null;
 				}
-				
+				InvigilateTab.wantedStudentList = new ArrayList<ObjectId>();
 				InvigilateTab.hideWhenEnd();
 				InvigilateTab.btnSign.setVisible(false);
 				
@@ -617,6 +620,35 @@ public class ProctorHomeUI extends JInternalFrame {
 		panel.add(idLabel);
 		idLabel.setVisible(true);
 		
+		final JButton btnShow = new JButton("Show");
+		btnShow.setBounds(upperLeftX + 256 - (btnSize + btnSpace) * 4, upperLeftY, btnSize, btnSize);
+		idLabel.setBorder(new LineBorder(new Color(0, 0, 0)));
+//		btnShow.setIcon(new ImageIcon("icon\\appbar.warning.small.jpg"));
+		btnShow.setBorder(BorderFactory.createEmptyBorder());
+		btnShow.setContentAreaFilled(false);
+		btnShow.setName(id + "#btnShow#");
+		btnShow.addMouseListener(new MouseAdapter() {
+			
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				
+				String id = arg0.getComponent().getName().split("#")[0];
+				if (btnShow.getText().equals("stop_showing")) {
+					InvigilateTab.wantedStudentList.add(new ObjectId(id));
+					System.out.println("going to show: " + id);
+					InvigilateTab.videoIdList.get(id).setText(id + " showing");
+					btnShow.setText("stop_showing");
+				} else {
+					InvigilateTab.wantedStudentList.remove(new ObjectId(id));
+					System.out.println("stop showing: " + id);
+					InvigilateTab.videoIdList.get(id).setText(id);
+					btnShow.setText("show");
+				}
+			}
+			
+		});
+		pnInvigilate.add(btnShow);
+		
 		JButton btnWarn = new JButton("Warn");
 		btnWarn.setBounds(upperLeftX + 256 - (btnSize + btnSpace) * 3, upperLeftY, btnSize, btnSize);
 		idLabel.setBorder(new LineBorder(new Color(0, 0, 0)));
@@ -680,60 +712,15 @@ public class ProctorHomeUI extends JInternalFrame {
 		
 		panel.repaint();
 		
+		
 		InvigilateTab.videoIdList.put(id, idLabel);
+		InvigilateTab.btnShowList.put(id, btnShow);
 		InvigilateTab.videoBoxList.put(id, videoLabel);
 		InvigilateTab.videoWarnList.put(id, btnWarn);
 		InvigilateTab.videoEndList.put(id, btnEnd);
 		InvigilateTab.videoMsgList.put(id, btnMsg);
 		
 		InvigilateTab.numOfVideoBox++;
-	}
-
-	// should be moved to controller later
-	class ReceiveShow extends Thread {
-		int port = 6002;
-		
-	    public RecordObject recordObject;
-	    public ObjectInputStream sInput;
-	    public ServerSocket serverSocket;
-	    public Socket socket;
-	    
-	    public volatile boolean shouldEnd;
-	  
-	    public ReceiveShow () {
-	    	this.shouldEnd = false;
-	    	try {
-				this.serverSocket = new ServerSocket(port);
-			} catch (IOException e) {
-				// XXX Auto-generated catch block
-				e.printStackTrace();
-				System.out.println("new ServerSocket(port) failed");
-				this.shouldEnd = true;
-			}
-	    }
-	    
-	    public void run() {
-	    	try {
-		    	while (!shouldEnd) {  
-					socket = serverSocket.accept();
-					sInput = new ObjectInputStream(socket.getInputStream());
-		    		RecordObject recordObject = (RecordObject) sInput.readObject();
-		    		socket.close();
-		    		
-		    		BufferedImage buf = ImageIO.read(new ByteArrayInputStream(recordObject.getImageBytes()));
-		            IplImage toDisplay = IplImage.createFrom(buf);
-		            
-		            System.out.println("name: " + InvigilateTab.sessionStudentList.get(recordObject.userId));
-		            InvigilateTab.videoBoxList.get(recordObject.getUserId()).setIcon(new ImageIcon(toDisplay.getBufferedImage()));
-		    	}
-		    	socket.close();
-		    	serverSocket.close();
-		    	return ;
-			} catch (Exception e) {
-				// XXX Auto-generated catch block
-				e.printStackTrace();
-			}
-	    }
 	}
 
 	// here are timers
@@ -793,7 +780,8 @@ public class ProctorHomeUI extends JInternalFrame {
 						addOneVideoBox((String)temp.getValue().get("username"), pnInvigilate);
 					}
 					
-					videoReceiveShowThread = new ReceiveShow();
+					videoReceiveShowThread = new Displayer(InvigilateTab.wantedStudentList, InvigilateTab.videoBoxList);
+					videoReceiveShowThread.start();
 				}
 			} else {
 				lblTimeToGo.setText("here is UpdateTimeToGoBeforeExam. something goes wrong");
@@ -882,7 +870,7 @@ public class ProctorHomeUI extends JInternalFrame {
 		System.out.println("second to go: " + secondToGo);
 		return secondToGo;
 	}
-	public void getMostRecentSession() {
+	public static void getMostRecentSession() {
 //		DBCursor sessionsCursor = Main.mongoHQ.record.find(new BasicDBObject("user_id", Main.user_id), new BasicDBObject("session_id", 1));
 		if (Main.mongoHQ == null) {
 			System.out.println("server not found");
@@ -959,11 +947,14 @@ public class ProctorHomeUI extends JInternalFrame {
 
 	// here are components of invigilate tab
 	static class InvigilateTab {
+		
 		public static DBObject mostRecentSession;
 		public static TreeMap<ObjectId, DBObject> sessionStudentList = new TreeMap<ObjectId, DBObject>();
+		public static ArrayList<ObjectId> wantedStudentList;
 
 		public static int numOfVideoBox = 0;
 		
+		public static TreeMap<String, JButton> btnShowList = new TreeMap<String, JButton>();
 		public static TreeMap<String, JLabel> videoBoxList = new TreeMap<String, JLabel>();
 		public static TreeMap<String, JLabel> videoIdList = new TreeMap<String, JLabel>();
 		public static TreeMap<String, JButton> videoWarnList = new TreeMap<String, JButton>();
@@ -994,6 +985,13 @@ public class ProctorHomeUI extends JInternalFrame {
 				temp = iter.next();
 				videoBoxList.get(temp).setVisible(false);
 				videoBoxList.remove(temp);
+			}
+			
+			iter = btnShowList.keySet().iterator();
+			while (iter.hasNext()) {
+				temp = iter.next();
+				btnShowList.get(temp).setVisible(false);
+				btnShowList.remove(temp);
 			}
 
 			iter = videoIdList.keySet().iterator();
