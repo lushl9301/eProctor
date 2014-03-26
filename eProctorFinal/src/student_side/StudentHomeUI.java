@@ -316,7 +316,7 @@ public class StudentHomeUI extends JInternalFrame {
 		@Override
 		public String getColumnName(int column) {
 			switch (column) {
-			// "Record ID", "Course", "Session", "Grade", "Remark"
+			// "Record ID", "Course", "Session", "Grade", "Remark"ecly753
 			case 0:
 				return "Record ID";
 			case 1:

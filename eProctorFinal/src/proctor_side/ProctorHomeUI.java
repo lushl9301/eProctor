@@ -723,6 +723,7 @@ public class ProctorHomeUI extends JInternalFrame {
 		    		BufferedImage buf = ImageIO.read(new ByteArrayInputStream(recordObject.getImageBytes()));
 		            IplImage toDisplay = IplImage.createFrom(buf);
 		            
+		            System.out.println("name: " + InvigilateTab.sessionStudentList.get(recordObject.userId));
 		            InvigilateTab.videoBoxList.get(recordObject.getUserId()).setIcon(new ImageIcon(toDisplay.getBufferedImage()));
 		    	}
 		    	socket.close();
@@ -792,12 +793,7 @@ public class ProctorHomeUI extends JInternalFrame {
 						addOneVideoBox((String)temp.getValue().get("username"), pnInvigilate);
 					}
 					
-//					videoReceiveShowThread = new ReceiveShow();
-					
-//					InvigilateTab.textField.setVisible(true);
-//					InvigilateTab.btnSend.setVisible(true);
-//					InvigilateTab.lblStudentId.setVisible(true);
-//					InvigilateTab.lblType.setVisible(true);
+					videoReceiveShowThread = new ReceiveShow();
 				}
 			} else {
 				lblTimeToGo.setText("here is UpdateTimeToGoBeforeExam. something goes wrong");
