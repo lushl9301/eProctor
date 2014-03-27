@@ -66,7 +66,7 @@ public class ProctorHomeUI extends JInternalFrame {
 
 	// for invigilation
 	private Timer timer;
-	private Displayer videoReceiveShowThread;
+	private static Displayer videoReceiveShowThread;
 	// for testing camera in setting tab
 	private TestVideo testVideoThread;
 
@@ -161,7 +161,7 @@ public class ProctorHomeUI extends JInternalFrame {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
 				System.out.println("btnTestAddVideoBox clicked");
-				addOneVideoBox("" + InvigilateTab.numOfVideoBox, pnInvigilate);
+				addOneVideoBox("" + InvigilateTab.numOfVideoBox, new ObjectId(""), pnInvigilate);
 			}
 		});
 		btnTestAddVideoBox.addActionListener(new ActionListener() {
@@ -601,7 +601,7 @@ public class ProctorHomeUI extends JInternalFrame {
 		}
 	}
 
-	public void addOneVideoBox (String id, JPanel panel) {
+	public void addOneVideoBox (String id, ObjectId student_id, JPanel panel) {
 		int horizontalSpace = 8;
 		int verticalSpace = 50;
 		
@@ -612,7 +612,7 @@ public class ProctorHomeUI extends JInternalFrame {
 		
 		int btnSize = 30;
 
-		final JLabel idLabel = new JLabel("" + InvigilateTab.numOfVideoBox);
+		final JLabel idLabel = new JLabel(id);
 		// for displaying student's name
 		// 4 in a row, each has 10 space to other label in the same row, has 50 space to other in the same column, size = 100 x 30
 		idLabel.setBounds(upperLeftX, upperLeftY, 70, 30);
@@ -621,28 +621,39 @@ public class ProctorHomeUI extends JInternalFrame {
 		idLabel.setVisible(true);
 		
 		final JButton btnShow = new JButton("Show");
-		btnShow.setBounds(upperLeftX + 256 - (btnSize + btnSpace) * 4, upperLeftY, btnSize, btnSize);
+		btnShow.setBounds(upperLeftX + 256 - (btnSize + btnSpace) * 5, upperLeftY, btnSize * 2, btnSize);
 		idLabel.setBorder(new LineBorder(new Color(0, 0, 0)));
 //		btnShow.setIcon(new ImageIcon("icon\\appbar.warning.small.jpg"));
 		btnShow.setBorder(BorderFactory.createEmptyBorder());
 		btnShow.setContentAreaFilled(false);
-		btnShow.setName(id + "#btnShow#");
+		btnShow.setName(id + "#" + student_id + "#btnShow#"); // remember here is student_id, not student's name!!!!! different from other .setName()
 		btnShow.addMouseListener(new MouseAdapter() {
 			
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				
-				String id = arg0.getComponent().getName().split("#")[0];
-				if (btnShow.getText().equals("stop_showing")) {
-					InvigilateTab.wantedStudentList.add(new ObjectId(id));
-					System.out.println("going to show: " + id);
-					InvigilateTab.videoIdList.get(id).setText(id + " showing");
-					btnShow.setText("stop_showing");
-				} else {
-					InvigilateTab.wantedStudentList.remove(new ObjectId(id));
-					System.out.println("stop showing: " + id);
-					InvigilateTab.videoIdList.get(id).setText(id);
-					btnShow.setText("show");
+				System.out.println("here is btnShow!! I'm pressed.");
+				synchronized(InvigilateTab.wantedStudentList) {
+					String id = arg0.getComponent().getName().split("#")[0];
+					ObjectId student_id = new ObjectId(arg0.getComponent().getName().split("#")[1]);
+					System.out.println("here is btnShow!! id: " + id);
+					System.out.println("btnShow: " + btnShow.getText());
+					System.out.println("videoIdList.size(): " + InvigilateTab.videoIdList.size());
+					if (btnShow.getText().equals("Show")) {
+						InvigilateTab.wantedStudentList.add(student_id);
+						System.out.println("going to show: " + id);
+						
+						///////
+						System.out.println(InvigilateTab.videoIdList.toString());
+						//
+						
+						InvigilateTab.videoIdList.get(id).setText(id + " showing");
+						btnShow.setText("stop_showing");
+					} else {
+						InvigilateTab.wantedStudentList.remove(student_id);
+						System.out.println("stop showing: " + id);
+						InvigilateTab.videoIdList.get(id).setText(id);
+						btnShow.setText("Show");
+					}
 				}
 			}
 			
@@ -715,11 +726,10 @@ public class ProctorHomeUI extends JInternalFrame {
 		
 		InvigilateTab.videoIdList.put(id, idLabel);
 		InvigilateTab.btnShowList.put(id, btnShow);
-		InvigilateTab.videoBoxList.put(id, videoLabel);
+		InvigilateTab.videoBoxList.put(student_id.toString(), videoLabel);
 		InvigilateTab.videoWarnList.put(id, btnWarn);
 		InvigilateTab.videoEndList.put(id, btnEnd);
 		InvigilateTab.videoMsgList.put(id, btnMsg);
-		
 		InvigilateTab.numOfVideoBox++;
 	}
 
@@ -777,11 +787,11 @@ public class ProctorHomeUI extends JInternalFrame {
 					while (iter.hasNext()) {
 						System.out.println("add one");
 						temp = iter.next();
-						addOneVideoBox((String)temp.getValue().get("username"), pnInvigilate);
+						addOneVideoBox((String)temp.getValue().get("username"), (ObjectId)temp.getValue().get("_id"), pnInvigilate);
 					}
+					InvigilateTab.wantedStudentList = new ArrayList<ObjectId>();
 					
-					videoReceiveShowThread = new Displayer(InvigilateTab.wantedStudentList, InvigilateTab.videoBoxList);
-					videoReceiveShowThread.start();
+					videoReceiveShowThread = new Displayer(InvigilateTab.wantedStudentList, InvigilateTab.videoBoxList, 6002);
 				}
 			} else {
 				lblTimeToGo.setText("here is UpdateTimeToGoBeforeExam. something goes wrong");
@@ -954,8 +964,8 @@ public class ProctorHomeUI extends JInternalFrame {
 
 		public static int numOfVideoBox = 0;
 		
-		public static TreeMap<String, JButton> btnShowList = new TreeMap<String, JButton>();
-		public static TreeMap<String, JLabel> videoBoxList = new TreeMap<String, JLabel>();
+		public static TreeMap<String, JButton> btnShowList = new TreeMap<String, JButton>(); // student username
+		public static TreeMap<String, JLabel> videoBoxList = new TreeMap<String, JLabel>(); // student_id
 		public static TreeMap<String, JLabel> videoIdList = new TreeMap<String, JLabel>();
 		public static TreeMap<String, JButton> videoWarnList = new TreeMap<String, JButton>();
 		public static TreeMap<String, JButton> videoEndList = new TreeMap<String, JButton>();
@@ -979,6 +989,7 @@ public class ProctorHomeUI extends JInternalFrame {
 			InvigilateTab.lblIncomingMsg.setText("");
 			InvigilateTab.lblIncomingMsg.setVisible(false);
 			
+			while (videoReceiveShowThread != null && videoReceiveShowThread.isAlive());
 			Iterator<String> iter = videoBoxList.keySet().iterator();
 			String temp = null;
 			while (iter.hasNext()) {
@@ -1000,7 +1011,7 @@ public class ProctorHomeUI extends JInternalFrame {
 				videoIdList.get(temp).setVisible(false);
 				videoIdList.remove(temp);
 			}
-			
+						
 			iter = videoWarnList.keySet().iterator();
 			while (iter.hasNext()) {
 				temp = iter.next();

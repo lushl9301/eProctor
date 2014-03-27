@@ -8,6 +8,8 @@ import javax.imageio.ImageIO;
 import com.googlecode.javacv.CanvasFrame;
 import com.googlecode.javacv.cpp.opencv_core.IplImage;
 
+import entity.RecordObject;
+
 public class VideoServerThread implements Runnable {
 //    private HashMap<String, PassImg> passHashMap;
     private HashMap<String, RecordObject> receivedList;

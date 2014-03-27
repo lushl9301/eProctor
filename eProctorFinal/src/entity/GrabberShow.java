@@ -1,3 +1,5 @@
+package entity;
+
 import static com.googlecode.javacv.cpp.opencv_core.*;
 
 import java.awt.image.BufferedImage;
@@ -19,7 +21,7 @@ public class GrabberShow extends Thread {
     //public CanvasFrame canvas = new CanvasFrame("Web Cam");
     public boolean shouldEnd = false;
     private ObjectOutputStream sOutput;
-    private int port = MainForGrabberShow.port2;
+    private int port;
     private String userId;
     private Socket socket;
     private JLabel videoBox;
@@ -28,8 +30,8 @@ public class GrabberShow extends Thread {
         this.port = port;
         this.userId = student_id;
         this.videoBox = videoBox;
-        //canvas.setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE);
         this.start();
+        //canvas.setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE);
         //new Thread(this, "send image").start();
     }
 

@@ -88,7 +88,6 @@ public class DesktopUI extends JFrame {
 
 		graphicsDevice.setFullScreenWindow(this);
 		validate();
-		
 		controller.showLogin();
 		
 		Main.loginController = new entity.LoginController();

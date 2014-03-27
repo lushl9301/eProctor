@@ -67,7 +67,6 @@ public class Messager {
 			String name = "";
 			DBObject mingzi = Main.mongoHQ.proctor.findOne(new BasicDBObject("_id", (ObjectId)o.get("senderId")));
 			System.out.println("sender id: " + o.get("senderId"));
-			System.out.println("Messager here: mingzi: " + mingzi);
 			if (mingzi == null)
 				mingzi = Main.mongoHQ.student.findOne(new BasicDBObject("_id", (ObjectId)o.get("senderId")));
 			if (mingzi == null) {

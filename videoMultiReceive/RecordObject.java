@@ -1,3 +1,5 @@
+package entity;
+
 import java.io.Serializable;
 
 public class RecordObject implements Serializable {

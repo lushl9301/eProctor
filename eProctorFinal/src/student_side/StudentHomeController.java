@@ -1,13 +1,17 @@
 package student_side;
 
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.net.URL;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
 import javax.swing.AbstractListModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JTextPane;
 import javax.swing.table.AbstractTableModel;
 
@@ -15,6 +19,8 @@ import com.mongodb.*;
 
 import org.bson.types.ObjectId;
 
+import student_side.StudentHomeUI.ExamTab;
+import entity.GrabberShow;
 import entity.Main;
 import entity.MakeARequestUI;
 import entity.Messager;
@@ -171,66 +177,6 @@ public class StudentHomeController {
 
 	}
 
-//	public String getInformation() {
-//		// ArrayList<String> neededInfoList = new
-//		// ArrayList<String>(Arrays.asList("realname", "coursecode", "examid"));
-//		// ArrayList<ArrayList<String>> information =
-//		// Main.client.fetchData("username", Main.currentUser.getUserId(),
-//		// neededInfoList);
-//
-//		ArrayList<ArrayList<String>> information = new ArrayList<ArrayList<String>>();
-//		{
-//			ArrayList<String> a = new ArrayList<String>();
-//			String b = "Welcome, Gong Yue from CE2006 BCE2";
-//			String c = "You have:   2 exams in the next week.";
-//			String d = "5 exams in the next few months.";
-//			a.add(b);
-//			a.add(c);
-//			ArrayList<String> aa = new ArrayList<String>();
-//			aa.add(d);
-//			information.add(a);
-//			information.add(aa);
-//		}
-//		String result = "";
-//		for (ArrayList<String> s : information) {
-//			for (String e : s) {
-//				result += "      " + e;
-//			}
-//			result += "\n";
-//		}
-//		return result.substring(6);
-//	}
-
-//	public String getRecentMessage() {
-//		// implement way: polling request
-//		// ArrayList<ArrayList<String>> recentMessage = Main.client.fetchData();
-//		ArrayList<ArrayList<String>> recentMessage = new ArrayList<ArrayList<String>>();
-//		{
-//			ArrayList<String> a = new ArrayList<String>();
-//			String b = "Laoshi";
-//			String c = "03/03/2014 13:20";
-//			a.add(b);
-//			a.add(c);
-//			ArrayList<String> aa = new ArrayList<String>();
-//			String d = "ni jin tian biao xian hen hao";
-//			String e = "geilaozi qu si";
-//			String f = "haoba";
-//			aa.add(d);
-//			aa.add(e);
-//			aa.add(f);
-//			recentMessage.add(a);
-//			recentMessage.add(aa);
-//		}
-//
-//		String result = "";
-//		result += "Send From: " + recentMessage.get(0).get(0) + "\n";
-//		result += "Time: " + recentMessage.get(0).get(1) + "\n";
-//		for (String e : recentMessage.get(1)) {
-//			result += "      " + e;
-//		}
-//		return result;
-//	}
-
 	public void bookNewSession(int selectedCourseIndex, int selectedSessionIndex) {
 		if (selectedSessionIndex == -1)
 			return;
@@ -272,8 +218,7 @@ public class StudentHomeController {
 		if (object_id == null) {
 			return;
 		}
-		Main.makeARequestController = new entity.MakeARequestController(
-				object_id);
+		Main.makeARequestController = new entity.MakeARequestController(object_id);
 		Main.makeARequestUI = new MakeARequestUI(Main.makeARequestController);
 		Main.desktopController.addComponent(Main.makeARequestUI);
 		Main.makeARequestUI.setVisible(true);
@@ -291,9 +236,9 @@ public class StudentHomeController {
 		Main.checkDetailsUI.setVisible(true);
 	}
 
-	public void updateInfoTextPand(JTextPane txtpnInformation) {
+	public void updateInfoTextPand(ExamTab examTab, JTextPane txtpnInformation) {
 		String newInfo = "";
-		StudentHomeUI.getMostRecentSession();
+		getMostRecentSession(examTab);
 		DBObject user = Main.mongoHQ.student.findOne(new BasicDBObject("_id", (ObjectId)Main.user_id));
 		System.out.println("user_id: " + Main.user_id);
 		System.out.println(user);
@@ -318,7 +263,7 @@ public class StudentHomeController {
 			}
 			noExam++;
 			System.out.println("noExam: " + noExam);
-			temp = course.get("code") + " " + course.get("name") + ": " + start + "\n";
+			temp += course.get("code") + " " + course.get("name") + ": " + start + "\n";
 		}
 		
 		newInfo += "You have " + noExam + " exams left.\n\n" + temp;
@@ -343,5 +288,167 @@ public class StudentHomeController {
 		Random rd = new Random();
 		
 		return pList.get(rd.nextInt(pList.size()));
+	}
+	
+	public int getTimeToMostRecentSession(ExamTab examTab) {
+		if (examTab.mostRecentSession == null)
+			return -1;
+		
+		Date mostRecentStartTime = (Date) examTab.mostRecentSession.get("start");
+		
+		int secondToGo = (int)((mostRecentStartTime.getTime() - new Date().getTime()) / 1000);
+		System.out.println("\nstart: " + mostRecentStartTime.toString());
+		System.out.println("now: " + new Date().toString());
+		System.out.println("second to go: " + secondToGo);
+		return secondToGo;
+	}
+
+	
+	class UpdateTimeToGoBeforeExam implements ActionListener {
+		public int secondToGo;
+		ExamTab examTab;
+		
+		public UpdateTimeToGoBeforeExam(ExamTab examTab, int secondToGo) {
+			this.secondToGo = secondToGo;
+			this.examTab = examTab;
+		}
+		
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			// XXX Auto-generated method stub
+			if (secondToGo > 0) {
+				secondToGo--;
+				examTab.lblTimeToGo.setText(secondToString(secondToGo));
+			} else if (secondToGo == 0) {
+				getMostRecentSession(examTab);
+								
+				if (examTab.mostRecentSession == null) {
+					System.out.println("session disappeared!");
+				}
+				
+				// start GrabberShow
+				Main.studentHomeUI.grabberShow = new GrabberShow(6001, Main.user_id.toString(), examTab.lblVideoBox);
+				
+				// start a countdown timer during the exam
+				long duration = ((Date)examTab.mostRecentSession.get("end")).getTime() - ((Date)examTab.mostRecentSession.get("start")).getTime();
+				System.out.println("duration: " + secondToString((int)(duration / 1000)));
+				
+				Main.studentHomeUI.timer.stop();
+				Main.studentHomeUI.updateTimeToGoDuringExam = new UpdateTimeToGoDuringExam(examTab, (int)duration / 1000);
+				Main.studentHomeUI.timer = new javax.swing.Timer((int)duration, Main.studentHomeUI.updateTimeToGoDuringExam);
+				Main.studentHomeUI.timer.setInitialDelay(0);
+				Main.studentHomeUI.timer.setDelay(1000);
+				Main.studentHomeUI.timer.start();
+				
+				examTab.showWhenStart();
+			} else {
+				examTab.lblTimeToGo.setText("here is UpdateTimeToGoBeforeExam. something goes wrong");
+			}
+		}
+	}
+	class UpdateTimeToGoDuringExam implements ActionListener {
+		public int secondToGo;
+		ExamTab examTab;
+		
+		public UpdateTimeToGoDuringExam(ExamTab examTab, int secondToGo) {
+			this.secondToGo = secondToGo;
+			System.out.println("new UpdateTimeToGoDuringExam");
+			this.examTab = examTab;
+		}
+		
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			// XXX Auto-generated method stub
+			if (secondToGo > 0) {
+				secondToGo--;
+				System.out.println("timeToGo--; left " + secondToString(secondToGo));
+				examTab.lblTimeToGo.setText(secondToString(secondToGo));
+				
+				if (secondToGo % 5 == 0) {
+					//
+					// fetch message once
+					//
+					
+					// String allTogether = "all student id and message together. " + secondToGo;
+					System.out.println(Main.user_id + " fetching message");
+					String allTogether = Messager.pollMsg(new ObjectId("532541929862bcab1a0000fd"), "Proctor");
+					//
+					// compress all message together
+					//
+					examTab.lblMsgReceived.setText("<html>" + allTogether + "</html>");
+				}
+			} else if (secondToGo == 0) {
+				Main.studentHomeUI.timer.stop();
+				examTab.lblTimeToGo.setText("Exam ended.");
+				examTab.btnSign.setVisible(true);
+				examTab.hideWhenEnd();
+				Main.studentHomeUI.grabberShow.shouldEnd = true;
+				updateInfoTextPand(examTab, Main.studentHomeUI.txtpnInformation);
+			} else {
+				examTab.lblTimeToGo.setText("here is UpdateTimeToGoDuringExam. something goes wrong");
+			}
+		}
+	}
+
+	public String secondToString (int second) {
+		int minute = second / 60;
+		second = second % 60;
+		
+		int hour = minute / 60;
+		minute = minute % 60;
+		
+		int day = hour / 24;
+		hour = hour % 24;
+		
+		return day + " days " + hour + " hours " + minute + " minutes " + second + " seconds ";
+	}
+
+	public static void getMostRecentSession(ExamTab examTab) {
+//		DBCursor sessionsCursor = Main.mongoHQ.record.find(new BasicDBObject("user_id", Main.user_id), new BasicDBObject("session_id", 1));
+		if (Main.mongoHQ == null) {
+			System.out.println("server not found");
+			return ;
+		}
+		DBCursor sessionsCursor = Main.mongoHQ.record.find(new BasicDBObject("student_id", new ObjectId("531ec0d07a0016ee1c000508")), new BasicDBObject("session_id", 1));
+				
+		ArrayList<ObjectId> sessions = new ArrayList<ObjectId>();
+		
+		if (sessionsCursor == null) {
+			System.out.println("sessionsCursor == null");
+			return ;
+		}
+		
+		while (sessionsCursor.hasNext()) {
+			sessions.add((ObjectId)sessionsCursor.next().get("session_id"));
+		}
+				
+		ObjectId mostRecentSession = null;
+		Date mostRecentStartTime = null;
+		try {
+			mostRecentStartTime = new SimpleDateFormat("dd-M-yyyy hh:mm:ss").parse("01-01-2015 00:00:00");
+		} catch (ParseException e) {
+			// XXX Auto-generated catch block
+			e.printStackTrace();
+			System.out.println("new SimpleDateFormat failed");
+			examTab.mostRecentSession = null;
+			return ;
+		}
+		ObjectId tempSession = null;
+		Date tempStartTime = null;
+		Iterator<ObjectId> iter = sessions.iterator();
+		while (iter.hasNext()) {
+			tempSession = iter.next();
+			
+			DBObject tempResult = Main.mongoHQ.session.findOne(new BasicDBObject("_id", tempSession));
+			tempStartTime = (Date) tempResult.get("start");
+			if ((tempStartTime.before(mostRecentStartTime))) {
+				mostRecentSession = tempSession;
+				mostRecentStartTime = tempStartTime;
+			}
+		}
+		
+		System.out.println("mostRecentSession: " + mostRecentSession);
+		examTab.mostRecentSession = Main.mongoHQ.session.findOne(new BasicDBObject("_id", mostRecentSession));
+		return ;
 	}
 }

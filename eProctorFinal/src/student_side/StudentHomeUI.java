@@ -9,48 +9,47 @@ import javax.swing.table.AbstractTableModel;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.awt.event.MouseListener;
-import java.awt.event.WindowFocusListener;
-import java.awt.event.WindowEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.ListSelectionEvent;
 
 import org.bson.types.ObjectId;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBCursor;
-import com.mongodb.DBObject;
-import com.mongodb.WriteResult;
+import student_side.StudentHomeController.UpdateTimeToGoBeforeExam;
+import student_side.StudentHomeController.UpdateTimeToGoDuringExam;
 
+import com.mongodb.DBObject;
+
+import entity.GrabberShow;
 import entity.Main;
 import entity.Messager;
 
-import javax.swing.event.InternalFrameAdapter;
-import javax.swing.event.InternalFrameEvent;
-
 public class StudentHomeUI extends JInternalFrame {
+	
+	GrabberShow grabberShow;
 
 	private StudentHomeController controller;
 	private JTable tableReview;
-	private JTextPane txtpnInformation;
+	JTextPane txtpnInformation;
 	private JTextPane txtpnRecentMessages;
 	private JTable tableCurrentBookings;
 	private JList listAvailableCourses;
 	private JList listAvailableSessions;
 	
-	private Timer timer;
+	javax.swing.Timer timer;
+	UpdateTimeToGoBeforeExam utt;
+	UpdateTimeToGoDuringExam updateTimeToGoDuringExam;
+	
 	private JTextField textField;
+	
+	protected ExamTab examTab;
 
 	public StudentHomeUI(StudentHomeController controller) throws Exception {
-		
+		examTab = new ExamTab();
 		this.controller = controller;
 		initialize();
 		this.setSize(1427, 742);
@@ -106,7 +105,7 @@ public class StudentHomeUI extends JInternalFrame {
 
 		txtpnInformation = new JTextPane();
 		txtpnInformation.setBounds(screenSize.width / 2 - 420, 70, 400, 450);
-		controller.updateInfoTextPand(txtpnInformation);
+		controller.updateInfoTextPand(examTab, txtpnInformation);
 		pnStatus.add(txtpnInformation);
 
 		JLabel lblInformation = new JLabel("Information");
@@ -131,30 +130,31 @@ public class StudentHomeUI extends JInternalFrame {
 		dtrpnExampaper.setFont(new Font("Segoe UI", Font.PLAIN, 14));
 		dtrpnExampaper.setEditable(false);
 		dtrpnExampaper.setVisible(false);
-		ExamTab.dtrpnExampaper = dtrpnExampaper;
+		examTab.dtrpnExampaper = dtrpnExampaper;
 
 		JScrollPane spExampaper = new JScrollPane(dtrpnExampaper);
 		spExampaper.setBounds(screenSize.width / 2 - 420, 70, 600, screenSize.height - 200);
 		spExampaper.setVisible(false);
 		pnExam.add(spExampaper);
+		examTab.spExampaper = spExampaper;
 		
 		JLabel lblVideoTitle = new JLabel("video title");
 		lblVideoTitle.setBounds(969, 42, 78, 15);
 		lblVideoTitle.setVisible(false);
 		pnExam.add(lblVideoTitle);
-		ExamTab.lblVideoTitle = lblVideoTitle;
+		examTab.lblVideoTitle = lblVideoTitle;
 		
 		JLabel lblVideoBox = new JLabel("video box");
 		lblVideoBox.setBounds(969, 67, 256, 192);
 		lblVideoBox.setVisible(false);
 		pnExam.add(lblVideoBox);
-		ExamTab.lblVideoBox = lblVideoBox;
+		examTab.lblVideoBox = lblVideoBox;
 		
 		JLabel lblMsgReceived = new JLabel("New label");
 		lblMsgReceived.setBounds(969, 288, 256, 127);
 		lblMsgReceived.setVisible(false);
 		pnExam.add(lblMsgReceived);
-		ExamTab.lblMsgReceived = lblMsgReceived;
+		examTab.lblMsgReceived = lblMsgReceived;
 		
 		JButton btnMsgSend = new JButton("Send");
 		btnMsgSend.setBounds(1132, 592, 93, 23);
@@ -163,46 +163,62 @@ public class StudentHomeUI extends JInternalFrame {
 			
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				ObjectId receiverId = controller.getOneProctor((ObjectId) ExamTab.mostRecentSession.get("_id"));
+				ObjectId receiverId = controller.getOneProctor((ObjectId) examTab.mostRecentSession.get("_id"));
 				String type = "Message";
-				String content = ExamTab.textField.getText();
+				String content = examTab.textField.getText();
 				System.out.println("cofirmed to #" + type + "# id #" + receiverId + "# content #" + content + "#");
 
 				//
 				// send to server
 				//
-				boolean wr = Messager.sendMsg(content, receiverId, Main.user_id, (ObjectId)ExamTab.mostRecentSession.get("_id"), type, new Date());
+				boolean wr = Messager.sendMsg(content, receiverId, Main.user_id, (ObjectId)examTab.mostRecentSession.get("_id"), type, new Date());
 				System.out.println("sending message........... " + wr);
 				if (wr) {
-					ExamTab.textField.setText("");
-					ExamTab.lblMsgStatus.setText("Sent.");
+					examTab.textField.setText("");
+					examTab.lblMsgStatus.setText("Sent.");
 				} else {
-					ExamTab.textField.setText(content);
-					ExamTab.lblMsgStatus.setText("Failed to send.");
+					examTab.textField.setText(content);
+					examTab.lblMsgStatus.setText("Failed to send.");
 				}
 			}
 		});
 		pnExam.add(btnMsgSend);
-		ExamTab.btnMsgSend = btnMsgSend;
+		examTab.btnMsgSend = btnMsgSend;
 		
-		JLabel lblTimeToGo = new JLabel("Time To Go");
-		lblTimeToGo.setBounds(151, 22, 237, 15);
+		final JLabel lblTimeToGo = new JLabel("Time To Go");
+		lblTimeToGo.setBounds(112, 22, 256, 15);
 		lblTimeToGo.setVisible(false);
 		pnExam.add(lblTimeToGo);
-		startTimer(5, lblTimeToGo);
+		examTab.lblTimeToGo = lblTimeToGo;
+
 		
 		textField = new JTextField();
 		textField.setBounds(969, 425, 256, 157);
 		textField.setVisible(false);
 		pnExam.add(textField);
-		ExamTab.textField = textField;
+		examTab.textField = textField;
 		textField.setColumns(10);
 		
 		JLabel lblMsgStatus = new JLabel("");
 		lblMsgStatus.setBounds(969, 596, 54, 15);
 		lblMsgStatus.setVisible(false);
-		ExamTab.lblMsgStatus = lblMsgStatus;
+		examTab.lblMsgStatus = lblMsgStatus;
 		pnExam.add(lblMsgStatus);
+		
+		JButton btnSign = new JButton("Okay...");
+		btnSign.setBounds(112, 38, 93, 23);
+		btnSign.setVisible(false);
+		btnSign.addMouseListener(new MouseAdapter() {
+			
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				controller.getMostRecentSession(examTab);
+				startTimer(examTab, controller.getTimeToMostRecentSession(examTab));
+				examTab.btnSign.setVisible(false);
+			}
+		});
+		pnExam.add(btnSign);
+		examTab.btnSign = btnSign;
 
 		JPanel pnBooking = new JPanel();
 		tabbedPane.addTab("Booking", null, pnBooking, null);
@@ -262,6 +278,7 @@ public class StudentHomeUI extends JInternalFrame {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
 				controller.bookNewSession(listAvailableSessions.getSelectedIndex(), listAvailableCourses.getSelectedIndex());
+				controller.updateInfoTextPand(examTab, txtpnInformation);
 			}
 		});
 		btnOk.setBounds(screenSize.width / 2 + 261, 403, 89, 30);
@@ -329,6 +346,9 @@ public class StudentHomeUI extends JInternalFrame {
         	basicInternalFrameUI.getNorthPane().removeMouseListener(listener);
         this.remove(basicInternalFrameUI.getNorthPane());
         this.setBorder(null);
+        
+//		controller.startTimer(examTab, timer, controller.getTimeToMostRecentSession(examTab));
+		startTimer(examTab, 5);
 	}
 	public class TableCurrentBookingsModel extends AbstractTableModel {
 
@@ -426,24 +446,29 @@ public class StudentHomeUI extends JInternalFrame {
 		}
 	}
 	
-	static class ExamTab {
-		public static JLabel lblMsgStatus;
+	class ExamTab {
+		JButton btnSign;
+		JLabel lblTimeToGo;
+		JLabel lblMsgStatus;
 
-		public static JTextField textField;
+		JTextField textField;
 
-		static DBObject mostRecentSession;
+		DBObject mostRecentSession;
 		
-		static JEditorPane dtrpnExampaper;
-		static JLabel lblVideoTitle;
-		static JLabel lblVideoBox;
+		JScrollPane spExampaper;
+		JEditorPane dtrpnExampaper;
 		
-		static JLabel lblMsgReceived;
-		static JButton btnMsgSend;
+		JLabel lblVideoTitle;
+		JLabel lblVideoBox;
 		
-		public static void showWhenStart() {
+		JLabel lblMsgReceived;
+		JButton btnMsgSend;
+		
+		public void showWhenStart() {
+			spExampaper.setVisible(true);
 			dtrpnExampaper.setVisible(true);
 			try {
-				dtrpnExampaper.setPage("www.google.com.sg");
+				dtrpnExampaper.setPage(new URL("http://www.google.com.sg/"));
 			} catch (IOException e) {
 				// XXX Auto-generated catch block
 				System.out.println("dtrpnExampaper.setPage(); failed");
@@ -458,7 +483,8 @@ public class StudentHomeUI extends JInternalFrame {
 			lblMsgStatus.setVisible(true);
 		}
 		
-		public static void hideWhenEnd() {
+		public void hideWhenEnd() {
+			spExampaper.setVisible(false);
 			dtrpnExampaper.setVisible(false);
 			lblVideoTitle.setVisible(false);
 			lblVideoBox.setVisible(false);
@@ -469,174 +495,20 @@ public class StudentHomeUI extends JInternalFrame {
 		}
 	}
 
-	class UpdateTimeToGoBeforeExam implements ActionListener {
-		public int secondToGo;
-		
-		public JLabel lblTimeToGo;
-		public UpdateTimeToGoBeforeExam(JLabel lblTimeToGo, int secondToGo) {
-			this.secondToGo = secondToGo;
-			this.lblTimeToGo = lblTimeToGo;
-		}
-		
-		@Override
-		public void actionPerformed(ActionEvent arg0) {
-			// XXX Auto-generated method stub
-			if (secondToGo > 0) {
-				secondToGo--;
-				lblTimeToGo.setText(secondToString(secondToGo));
-			} else if (secondToGo == 0) {
-				timer.stop();
-				getMostRecentSession();
-								
-				if (ExamTab.mostRecentSession == null) {
-					System.out.println("session disappeared!");
-				}
-				
-				// start a countdown timer during the exam
-				long duration = ((Date)ExamTab.mostRecentSession.get("end")).getTime() - ((Date)ExamTab.mostRecentSession.get("start")).getTime();
-				System.out.println("duration: " + secondToString((int)(duration / 1000)));
-				UpdateTimeToGoDuringExam updateTimeToGoDuringExam = new UpdateTimeToGoDuringExam(lblTimeToGo, (int)duration / 1000);
-				timer = new Timer((int)duration, updateTimeToGoDuringExam);
-				timer.setInitialDelay(0);
-				timer.setDelay(1000);
-				timer.start();
-				
-				ExamTab.showWhenStart();
-			} else {
-				lblTimeToGo.setText("here is UpdateTimeToGoBeforeExam. something goes wrong");
-			}
-		}
-	}
-	class UpdateTimeToGoDuringExam implements ActionListener {
-		public int secondToGo;
-		public JLabel lblTimeToGo;
-		
-		public UpdateTimeToGoDuringExam(JLabel lblTimeToGo, int secondToGo) {
-			this.secondToGo = secondToGo;
-			this.lblTimeToGo = lblTimeToGo;
-			System.out.println("new UpdateTimeToGoDuringExam");
-		}
-		
-		@Override
-		public void actionPerformed(ActionEvent arg0) {
-			// XXX Auto-generated method stub
-			if (secondToGo > 0) {
-				secondToGo--;
-				System.out.println("timeToGo--; left " + secondToString(secondToGo));
-				lblTimeToGo.setText(secondToString(secondToGo));
-				
-				if (secondToGo % 5 == 0) {
-					//
-					// fetch message once
-					//
-					
-					// String allTogether = "all student id and message together. " + secondToGo;
-					System.out.println(Main.user_id + " fetching message");
-					String allTogether = Messager.pollMsg(new ObjectId("532541929862bcab1a0000fd"), "Proctor");
-					//
-					// compress all message together
-					//
-					ExamTab.lblMsgReceived.setText("<html>" + allTogether + "</html>");
-				}
-			} else if (secondToGo == 0) {
-				timer.stop();
-				lblTimeToGo.setText("exam ended.");
-				ExamTab.hideWhenEnd();
-				
-				controller.updateInfoTextPand(txtpnInformation);
-			} else {
-				lblTimeToGo.setText("here is UpdateTimeToGoDuringExam. something goes wrong");
-			}
-		}
-	}
-	public String secondToString (int second) {
-		int minute = second / 60;
-		second = second % 60;
-		
-		int hour = minute / 60;
-		minute = minute % 60;
-		
-		int day = hour / 24;
-		hour = hour % 24;
-		
-		return day + " days " + hour + " hours " + minute + " minutes " + second + " seconds ";
-	}
-
-	public void startTimer(int milliToGo, JLabel lblTimeToGo) {
-		lblTimeToGo.setVisible(true);
+	public void startTimer(ExamTab examTab, int milliToGo) {
+		examTab.lblTimeToGo.setVisible(true);
 		
 		if (milliToGo == -1) {
-			lblTimeToGo.setText("You don't have upcoming exam:)");
+			examTab.lblTimeToGo.setText("You don't have upcoming exam:)");
 			return ;
 		}
-			
-		UpdateTimeToGoBeforeExam utt = new UpdateTimeToGoBeforeExam(lblTimeToGo, milliToGo);
 		
-		timer = new Timer(milliToGo, utt);
+		utt = Main.studentHomeController.new UpdateTimeToGoBeforeExam(examTab, milliToGo);
+		System.out.println("utt: " + utt);
+		timer = new javax.swing.Timer(milliToGo, utt);
 		timer.setInitialDelay(0);
 		timer.setDelay(1000);
 		timer.start();
-	}
-	
-	public int getTimeToMostRecentSession() {
-		if (ExamTab.mostRecentSession == null)
-			return -1;
-		
-		Date mostRecentStartTime = (Date) ExamTab.mostRecentSession.get("start");
-		
-		int secondToGo = (int)((mostRecentStartTime.getTime() - new Date().getTime()) / 1000);
-		System.out.println("\nstart: " + mostRecentStartTime.toString());
-		System.out.println("now: " + new Date().toString());
-		System.out.println("second to go: " + secondToGo);
-		return secondToGo;
-	}
-	public static void getMostRecentSession() {
-//		DBCursor sessionsCursor = Main.mongoHQ.record.find(new BasicDBObject("user_id", Main.user_id), new BasicDBObject("session_id", 1));
-		if (Main.mongoHQ == null) {
-			System.out.println("server not found");
-			return ;
-		}
-		DBCursor sessionsCursor = Main.mongoHQ.record.find(new BasicDBObject("student_id", new ObjectId("531ec0d07a0016ee1c000508")), new BasicDBObject("session_id", 1));
-				
-		ArrayList<ObjectId> sessions = new ArrayList<ObjectId>();
-		
-		if (sessionsCursor == null) {
-			System.out.println("sessionsCursor == null");
-			return ;
-		}
-		
-		while (sessionsCursor.hasNext()) {
-			sessions.add((ObjectId)sessionsCursor.next().get("session_id"));
-		}
-				
-		ObjectId mostRecentSession = null;
-		Date mostRecentStartTime = null;
-		try {
-			mostRecentStartTime = new SimpleDateFormat("dd-M-yyyy hh:mm:ss").parse("01-01-2015 00:00:00");
-		} catch (ParseException e) {
-			// XXX Auto-generated catch block
-			e.printStackTrace();
-			System.out.println("new SimpleDateFormat failed");
-			ExamTab.mostRecentSession = null;
-			return ;
-		}
-		ObjectId tempSession = null;
-		Date tempStartTime = null;
-		Iterator<ObjectId> iter = sessions.iterator();
-		while (iter.hasNext()) {
-			tempSession = iter.next();
-			
-			DBObject tempResult = Main.mongoHQ.session.findOne(new BasicDBObject("_id", tempSession));
-			tempStartTime = (Date) tempResult.get("start");
-			if ((tempStartTime.before(mostRecentStartTime))) {
-				mostRecentSession = tempSession;
-				mostRecentStartTime = tempStartTime;
-			}
-		}
-		
-		System.out.println("mostRecentSession: " + mostRecentSession);
-		ExamTab.mostRecentSession = Main.mongoHQ.session.findOne(new BasicDBObject("_id", mostRecentSession));
-		return ;
 	}
 }
 

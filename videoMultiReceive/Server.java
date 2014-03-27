@@ -1,6 +1,8 @@
 import java.io.*;
 import java.util.HashMap;
 
+import entity.RecordObject;
+
 public class Server {
     private static int port1 = 6001;
     private static int port2 = 6002;
