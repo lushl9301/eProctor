@@ -6,6 +6,7 @@ import java.util.Date;
 
 import org.bson.types.ObjectId;
 
+import com.mongodb.BasicDBObject;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.QueryBuilder;
@@ -27,6 +28,14 @@ public class MakeARequestController {
 	}
 	
 	public void deleteRecord() {
+		QueryBuilder qb = new QueryBuilder();
+		qb.put("_id").is(record_id);
+		Main.mongoHQ.record.remove(qb.get());
+		
+		DBObject findQuery = new BasicDBObject("_id", Main.user_id);
+		DBObject updateQuery = new BasicDBObject("$addToSet", new BasicDBObject(
+				"enrolledNotTested", objCourse.get("_id")));
+		Main.mongoHQ.student.update(findQuery, updateQuery);
 		// TODO Auto-generated method stub
 //		Main.makeARequestUI.setVisible(false);
 	}
